@@ -27,6 +27,7 @@ import { AccountsPayable } from "./pages/payments/AccountsPayable";
 import { SettingsLayout } from "./pages/settings/SettingsLayout";
 import { GeneralSettings } from "./pages/settings/GeneralSettings";
 import { BillList } from "./pages/purchases/BillList";
+import { InvoiceList } from "./pages/sales/InvoiceList";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
               <Route path="orders" element={<SalesOrderList />} />
               <Route path="orders/:id" element={<SalesOrderDetail />} />
               <Route path="order-templates" element={<CustomerList />} />
+              <Route path="invoices" element={<InvoiceList />} />
             </Route>
             
             {/* Purchases Module */}
