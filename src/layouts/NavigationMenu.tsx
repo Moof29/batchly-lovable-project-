@@ -10,6 +10,7 @@ const menuItems = [
     path: "/sales",
     subItems: [
       { title: "Sales Orders", icon: FileText, path: "/sales/orders" },
+      { title: "Sales Order Templates", icon: FileText, path: "/sales/order-templates" },
       { title: "Invoices", icon: FileText, path: "/sales/invoices" }
     ]
   },
