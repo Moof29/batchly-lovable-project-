@@ -1,4 +1,3 @@
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -14,6 +13,9 @@ import { SalesOrderDetail } from "./pages/sales/SalesOrderDetail";
 import { PurchasesLayout } from "./pages/purchases/PurchasesLayout";
 import { PurchaseOrderList } from "./pages/purchases/PurchaseOrderList";
 import { PurchaseOrderDetail } from "./pages/purchases/PurchaseOrderDetail";
+import { InventoryLayout } from "./pages/inventory/InventoryLayout";
+import { ItemList } from "./pages/inventory/ItemList";
+import { ItemDetail } from "./pages/inventory/ItemDetail";
 
 const queryClient = new QueryClient();
 
@@ -42,8 +44,10 @@ const App = () => (
             </Route>
             
             {/* Inventory Module */}
-            <Route path="/inventory/*" element={<div>Inventory Module (Coming Soon)</div>} />
-            <Route path="/inventory/items" element={<div>Items (Coming Soon)</div>} />
+            <Route path="/inventory" element={<InventoryLayout />}>
+              <Route path="items" element={<ItemList />} />
+              <Route path="items/:id" element={<ItemDetail />} />
+            </Route>
             
             {/* People Module */}
             <Route path="/people/*" element={<div>People Module (Coming Soon)</div>} />
