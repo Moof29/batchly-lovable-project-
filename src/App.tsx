@@ -28,6 +28,7 @@ import { SettingsLayout } from "./pages/settings/SettingsLayout";
 import { GeneralSettings } from "./pages/settings/GeneralSettings";
 import { BillList } from "./pages/purchases/BillList";
 import { InvoiceList } from "./pages/sales/InvoiceList";
+import { BillDetail } from "./pages/purchases/BillDetail";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ const App = () => (
               <Route path="orders" element={<PurchaseOrderList />} />
               <Route path="orders/:id" element={<PurchaseOrderDetail />} />
               <Route path="bills" element={<BillList />} />
+              <Route path="bills/:id" element={<BillDetail />} />
             </Route>
             
             {/* Inventory Module */}
