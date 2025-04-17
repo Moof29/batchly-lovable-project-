@@ -1,3 +1,4 @@
+
 import { FileText, Home, ShoppingCart, Package, Users, DollarSign, CreditCard, Briefcase, Clock, Settings, BarChart4, Receipt, Wallet } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -10,8 +11,7 @@ const menuItems = [
     subItems: [
       { title: "Sales Orders", icon: FileText, path: "/sales/orders" },
       { title: "Sales Order Templates", icon: FileText, path: "/sales/order-templates" },
-      { title: "Invoices", icon: FileText, path: "/sales/invoices" },
-      { title: "Accounts Receivable", icon: Receipt, path: "/sales/accounts-receivable" }
+      { title: "Invoices", icon: FileText, path: "/sales/invoices" }
     ]
   },
   { 
@@ -20,8 +20,7 @@ const menuItems = [
     path: "/purchases",
     subItems: [
       { title: "Purchase Orders", icon: FileText, path: "/purchases/orders" },
-      { title: "Bills", icon: FileText, path: "/purchases/bills" },
-      { title: "Accounts Payable", icon: Wallet, path: "/purchases/accounts-payable" }
+      { title: "Bills", icon: FileText, path: "/purchases/bills" }
     ]
   },
   { 
@@ -46,7 +45,11 @@ const menuItems = [
   { 
     title: "Payments", 
     icon: CreditCard, 
-    path: "/payments" 
+    path: "/payments",
+    subItems: [
+      { title: "Accounts Receivable", icon: Receipt, path: "/payments/accounts-receivable" },
+      { title: "Accounts Payable", icon: Wallet, path: "/payments/accounts-payable" }
+    ]
   },
   { 
     title: "Settings", 
@@ -61,7 +64,7 @@ export const NavigationMenu = () => {
   const renderMenuItem = (item: typeof menuItems[0], isSubItem = false) => {
     const isActive = location.pathname === item.path;
     const hasSubItems = 'subItems' in item && item.subItems?.length > 0;
-    const isParentOfActive = hasSubItems && item.subItems?.some(subItem => location.pathname === subItem.path);
+    const isParentOfActive = hasSubItems && item.subItems?.some(subItem => location.pathname.startsWith(subItem.path));
     
     return (
       <div key={item.path}>
