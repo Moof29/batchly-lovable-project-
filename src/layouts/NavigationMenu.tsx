@@ -2,7 +2,7 @@
 import { FileText, ShoppingCart, Package, Users, DollarSign, CreditCard, Briefcase, Clock, Settings, BarChart4, Receipt, Wallet, ChevronDown } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 const menuItems = [
@@ -64,6 +64,21 @@ const menuItems = [
 export const NavigationMenu = () => {
   const location = useLocation();
   const [openSections, setOpenSections] = useState<string[]>([]);
+
+  // Set initial open sections based on current route
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const sectionsToOpen = menuItems
+      .filter(item => item.subItems && currentPath.startsWith(item.path))
+      .map(item => item.title);
+    
+    if (sectionsToOpen.length > 0) {
+      setOpenSections(prev => {
+        const newSections = [...new Set([...prev, ...sectionsToOpen])];
+        return newSections;
+      });
+    }
+  }, [location.pathname]);
 
   const toggleSection = (title: string) => {
     setOpenSections(current => 
