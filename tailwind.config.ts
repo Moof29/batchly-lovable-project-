@@ -25,7 +25,7 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         
-        // Brand Colors
+        // Brand Colors - Navy Blue Theme
         brand: {
           300: "hsl(var(--brand-300))",
           400: "hsl(var(--brand-400))",
