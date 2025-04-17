@@ -1,4 +1,3 @@
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -22,6 +21,11 @@ import { CustomerList } from "./pages/people/CustomerList";
 import { VendorList } from "./pages/people/VendorList";
 import { EmployeeList } from "./pages/people/EmployeeList";
 import { TimeTrackingList } from "./pages/people/TimeTrackingList";
+import { PaymentsLayout } from "./pages/payments/PaymentsLayout";
+import { AccountsReceivable } from "./pages/payments/AccountsReceivable";
+import { AccountsPayable } from "./pages/payments/AccountsPayable";
+import { SettingsLayout } from "./pages/settings/SettingsLayout";
+import { GeneralSettings } from "./pages/settings/GeneralSettings";
 
 const queryClient = new QueryClient();
 
@@ -64,10 +68,15 @@ const App = () => (
             </Route>
             
             {/* Payments Module */}
-            <Route path="/payments/*" element={<div>Payments (Coming Soon)</div>} />
+            <Route path="/payments" element={<PaymentsLayout />}>
+              <Route path="accounts-receivable" element={<AccountsReceivable />} />
+              <Route path="accounts-payable" element={<AccountsPayable />} />
+            </Route>
             
             {/* Settings Module */}
-            <Route path="/settings/*" element={<div>Settings (Coming Soon)</div>} />
+            <Route path="/settings" element={<SettingsLayout />}>
+              <Route index element={<GeneralSettings />} />
+            </Route>
             
             {/* 404 Not Found */}
             <Route path="*" element={<NotFound />} />
