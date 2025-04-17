@@ -22,12 +22,12 @@ export const NavigationMenu = () => {
           to={item.path}
           className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
             location.pathname === item.path
-              ? "bg-brand-500 text-white"
-              : "hover:bg-gray-100 text-gray-700"
+              ? "bg-primary text-primary-foreground shadow-sm"
+              : "hover:bg-accent hover:text-accent-foreground"
           }`}
         >
           <item.icon className="h-5 w-5" />
-          <span>{item.title}</span>
+          <span className="font-medium">{item.title}</span>
         </Link>
       ))}
     </div>

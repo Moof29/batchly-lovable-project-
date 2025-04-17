@@ -4,72 +4,53 @@
 
 @layer base {
   :root {
-    --background: 240 20% 10%;
-    --foreground: 0 0% 98%;
+    --background: 222 47% 97%;
+    --foreground: 217 33% 17%;
     
     /* Brand Colors - Navy Blue Theme */
-    --brand-500: 220 68% 39%; /* Deep Navy Blue */
-    --brand-400: 220 68% 49%; /* Slightly Lighter Navy */
-    --brand-600: 220 68% 29%; /* Darker Navy */
-    --brand-300: 220 68% 59%; /* Lighter Navy Blue */
-    --brand-700: 220 68% 19%; /* Very Dark Navy */
+    --brand-500: 217 33% 17%; /* Primary Navy */
+    --brand-400: 215 25% 27%;
+    --brand-600: 217 33% 17%;
+    --brand-300: 221 29% 37%;
+    --brand-700: 224 31% 47%;
     
-    /* Accent Colors - Complementary to Navy Blue */
-    --accent-purple: 270 50% 49%;
-    --accent-orange: 25 68% 49%;
-    --accent-blue: 200 68% 59%;
+    /* Card and UI Colors */
+    --card: 0 0% 100%;
+    --card-foreground: 217 33% 17%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 217 33% 17%;
     
-    /* Neutral Colors */
-    --neutral-50: 220 20% 98%;
-    --neutral-100: 220 20% 96%;
-    --neutral-200: 220 15% 91%;
-    --neutral-300: 220 15% 84%;
-    --neutral-400: 220 15% 65%;
-    --neutral-500: 220 15% 47%;
-    --neutral-600: 220 15% 35%;
-    --neutral-700: 220 15% 27%;
-    --neutral-800: 220 20% 17%;
-    --neutral-900: 220 25% 11%;
+    /* UI Elements */
+    --primary: 217 33% 17%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 217 33% 17%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 217 33% 17%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 217 33% 17%;
     
     /* System Colors */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 20% 98%;
     --success: 142 72% 29%;
     --warning: 38 92% 50%;
-    --error: 0 84% 60%;
-    --info: 206 100% 50%;
+    --info: 199 89% 48%;
     
-    /* UI Element Colors */
-    --card: 240 20% 10%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 20% 10%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 220 68% 39%; /* Using Navy Blue as primary */
-    --primary-foreground: 0 0% 98%;
-    --secondary: 220 15% 35%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 220 15% 27%;
-    --muted-foreground: 220 15% 65%;
-    --accent: 220 15% 35%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 220 15% 35%;
-    --input: 220 15% 35%;
-    --ring: 220 68% 49%;
-    --radius: 0.5rem;
+    /* Border and Input */
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 224 71% 45%;
     
-    --sidebar-background: 240 20% 10%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 220 68% 39%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 220 15% 27%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 220 15% 35%;
-    --sidebar-ring: 220 68% 49%;
+    --radius: 1rem;
   }
 
   .dark {
-    --background: 240 20% 10%;
-    --foreground: 0 0% 98%;
+    --background: 222 47% 11%;
+    --foreground: 213 31% 91%;
+    
+    --card: 222 47% 11%;
+    --card-foreground: 213 31% 91%;
     
     /* Dark Mode Adjustments for Navy Blue */
     --brand-500: 220 68% 39%;
@@ -111,7 +92,6 @@
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground;
   }
