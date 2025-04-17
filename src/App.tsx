@@ -7,6 +7,9 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import { SalesLayout } from "./pages/sales/SalesLayout";
+import { SalesOrderList } from "./pages/sales/SalesOrderList";
+import { SalesOrderDetail } from "./pages/sales/SalesOrderDetail";
 
 const queryClient = new QueryClient();
 
@@ -21,11 +24,10 @@ const App = () => (
             <Route path="/" element={<Index />} />
             
             {/* Sales Module */}
-            <Route path="/sales/*" element={<div>Sales Module (Coming Soon)</div>} />
-            <Route path="/sales/orders" element={<div>Sales Orders (Coming Soon)</div>} />
-            <Route path="/sales/order-templates" element={<div>Sales Order Templates (Coming Soon)</div>} />
-            <Route path="/sales/invoices" element={<div>Invoices (Coming Soon)</div>} />
-            <Route path="/sales/accounts-receivable" element={<div>Accounts Receivable (Coming Soon)</div>} />
+            <Route path="/sales" element={<SalesLayout />}>
+              <Route path="orders" element={<SalesOrderList />} />
+              <Route path="orders/:id" element={<SalesOrderDetail />} />
+            </Route>
             
             {/* Purchases Module */}
             <Route path="/purchases/*" element={<div>Purchases Module (Coming Soon)</div>} />
