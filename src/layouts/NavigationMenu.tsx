@@ -1,3 +1,4 @@
+
 import { FileText, Home, ShoppingCart, Package, Users, DollarSign, CreditCard, Briefcase, Clock, Settings, BarChart4, Receipt, Wallet } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -66,29 +67,31 @@ export const NavigationMenu = () => {
     const isParentOfActive = hasSubItems && item.subItems?.some(subItem => location.pathname.startsWith(subItem.path));
     
     return (
-      <div key={item.path}>
+      <div key={item.path} className="relative">
         <Link
           to={item.path}
-          className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+          className={`flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${
             isActive || isParentOfActive
               ? "bg-primary text-primary-foreground shadow-sm"
-              : "hover:bg-accent hover:text-accent-foreground"
+              : "hover:bg-accent/50 hover:text-accent-foreground"
           } ${isSubItem ? "ml-6" : ""}`}
         >
-          <item.icon className="h-5 w-5" />
-          <span className="font-medium">{item.title}</span>
+          <item.icon className="h-5 w-5 flex-shrink-0" />
+          <span className="font-medium text-sm">{item.title}</span>
         </Link>
         
-        {hasSubItems && item.subItems?.map((subItem) => 
-          renderMenuItem(subItem, true)
+        {hasSubItems && (
+          <div className="mt-1 space-y-1">
+            {item.subItems?.map((subItem) => renderMenuItem(subItem, true))}
+          </div>
         )}
       </div>
     );
   };
 
   return (
-    <div className="space-y-2 py-4">
+    <nav className="space-y-1 py-4 px-2">
       {menuItems.map((item) => renderMenuItem(item))}
-    </div>
+    </nav>
   );
 };

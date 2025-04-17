@@ -34,7 +34,12 @@ export const InvoiceList = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">Invoices</h1>
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Invoices</h1>
+          <p className="text-sm text-muted-foreground">
+            Manage and track your customer invoices
+          </p>
+        </div>
         <Button asChild>
           <Link to="/sales/invoices/new">
             <Plus className="mr-2 h-4 w-4" />
@@ -43,44 +48,52 @@ export const InvoiceList = () => {
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
+      <Card className="border-border/50">
+        <CardHeader className="px-6">
           <CardTitle>All Invoices</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-6">
           {isLoading ? (
-            <div>Loading...</div>
+            <div className="flex items-center justify-center h-32 text-muted-foreground">
+              Loading...
+            </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Invoice #</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Balance Due</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {invoices?.map((invoice) => (
-                  <TableRow key={invoice.id}>
-                    <TableCell>{invoice.invoice_number}</TableCell>
-                    <TableCell>{new Date(invoice.invoice_date).toLocaleDateString()}</TableCell>
-                    <TableCell>{invoice.customer_profile?.display_name}</TableCell>
-                    <TableCell className="capitalize">{invoice.status}</TableCell>
-                    <TableCell>${invoice.total.toFixed(2)}</TableCell>
-                    <TableCell>${invoice.balance_due.toFixed(2)}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="outline" asChild>
-                        <Link to={`/sales/invoices/${invoice.id}`}>View</Link>
-                      </Button>
-                    </TableCell>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Invoice #</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Total</TableHead>
+                    <TableHead className="text-right">Balance Due</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {invoices?.map((invoice) => (
+                    <TableRow key={invoice.id}>
+                      <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
+                      <TableCell>{new Date(invoice.invoice_date).toLocaleDateString()}</TableCell>
+                      <TableCell>{invoice.customer_profile?.display_name}</TableCell>
+                      <TableCell>
+                        <span className="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium capitalize bg-primary/10 text-primary">
+                          {invoice.status}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">${invoice.total.toFixed(2)}</TableCell>
+                      <TableCell className="text-right">${invoice.balance_due.toFixed(2)}</TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="outline" size="sm" asChild>
+                          <Link to={`/sales/invoices/${invoice.id}`}>View</Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
