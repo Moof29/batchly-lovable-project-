@@ -7,34 +7,54 @@
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     
-    --brand-primary: 146, 70%, 40%; /* Green from logo */
-    --brand-secondary: 14, 88%, 58%; /* Soft orange from logo background */
+    /* Brand Colors */
+    --brand-500: 145 68% 49%; /* #2ecc71 - Logo green */
+    --brand-400: 145 68% 59%; /* Lighter green */
+    --brand-600: 145 68% 39%; /* Darker green */
+    --brand-300: 145 68% 69%; /* Very light green */
+    --brand-700: 145 68% 29%; /* Very dark green */
     
+    /* Accent Colors - Complementary to brand green */
+    --accent-purple: 270 68% 49%;
+    --accent-orange: 25 68% 49%;
+    --accent-blue: 200 68% 49%;
+    
+    /* Neutral Colors */
+    --neutral-50: 210 40% 98%;
+    --neutral-100: 210 40% 96%;
+    --neutral-200: 214 32% 91%;
+    --neutral-300: 213 27% 84%;
+    --neutral-400: 215 20% 65%;
+    --neutral-500: 215 16% 47%;
+    --neutral-600: 215 19% 35%;
+    --neutral-700: 215 25% 27%;
+    --neutral-800: 217 33% 17%;
+    --neutral-900: 222 47% 11%;
+    
+    /* System Colors */
+    --success: 142 72% 29%;
+    --warning: 38 92% 50%;
+    --error: 0 84% 60%;
+    --info: 206 100% 50%;
+    
+    /* UI Element Colors */
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-    
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 145 68% 49%; /* Using brand green as primary */
     --primary-foreground: 210 40% 98%;
-    
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-    
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
-    
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    
+    --ring: 145 68% 49%; /* Using brand green for focus rings */
     --radius: 0.5rem;
     
     --sidebar-background: 0 0% 98%;
@@ -58,30 +78,31 @@
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     
+    /* Dark Mode Adjustments */
+    --brand-500: 145 68% 49%; /* Keeping brand green consistent */
+    --brand-400: 145 50% 59%;
+    --brand-600: 145 50% 39%;
+    --brand-300: 145 50% 69%;
+    --brand-700: 145 50% 29%;
+    
+    /* Dark Mode UI Colors */
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-    
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    
-    --primary: 210 40% 98%;
+    --primary: 145 68% 49%;
     --primary-foreground: 222.2 47.4% 11.2%;
-    
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-    
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
-    
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --ring: 145 68% 49%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
