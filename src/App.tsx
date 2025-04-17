@@ -1,4 +1,3 @@
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -27,6 +26,7 @@ import { AccountsReceivable } from "./pages/payments/AccountsReceivable";
 import { AccountsPayable } from "./pages/payments/AccountsPayable";
 import { SettingsLayout } from "./pages/settings/SettingsLayout";
 import { GeneralSettings } from "./pages/settings/GeneralSettings";
+import { BillList } from "./pages/purchases/BillList";
 
 const queryClient = new QueryClient();
 
@@ -44,13 +44,14 @@ const App = () => (
             <Route path="/sales" element={<SalesLayout />}>
               <Route path="orders" element={<SalesOrderList />} />
               <Route path="orders/:id" element={<SalesOrderDetail />} />
+              <Route path="order-templates" element={<CustomerList />} />
             </Route>
             
             {/* Purchases Module */}
             <Route path="/purchases" element={<PurchasesLayout />}>
               <Route path="orders" element={<PurchaseOrderList />} />
               <Route path="orders/:id" element={<PurchaseOrderDetail />} />
-              <Route path="bills" element={<div>Bills (Coming Soon)</div>} />
+              <Route path="bills" element={<BillList />} />
             </Route>
             
             {/* Inventory Module */}
