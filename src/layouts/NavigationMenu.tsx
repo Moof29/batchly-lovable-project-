@@ -65,11 +65,11 @@ export const NavigationMenu = () => {
   const location = useLocation();
   const [openSections, setOpenSections] = useState<string[]>([]);
 
-  // Set initial open sections based on current route
+  // Set initial open sections and maintain expanded state based on current route
   useEffect(() => {
     const currentPath = location.pathname;
     const sectionsToOpen = menuItems
-      .filter(item => item.subItems && currentPath.startsWith(item.path))
+      .filter(item => item.subItems && (currentPath === item.path || currentPath.startsWith(item.path + '/')))
       .map(item => item.title);
     
     if (sectionsToOpen.length > 0) {
