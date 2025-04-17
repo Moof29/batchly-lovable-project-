@@ -1,4 +1,3 @@
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -26,6 +25,7 @@ const App = () => (
             <Route path="/sales/orders" element={<div>Sales Orders (Coming Soon)</div>} />
             <Route path="/sales/order-templates" element={<div>Sales Order Templates (Coming Soon)</div>} />
             <Route path="/sales/invoices" element={<div>Invoices (Coming Soon)</div>} />
+            <Route path="/sales/accounts-receivable" element={<div>Accounts Receivable (Coming Soon)</div>} />
             
             {/* Purchases Module */}
             <Route path="/purchases/*" element={<div>Purchases Module (Coming Soon)</div>} />
