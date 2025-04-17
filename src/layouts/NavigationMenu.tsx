@@ -9,7 +9,8 @@ const menuItems = [
     icon: DollarSign, 
     path: "/sales",
     subItems: [
-      { title: "Sales Orders", icon: FileText, path: "/sales/orders" }
+      { title: "Sales Orders", icon: FileText, path: "/sales/orders" },
+      { title: "Invoices", icon: FileText, path: "/sales/invoices" }
     ]
   },
   { title: "Purchases", icon: ShoppingCart, path: "/purchases" },

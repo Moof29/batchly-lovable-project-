@@ -21,9 +21,10 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/sales/*" element={<div>Sales Module (Coming Soon)</div>} />
+            <Route path="/sales/orders" element={<div>Sales Orders (Coming Soon)</div>} />
+            <Route path="/sales/invoices" element={<div>Invoices (Coming Soon)</div>} />
             <Route path="/purchases/*" element={<div>Purchases Module (Coming Soon)</div>} />
             <Route path="/inventory/*" element={<div>Inventory Module (Coming Soon)</div>} />
-            <Route path="/accounting/*" element={<div>Accounting Module (Coming Soon)</div>} />
             <Route path="/people/*" element={<div>People Module (Coming Soon)</div>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
