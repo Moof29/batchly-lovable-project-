@@ -14,7 +14,3 @@ export {
   SidebarMenuButton,
 } from "./sidebar-menu"
 
-7. Delete the original sidebar.tsx file since we've moved everything:
-
-<lov-delete file_path="src/components/ui/sidebar.tsx" />
-
