@@ -18,8 +18,11 @@ import { ItemList } from "./pages/inventory/ItemList";
 import { ItemDetail } from "./pages/inventory/ItemDetail";
 import { PeopleLayout } from "./pages/people/PeopleLayout";
 import { CustomerList } from "./pages/people/CustomerList";
+import { CustomerDetail } from "./pages/people/CustomerDetail";
 import { VendorList } from "./pages/people/VendorList";
+import { VendorDetail } from "./pages/people/VendorDetail";
 import { EmployeeList } from "./pages/people/EmployeeList";
+import { EmployeeDetail } from "./pages/people/EmployeeDetail";
 import { TimeTrackingList } from "./pages/people/TimeTrackingList";
 import { PaymentsLayout } from "./pages/payments/PaymentsLayout";
 import { AccountsReceivable } from "./pages/payments/AccountsReceivable";
@@ -29,6 +32,8 @@ import { GeneralSettings } from "./pages/settings/GeneralSettings";
 import { BillList } from "./pages/purchases/BillList";
 import { InvoiceList } from "./pages/sales/InvoiceList";
 import { BillDetail } from "./pages/purchases/BillDetail";
+import { InvoiceDetail } from "./pages/sales/InvoiceDetail";
+import { TimeEntryDetail } from "./pages/people/TimeEntryDetail";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +53,7 @@ const App = () => (
               <Route path="orders/:id" element={<SalesOrderDetail />} />
               <Route path="order-templates" element={<CustomerList />} />
               <Route path="invoices" element={<InvoiceList />} />
+              <Route path="invoices/:id" element={<InvoiceDetail />} />
             </Route>
             
             {/* Purchases Module */}
@@ -67,9 +73,13 @@ const App = () => (
             {/* People Module */}
             <Route path="/people" element={<PeopleLayout />}>
               <Route path="customers" element={<CustomerList />} />
+              <Route path="customers/:id" element={<CustomerDetail />} />
               <Route path="vendors" element={<VendorList />} />
+              <Route path="vendors/:id" element={<VendorDetail />} />
               <Route path="employees" element={<EmployeeList />} />
+              <Route path="employees/:id" element={<EmployeeDetail />} />
               <Route path="time-tracking" element={<TimeTrackingList />} />
+              <Route path="time-tracking/:id" element={<TimeEntryDetail />} />
             </Route>
             
             {/* Payments Module */}
