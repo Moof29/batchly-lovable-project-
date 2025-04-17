@@ -13,4 +13,4 @@ export {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "./sidebar-menu"
-
+export { SidebarTrigger } from "./sidebar-trigger"

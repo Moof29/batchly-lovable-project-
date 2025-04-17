@@ -1,7 +1,6 @@
-
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
-import { cva } from "class-variance-authority"
+import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useSidebar } from "./sidebar-context"
@@ -112,4 +111,3 @@ export const SidebarMenuButton = React.forwardRef<
   }
 )
 SidebarMenuButton.displayName = "SidebarMenuButton"
-
