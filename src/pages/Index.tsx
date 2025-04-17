@@ -1,7 +1,5 @@
-
 import { MainLayout } from "@/layouts/MainLayout";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { LogoIcon } from "@/components/LogoIcon";
 import { LineChart, Wallet, Users, ShoppingCart } from "lucide-react";
 
 const Index = () => {
@@ -9,10 +7,7 @@ const Index = () => {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <LogoIcon className="h-12 w-12" />
-            <h1 className="text-2xl font-semibold tracking-tight">Dashboard Overview</h1>
-          </div>
+          <h1 className="text-2xl font-semibold tracking-tight">Dashboard Overview</h1>
         </div>
         
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">

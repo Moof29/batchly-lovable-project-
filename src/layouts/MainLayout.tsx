@@ -2,12 +2,16 @@
 import { Header } from "@/components/ui/header";
 import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
 import { NavigationMenu } from "./NavigationMenu";
+import { LogoIcon } from "@/components/LogoIcon";
 
 export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen flex w-full bg-background">
       <Sidebar className="border-r border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <SidebarContent>
+          <div className="p-4 mb-2">
+            <LogoIcon className="h-10 w-10" />
+          </div>
           <NavigationMenu />
         </SidebarContent>
       </Sidebar>
