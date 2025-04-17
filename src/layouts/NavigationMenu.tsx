@@ -1,9 +1,9 @@
-
 import { FileText, ShoppingCart, Package, Users, DollarSign, CreditCard, Briefcase, Clock, Settings, BarChart4, Receipt, Wallet, ChevronDown } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { useSidebar } from "@/components/ui/sidebar";
 
 const menuItems = [
   { title: "Dashboard", icon: BarChart4, path: "/" },
@@ -64,8 +64,9 @@ const menuItems = [
 export const NavigationMenu = () => {
   const location = useLocation();
   const [openSections, setOpenSections] = useState<string[]>([]);
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
 
-  // Set initial open sections and maintain expanded state based on current route
   useEffect(() => {
     const currentPath = location.pathname;
     const sectionsToOpen = menuItems
@@ -93,7 +94,7 @@ export const NavigationMenu = () => {
     const hasSubItems = 'subItems' in item && item.subItems?.length > 0;
     const isOpen = openSections.includes(item.title);
     const isParentOfActive = hasSubItems && item.subItems?.some(subItem => location.pathname.startsWith(subItem.path));
-    
+
     if (hasSubItems) {
       return (
         <div key={item.path} className="relative">
@@ -101,26 +102,34 @@ export const NavigationMenu = () => {
             <CollapsibleTrigger 
               onClick={() => toggleSection(item.title)}
               className={cn(
-                "flex w-full items-center justify-between px-4 py-2.5 rounded-lg transition-all duration-200",
+                "flex w-full items-center justify-between px-3 py-2 rounded-lg transition-all duration-200",
                 (isActive || isParentOfActive || isOpen)
                   ? "bg-primary text-primary-foreground shadow-sm"
-                  : "hover:bg-accent/50 hover:text-accent-foreground"
+                  : "hover:bg-accent/50 hover:text-accent-foreground",
+                isCollapsed && "justify-center px-2"
               )}
             >
-              <div className="flex items-center space-x-3">
+              <div className={cn(
+                "flex items-center",
+                !isCollapsed && "space-x-3"
+              )}>
                 <item.icon className="h-5 w-5 flex-shrink-0" />
-                <span className="font-medium text-sm">{item.title}</span>
+                {!isCollapsed && <span className="font-medium text-sm">{item.title}</span>}
               </div>
-              <ChevronDown 
-                className={cn(
-                  "h-4 w-4 transition-transform duration-200",
-                  isOpen ? "transform rotate-180" : ""
-                )} 
-              />
+              {!isCollapsed && (
+                <ChevronDown 
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-200",
+                    isOpen ? "transform rotate-180" : ""
+                  )} 
+                />
+              )}
             </CollapsibleTrigger>
-            <CollapsibleContent className="mt-1">
-              {item.subItems?.map((subItem) => renderMenuItem(subItem, true))}
-            </CollapsibleContent>
+            {!isCollapsed && (
+              <CollapsibleContent className="mt-1">
+                {item.subItems?.map((subItem) => renderMenuItem(subItem, true))}
+              </CollapsibleContent>
+            )}
           </Collapsible>
         </div>
       );
@@ -131,22 +140,24 @@ export const NavigationMenu = () => {
         <Link
           to={item.path}
           className={cn(
-            "flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-all duration-200",
+            "flex items-center px-3 py-2 rounded-lg transition-all duration-200",
             isActive
               ? "bg-primary text-primary-foreground shadow-sm"
               : "hover:bg-accent/50 hover:text-accent-foreground",
-            isSubItem ? "ml-6" : ""
+            !isCollapsed && "space-x-3",
+            isSubItem && !isCollapsed && "ml-6",
+            isCollapsed && "justify-center px-2"
           )}
         >
           <item.icon className="h-5 w-5 flex-shrink-0" />
-          <span className="font-medium text-sm">{item.title}</span>
+          {!isCollapsed && <span className="font-medium text-sm">{item.title}</span>}
         </Link>
       </div>
     );
   };
 
   return (
-    <nav className="space-y-1 py-4 px-2">
+    <nav className="space-y-1 py-2 px-2">
       {menuItems.map((item) => renderMenuItem(item))}
     </nav>
   );
