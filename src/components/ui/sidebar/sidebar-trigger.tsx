@@ -1,7 +1,7 @@
 
 import * as React from "react"
 import { Button } from "@/components/ui/button"
-import { Menu } from "lucide-react"
+import { ChevronLeft, ChevronRight, Menu } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "./sidebar-context"
 
@@ -19,7 +19,7 @@ export const SidebarTrigger = React.forwardRef<
       variant="ghost"
       size="icon"
       className={cn(
-        "h-9 w-9 rounded-full",
+        "h-9 w-9 rounded-md",
         state === "expanded" ? "text-foreground" : "text-primary",
         className
       )}
@@ -27,7 +27,11 @@ export const SidebarTrigger = React.forwardRef<
       aria-label={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
       {...props}
     >
-      <Menu className="h-5 w-5" />
+      {isMobile ? (
+        <Menu className="h-5 w-5" />
+      ) : (
+        state === "expanded" ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />
+      )}
     </Button>
   )
 })

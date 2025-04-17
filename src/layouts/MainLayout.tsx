@@ -21,7 +21,7 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
               </TooltipTrigger>
               {isCollapsed && <TooltipContent side="right">Batchly</TooltipContent>}
             </Tooltip>
-            <SidebarTrigger className="hidden md:flex" />
+            {!isCollapsed && <SidebarTrigger className="hidden md:flex" />}
           </div>
           <NavigationMenu />
         </SidebarContent>
@@ -29,7 +29,7 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
       <div className="flex-1 flex flex-col min-h-screen">
         <Header>
           <div className="flex-1 flex items-center">
-            <SidebarTrigger className="text-foreground h-10 w-10 flex items-center justify-center" />
+            <SidebarTrigger className="text-foreground h-10 w-10 flex items-center justify-center md:ml-0" />
           </div>
         </Header>
         <main className="flex-1 p-6 overflow-auto">
