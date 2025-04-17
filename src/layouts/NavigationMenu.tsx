@@ -1,4 +1,4 @@
-import { FileText, Home, ShoppingCart, Package, Users, DollarSign, CreditCard, Briefcase, Clock, Settings, BarChart4, Receipt } from "lucide-react";
+import { FileText, Home, ShoppingCart, Package, Users, DollarSign, CreditCard, Briefcase, Clock, Settings, BarChart4, Receipt, Wallet } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const menuItems = [
@@ -20,7 +20,8 @@ const menuItems = [
     path: "/purchases",
     subItems: [
       { title: "Purchase Orders", icon: FileText, path: "/purchases/orders" },
-      { title: "Bills", icon: FileText, path: "/purchases/bills" }
+      { title: "Bills", icon: FileText, path: "/purchases/bills" },
+      { title: "Accounts Payable", icon: Wallet, path: "/purchases/accounts-payable" }
     ]
   },
   { 

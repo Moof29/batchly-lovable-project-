@@ -31,6 +31,7 @@ const App = () => (
             <Route path="/purchases/*" element={<div>Purchases Module (Coming Soon)</div>} />
             <Route path="/purchases/orders" element={<div>Purchase Orders (Coming Soon)</div>} />
             <Route path="/purchases/bills" element={<div>Bills (Coming Soon)</div>} />
+            <Route path="/purchases/accounts-payable" element={<div>Accounts Payable (Coming Soon)</div>} />
             
             {/* Inventory Module */}
             <Route path="/inventory/*" element={<div>Inventory Module (Coming Soon)</div>} />
