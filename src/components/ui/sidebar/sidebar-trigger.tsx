@@ -20,8 +20,8 @@ export const SidebarTrigger = React.forwardRef<
       size="icon"
       className={cn(
         "h-9 w-9 rounded-md hover:bg-muted",
-        isMobile ? "text-foreground" : 
-          state === "expanded" ? "text-foreground" : "text-primary",
+        isMobile ? "text-primary font-bold" : 
+          state === "expanded" ? "text-primary" : "text-primary",
         className
       )}
       onClick={toggleSidebar}

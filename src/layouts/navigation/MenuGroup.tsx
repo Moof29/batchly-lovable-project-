@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -12,7 +12,7 @@ import { MenuItem } from './MenuItem';
 interface MenuGroupProps {
   item: MenuItemType;
   isOpen: boolean;
-  onToggle: (title: string) => void;
+  onToggle: () => void;
 }
 
 export const MenuGroup: React.FC<MenuGroupProps> = ({ item, isOpen, onToggle }) => {
@@ -22,18 +22,14 @@ export const MenuGroup: React.FC<MenuGroupProps> = ({ item, isOpen, onToggle }) 
   
   const isActive = location.pathname === item.path;
   const isParentOfActive = item.subItems?.some(subItem => 
-    location.pathname === subItem.path || location.pathname.startsWith(subItem.path)
+    location.pathname === subItem.path || location.pathname.startsWith(`${subItem.path}/`)
   );
 
-  if (!item.subItems || item.subItems.length === 0) {
-    return <MenuItem item={item} />;
-  }
-
   return (
-    <div className="relative">
+    <div className="relative my-1">
       <Collapsible 
         open={isOpen} 
-        onOpenChange={(isNowOpen) => onToggle(item.title)}
+        onOpenChange={onToggle}
       >
         <CollapsibleTrigger 
           className={cn(
@@ -50,7 +46,7 @@ export const MenuGroup: React.FC<MenuGroupProps> = ({ item, isOpen, onToggle }) 
                 "flex items-center",
                 !isCollapsed && "space-x-3"
               )}>
-                <item.icon className="h-5 w-5 flex-shrink-0" />
+                <item.icon className={cn("flex-shrink-0", isCollapsed ? "h-5 w-5" : "h-4 w-4")} />
                 {!isCollapsed && <span className="font-medium text-sm">{item.title}</span>}
               </div>
             </TooltipTrigger>
@@ -67,20 +63,19 @@ export const MenuGroup: React.FC<MenuGroupProps> = ({ item, isOpen, onToggle }) 
           )}
         </CollapsibleTrigger>
 
-        {/* Regular submenu for expanded sidebar */}
         {!isCollapsed && (
-          <CollapsibleContent className="mt-1">
-            {item.subItems.map((subItem) => (
+          <CollapsibleContent className="mt-1 space-y-1">
+            {item.subItems?.map((subItem) => (
               <MenuItem key={subItem.path} item={subItem} isSubItem={true} />
             ))}
           </CollapsibleContent>
         )}
         
-        {/* Vertical submenu for collapsed sidebar */}
         {isCollapsed && isOpen && (
-          <div className="mt-1 flex flex-col items-center space-y-1">
-            {item.subItems.map((subItem) => {
-              const isSubItemActive = location.pathname === subItem.path;
+          <div className="mt-1 pt-1 pb-1 flex flex-col items-center space-y-1">
+            {item.subItems?.map((subItem) => {
+              const isSubItemActive = location.pathname === subItem.path || 
+                                      location.pathname.startsWith(`${subItem.path}/`);
               return (
                 <Tooltip key={subItem.path} delayDuration={300}>
                   <TooltipTrigger asChild>

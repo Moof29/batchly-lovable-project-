@@ -11,13 +11,16 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const isCollapsed = state === "collapsed";
   
   return (
-    <div className="min-h-screen flex w-full bg-background">
-      <Sidebar className="border-r border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="min-h-screen flex w-full bg-gray-50">
+      <Sidebar className="border-r border-border/50 bg-white shadow-md">
         <SidebarContent>
-          <div className="p-4 mb-2 flex items-center justify-between">
+          <div className="p-4 mb-4 flex items-center justify-between">
             <Tooltip>
               <TooltipTrigger asChild>
-                <LogoIcon className="h-8 w-8" />
+                <div className="flex items-center">
+                  <LogoIcon className="h-8 w-8" />
+                  {!isCollapsed && <span className="ml-2 text-lg font-semibold">Batchly</span>}
+                </div>
               </TooltipTrigger>
               {isCollapsed && <TooltipContent side="right">Batchly</TooltipContent>}
             </Tooltip>

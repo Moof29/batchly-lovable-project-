@@ -15,10 +15,10 @@ export const MenuItem: React.FC<MenuItemProps> = ({ item, isSubItem = false }) =
   const location = useLocation();
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
-  const isActive = location.pathname === item.path;
+  const isActive = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
 
   return (
-    <div className="relative">
+    <div className="relative my-1">
       <Tooltip delayDuration={300}>
         <TooltipTrigger asChild>
           <Link
@@ -29,11 +29,11 @@ export const MenuItem: React.FC<MenuItemProps> = ({ item, isSubItem = false }) =
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "hover:bg-accent/50 hover:text-accent-foreground",
               !isCollapsed && "space-x-3",
-              isSubItem && !isCollapsed && "ml-6",
+              isSubItem && !isCollapsed && "ml-6 text-sm",
               isCollapsed && "justify-center px-2"
             )}
           >
-            <item.icon className="h-5 w-5 flex-shrink-0" />
+            <item.icon className={cn("flex-shrink-0", isCollapsed ? "h-5 w-5" : "h-4 w-4")} />
             {!isCollapsed && <span className="font-medium text-sm">{item.title}</span>}
           </Link>
         </TooltipTrigger>
