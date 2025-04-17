@@ -9,9 +9,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus } from "lucide-react";
+import { Plus, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const BillList = () => {
@@ -31,53 +32,73 @@ export const BillList = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">Bills</h1>
-        <Button asChild>
-          <Link to="/purchases/bills/new">
-            <Plus className="mr-2 h-4 w-4" />
-            New Bill
-          </Link>
-        </Button>
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Bills</h1>
+          <p className="text-sm text-muted-foreground">Manage and track your bills from vendors</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="sm">
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+          <Button asChild>
+            <Link to="/purchases/bills/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Bill
+            </Link>
+          </Button>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
+      <Card className="shadow-md">
+        <CardHeader className="py-4">
           <CardTitle>All Bills</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div>Loading...</div>
+            <div className="flex items-center justify-center py-8">
+              <div className="text-sm text-muted-foreground">Loading bills...</div>
+            </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Bill #</TableHead>
-                  <TableHead>Vendor</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {bills?.map((bill) => (
-                  <TableRow key={bill.id}>
-                    <TableCell>{bill.bill_number}</TableCell>
-                    <TableCell>{bill.vendor_profile?.display_name}</TableCell>
-                    <TableCell>{new Date(bill.bill_date).toLocaleDateString()}</TableCell>
-                    <TableCell>{bill.due_date ? new Date(bill.due_date).toLocaleDateString() : '-'}</TableCell>
-                    <TableCell>${bill.total?.toFixed(2) || '0.00'}</TableCell>
-                    <TableCell className="capitalize">{bill.status}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="outline" asChild>
-                        <Link to={`/purchases/bills/${bill.id}`}>View</Link>
-                      </Button>
-                    </TableCell>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="font-medium">Bill #</TableHead>
+                    <TableHead className="font-medium">Vendor</TableHead>
+                    <TableHead className="font-medium">Date</TableHead>
+                    <TableHead className="font-medium">Due Date</TableHead>
+                    <TableHead className="font-medium">Total</TableHead>
+                    <TableHead className="font-medium">Status</TableHead>
+                    <TableHead className="text-right font-medium">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {bills?.map((bill) => (
+                    <TableRow key={bill.id} className="hover:bg-muted/50">
+                      <TableCell className="font-medium">{bill.bill_number}</TableCell>
+                      <TableCell>{bill.vendor_profile?.display_name}</TableCell>
+                      <TableCell>{new Date(bill.bill_date).toLocaleDateString()}</TableCell>
+                      <TableCell>{bill.due_date ? new Date(bill.due_date).toLocaleDateString() : '-'}</TableCell>
+                      <TableCell>${bill.total?.toFixed(2) || '0.00'}</TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={bill.status === 'paid' ? 'default' : 'secondary'}
+                          className="capitalize"
+                        >
+                          {bill.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="outline" size="sm" asChild>
+                          <Link to={`/purchases/bills/${bill.id}`}>View</Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
