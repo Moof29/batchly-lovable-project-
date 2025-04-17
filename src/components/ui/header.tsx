@@ -3,15 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bell, Search, User } from "lucide-react";
 
-interface HeaderProps {
-  children?: React.ReactNode;
-}
-
-export function Header({ children }: HeaderProps) {
+export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between space-x-4 px-4 md:px-6">
-        {children}
         <div className="flex items-center gap-4 flex-1">
           <form className="hidden lg:block flex-1 max-w-sm">
             <div className="relative">
