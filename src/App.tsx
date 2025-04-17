@@ -1,3 +1,4 @@
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -10,6 +11,9 @@ import NotFound from "./pages/NotFound";
 import { SalesLayout } from "./pages/sales/SalesLayout";
 import { SalesOrderList } from "./pages/sales/SalesOrderList";
 import { SalesOrderDetail } from "./pages/sales/SalesOrderDetail";
+import { PurchasesLayout } from "./pages/purchases/PurchasesLayout";
+import { PurchaseOrderList } from "./pages/purchases/PurchaseOrderList";
+import { PurchaseOrderDetail } from "./pages/purchases/PurchaseOrderDetail";
 
 const queryClient = new QueryClient();
 
@@ -30,10 +34,12 @@ const App = () => (
             </Route>
             
             {/* Purchases Module */}
-            <Route path="/purchases/*" element={<div>Purchases Module (Coming Soon)</div>} />
-            <Route path="/purchases/orders" element={<div>Purchase Orders (Coming Soon)</div>} />
-            <Route path="/purchases/bills" element={<div>Bills (Coming Soon)</div>} />
-            <Route path="/purchases/accounts-payable" element={<div>Accounts Payable (Coming Soon)</div>} />
+            <Route path="/purchases" element={<PurchasesLayout />}>
+              <Route path="orders" element={<PurchaseOrderList />} />
+              <Route path="orders/:id" element={<PurchaseOrderDetail />} />
+              <Route path="bills" element={<div>Bills (Coming Soon)</div>} />
+              <Route path="accounts-payable" element={<div>Accounts Payable (Coming Soon)</div>} />
+            </Route>
             
             {/* Inventory Module */}
             <Route path="/inventory/*" element={<div>Inventory Module (Coming Soon)</div>} />
