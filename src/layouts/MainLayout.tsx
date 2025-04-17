@@ -28,8 +28,8 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
       </Sidebar>
       <div className="flex-1 flex flex-col min-h-screen">
         <Header>
-          <div className="flex-1 flex items-center">
-            <SidebarTrigger className="text-foreground h-10 w-10 flex items-center justify-center md:ml-0" />
+          <div className="flex items-center">
+            <SidebarTrigger className="text-foreground mr-2" />
           </div>
         </Header>
         <main className="flex-1 p-6 overflow-auto">

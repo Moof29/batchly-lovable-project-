@@ -45,16 +45,17 @@ export const SidebarProvider = React.forwardRef<
   ) => {
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
-    const [_open, _setOpen] = React.useState(defaultOpen)
     
-    // Initialize from cookie if available
-    React.useEffect(() => {
-      const match = document.cookie.match(new RegExp(`(^| )${SIDEBAR_COOKIE_NAME}=([^;]+)`))
-      if (match) {
-        const storedValue = match[2] === 'true'
-        _setOpen(storedValue)
+    // Try to load initial state from cookie, otherwise use defaultOpen
+    const [_open, _setOpen] = React.useState<boolean>(() => {
+      if (typeof document !== "undefined") {
+        const match = document.cookie.match(new RegExp(`(^| )${SIDEBAR_COOKIE_NAME}=([^;]+)`))
+        if (match) {
+          return match[2] === 'true'
+        }
       }
-    }, [])
+      return defaultOpen
+    })
     
     const open = openProp ?? _open
     const setOpen = React.useCallback(
@@ -65,19 +66,21 @@ export const SidebarProvider = React.forwardRef<
         } else {
           _setOpen(openState)
         }
-        // Always save the state to cookie
-        document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+        // Save state to cookie
+        if (typeof document !== "undefined") {
+          document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+        }
       },
       [setOpenProp, open]
     )
 
     const toggleSidebar = React.useCallback(() => {
       if (isMobile) {
-        setOpenMobile((open) => !open)
+        setOpenMobile(!openMobile)
       } else {
-        setOpen((open) => !open)
+        setOpen(!open)
       }
-    }, [isMobile, setOpen, setOpenMobile])
+    }, [isMobile, setOpen, open, openMobile, setOpenMobile])
 
     React.useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
