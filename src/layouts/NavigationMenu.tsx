@@ -1,9 +1,9 @@
 
-import { FileText, Home, ShoppingCart, Package, Users, DollarSign } from "lucide-react";
+import { FileText, Home, ShoppingCart, Package, Users, DollarSign, CreditCard, Briefcase, Clock, Settings, BarChart4 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const menuItems = [
-  { title: "Dashboard", icon: Home, path: "/" },
+  { title: "Dashboard", icon: BarChart4, path: "/" },
   { 
     title: "Sales", 
     icon: DollarSign, 
@@ -14,9 +14,44 @@ const menuItems = [
       { title: "Invoices", icon: FileText, path: "/sales/invoices" }
     ]
   },
-  { title: "Purchases", icon: ShoppingCart, path: "/purchases" },
-  { title: "Inventory", icon: Package, path: "/inventory" },
-  { title: "People", icon: Users, path: "/people" },
+  { 
+    title: "Purchases", 
+    icon: ShoppingCart, 
+    path: "/purchases",
+    subItems: [
+      { title: "Purchase Orders", icon: FileText, path: "/purchases/orders" },
+      { title: "Bills", icon: FileText, path: "/purchases/bills" }
+    ]
+  },
+  { 
+    title: "Inventory", 
+    icon: Package, 
+    path: "/inventory",
+    subItems: [
+      { title: "Items", icon: Package, path: "/inventory/items" }
+    ]
+  },
+  { 
+    title: "People", 
+    icon: Users, 
+    path: "/people",
+    subItems: [
+      { title: "Customers", icon: Users, path: "/people/customers" },
+      { title: "Vendors", icon: Briefcase, path: "/people/vendors" },
+      { title: "Employees", icon: Users, path: "/people/employees" },
+      { title: "Time Tracking", icon: Clock, path: "/people/time-tracking" }
+    ]
+  },
+  { 
+    title: "Payments", 
+    icon: CreditCard, 
+    path: "/payments" 
+  },
+  { 
+    title: "Settings", 
+    icon: Settings, 
+    path: "/settings" 
+  },
 ];
 
 export const NavigationMenu = () => {
@@ -24,13 +59,15 @@ export const NavigationMenu = () => {
 
   const renderMenuItem = (item: typeof menuItems[0], isSubItem = false) => {
     const isActive = location.pathname === item.path;
+    const hasSubItems = 'subItems' in item && item.subItems?.length > 0;
+    const isParentOfActive = hasSubItems && item.subItems?.some(subItem => location.pathname === subItem.path);
     
     return (
       <div key={item.path}>
         <Link
           to={item.path}
           className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-            isActive
+            isActive || isParentOfActive
               ? "bg-primary text-primary-foreground shadow-sm"
               : "hover:bg-accent hover:text-accent-foreground"
           } ${isSubItem ? "ml-6" : ""}`}
@@ -39,7 +76,7 @@ export const NavigationMenu = () => {
           <span className="font-medium">{item.title}</span>
         </Link>
         
-        {'subItems' in item && item.subItems?.map((subItem) => 
+        {hasSubItems && item.subItems?.map((subItem) => 
           renderMenuItem(subItem, true)
         )}
       </div>
@@ -52,4 +89,3 @@ export const NavigationMenu = () => {
     </div>
   );
 };
-
