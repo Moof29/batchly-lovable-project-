@@ -1,3 +1,4 @@
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -16,6 +17,11 @@ import { PurchaseOrderDetail } from "./pages/purchases/PurchaseOrderDetail";
 import { InventoryLayout } from "./pages/inventory/InventoryLayout";
 import { ItemList } from "./pages/inventory/ItemList";
 import { ItemDetail } from "./pages/inventory/ItemDetail";
+import { PeopleLayout } from "./pages/people/PeopleLayout";
+import { CustomerList } from "./pages/people/CustomerList";
+import { VendorList } from "./pages/people/VendorList";
+import { EmployeeList } from "./pages/people/EmployeeList";
+import { TimeTrackingList } from "./pages/people/TimeTrackingList";
 
 const queryClient = new QueryClient();
 
@@ -50,11 +56,12 @@ const App = () => (
             </Route>
             
             {/* People Module */}
-            <Route path="/people/*" element={<div>People Module (Coming Soon)</div>} />
-            <Route path="/people/customers" element={<div>Customers (Coming Soon)</div>} />
-            <Route path="/people/vendors" element={<div>Vendors (Coming Soon)</div>} />
-            <Route path="/people/employees" element={<div>Employees (Coming Soon)</div>} />
-            <Route path="/people/time-tracking" element={<div>Time Tracking (Coming Soon)</div>} />
+            <Route path="/people" element={<PeopleLayout />}>
+              <Route path="customers" element={<CustomerList />} />
+              <Route path="vendors" element={<VendorList />} />
+              <Route path="employees" element={<EmployeeList />} />
+              <Route path="time-tracking" element={<TimeTrackingList />} />
+            </Route>
             
             {/* Payments Module */}
             <Route path="/payments/*" element={<div>Payments (Coming Soon)</div>} />
