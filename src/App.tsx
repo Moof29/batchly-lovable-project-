@@ -15,7 +15,7 @@ import { PurchaseOrderList } from "./pages/purchases/PurchaseOrderList";
 import { PurchaseOrderDetail } from "./pages/purchases/PurchaseOrderDetail";
 import { InventoryLayout } from "./pages/inventory/InventoryLayout";
 import { ItemList } from "./pages/inventory/ItemList";
-import { ItemDetail } from "./pages/inventory/ItemDetail";
+import { ItemDetailView } from "./pages/inventory/ItemDetail";
 import { PeopleLayout } from "./pages/people/PeopleLayout";
 import { CustomerList } from "./pages/people/CustomerList";
 import { VendorList } from "./pages/people/VendorList";
@@ -59,7 +59,7 @@ const App = () => (
             {/* Inventory Module */}
             <Route path="/inventory" element={<InventoryLayout />}>
               <Route path="items" element={<ItemList />} />
-              <Route path="items/:id" element={<ItemDetail />} />
+              <Route path="items/:id" element={<ItemDetailView />} />
             </Route>
             
             {/* People Module */}
