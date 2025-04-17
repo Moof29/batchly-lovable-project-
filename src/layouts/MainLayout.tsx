@@ -1,7 +1,7 @@
 
 import { Header } from "@/components/ui/header";
 import { Sidebar, SidebarContent, SidebarTrigger } from "@/components/ui/sidebar";
-import { NavigationMenu } from "./NavigationMenu";
+import { NavigationMenu } from "./navigation/NavigationMenu";
 import { LogoIcon } from "@/components/LogoIcon";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSidebar } from "@/components/ui/sidebar";
