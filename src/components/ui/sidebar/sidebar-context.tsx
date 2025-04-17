@@ -47,6 +47,15 @@ export const SidebarProvider = React.forwardRef<
     const [openMobile, setOpenMobile] = React.useState(false)
     const [_open, _setOpen] = React.useState(defaultOpen)
     
+    // Initialize from cookie if available
+    React.useEffect(() => {
+      const match = document.cookie.match(new RegExp(`(^| )${SIDEBAR_COOKIE_NAME}=([^;]+)`))
+      if (match) {
+        const storedValue = match[2] === 'true'
+        _setOpen(storedValue)
+      }
+    }, [])
+    
     const open = openProp ?? _open
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
@@ -98,8 +107,8 @@ export const SidebarProvider = React.forwardRef<
         <div
           style={
             {
-              "--sidebar-width": "16rem",
-              "--sidebar-width-icon": "3rem",
+              "--sidebar-width": "14rem",
+              "--sidebar-width-icon": "4rem",
               ...style,
             } as React.CSSProperties
           }
@@ -114,4 +123,3 @@ export const SidebarProvider = React.forwardRef<
   }
 )
 SidebarProvider.displayName = "SidebarProvider"
-

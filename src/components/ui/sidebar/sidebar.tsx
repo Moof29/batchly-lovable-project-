@@ -3,7 +3,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { useSidebar } from "./sidebar-context"
-import { SIDEBAR_WIDTH_MOBILE } from "./sidebar-constants"
+import { SIDEBAR_WIDTH, SIDEBAR_WIDTH_MOBILE, SIDEBAR_WIDTH_ICON } from "./sidebar-constants"
 
 export const Sidebar = React.forwardRef<
   HTMLDivElement,
@@ -17,7 +17,7 @@ export const Sidebar = React.forwardRef<
     {
       side = "left",
       variant = "sidebar",
-      collapsible = "offcanvas",
+      collapsible = "icon", // Changed default from "offcanvas" to "icon"
       className,
       children,
       ...props
@@ -66,7 +66,7 @@ export const Sidebar = React.forwardRef<
         ref={ref}
         className="group peer hidden md:block text-sidebar-foreground"
         data-state={state}
-        data-collapsible={state === "collapsed" ? collapsible : ""}
+        data-collapsible={collapsible}
         data-variant={variant}
         data-side={side}
       >
@@ -91,6 +91,12 @@ export const Sidebar = React.forwardRef<
               : "group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l",
             className
           )}
+          style={
+            {
+              "--sidebar-width": SIDEBAR_WIDTH,
+              "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
+            } as React.CSSProperties
+          }
           {...props}
         >
           <div
@@ -105,4 +111,3 @@ export const Sidebar = React.forwardRef<
   }
 )
 Sidebar.displayName = "Sidebar"
-
