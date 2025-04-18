@@ -1526,6 +1526,51 @@ export type Database = {
           },
         ]
       }
+      permission_audit_log: {
+        Row: {
+          action: Database["public"]["Enums"]["permission_action"]
+          affected_role: Database["public"]["Enums"]["user_role"] | null
+          affected_user_id: string | null
+          id: string
+          ip_address: string | null
+          new_value: boolean
+          organization_id: string
+          previous_value: boolean | null
+          resource: Database["public"]["Enums"]["permission_resource"]
+          timestamp: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["permission_action"]
+          affected_role?: Database["public"]["Enums"]["user_role"] | null
+          affected_user_id?: string | null
+          id?: string
+          ip_address?: string | null
+          new_value: boolean
+          organization_id: string
+          previous_value?: boolean | null
+          resource: Database["public"]["Enums"]["permission_resource"]
+          timestamp?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["permission_action"]
+          affected_role?: Database["public"]["Enums"]["user_role"] | null
+          affected_user_id?: string | null
+          id?: string
+          ip_address?: string | null
+          new_value?: boolean
+          organization_id?: string
+          previous_value?: boolean | null
+          resource?: Database["public"]["Enums"]["permission_resource"]
+          timestamp?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -1757,6 +1802,36 @@ export type Database = {
           permission?: Database["public"]["Enums"]["role_permission"]
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      role_permissions: {
+        Row: {
+          action: Database["public"]["Enums"]["permission_action"]
+          allowed: boolean
+          created_at: string
+          id: string
+          resource: Database["public"]["Enums"]["permission_resource"]
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["permission_action"]
+          allowed?: boolean
+          created_at?: string
+          id?: string
+          resource: Database["public"]["Enums"]["permission_resource"]
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["permission_action"]
+          allowed?: boolean
+          created_at?: string
+          id?: string
+          resource?: Database["public"]["Enums"]["permission_resource"]
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
         }
         Relationships: []
       }
@@ -2628,6 +2703,42 @@ export type Database = {
           },
         ]
       }
+      user_permissions: {
+        Row: {
+          action: Database["public"]["Enums"]["permission_action"]
+          allowed: boolean
+          created_at: string
+          granted_by: string | null
+          id: string
+          organization_id: string
+          resource: Database["public"]["Enums"]["permission_resource"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["permission_action"]
+          allowed: boolean
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          organization_id: string
+          resource: Database["public"]["Enums"]["permission_resource"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["permission_action"]
+          allowed?: boolean
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          organization_id?: string
+          resource?: Database["public"]["Enums"]["permission_resource"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       users: {
         Row: {
           auth_id: string | null
@@ -2857,11 +2968,35 @@ export type Database = {
     }
     Functions: {
       user_has_permission: {
-        Args: { permission: string }
+        Args:
+          | {
+              p_user_id: string
+              p_resource: Database["public"]["Enums"]["permission_resource"]
+              p_action: Database["public"]["Enums"]["permission_action"]
+            }
+          | { permission: string }
         Returns: boolean
       }
     }
     Enums: {
+      permission_action: "create" | "read" | "update" | "delete" | "manage"
+      permission_resource:
+        | "users"
+        | "customers"
+        | "vendors"
+        | "employees"
+        | "inventory"
+        | "items"
+        | "sales_orders"
+        | "purchase_orders"
+        | "invoices"
+        | "bills"
+        | "payments"
+        | "accounts"
+        | "time_tracking"
+        | "reports"
+        | "settings"
+        | "integrations"
       role_permission:
         | "view_dashboard"
         | "manage_users"
@@ -3004,6 +3139,25 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      permission_action: ["create", "read", "update", "delete", "manage"],
+      permission_resource: [
+        "users",
+        "customers",
+        "vendors",
+        "employees",
+        "inventory",
+        "items",
+        "sales_orders",
+        "purchase_orders",
+        "invoices",
+        "bills",
+        "payments",
+        "accounts",
+        "time_tracking",
+        "reports",
+        "settings",
+        "integrations",
+      ],
       role_permission: [
         "view_dashboard",
         "manage_users",

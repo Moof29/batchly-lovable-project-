@@ -13,6 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
+import { PermissionGate } from "@/components/PermissionGate";
 
 export const ItemList = () => {
   const { data: items, isLoading } = useQuery({
@@ -36,12 +37,14 @@ export const ItemList = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Inventory Items</h1>
-        <Button asChild>
-          <Link to="/inventory/items/new">
-            <Plus className="mr-2 h-4 w-4" />
-            New Item
-          </Link>
-        </Button>
+        <PermissionGate resource="items" action="create">
+          <Button asChild>
+            <Link to="/inventory/items/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Item
+            </Link>
+          </Button>
+        </PermissionGate>
       </div>
 
       <Card>
@@ -74,9 +77,11 @@ export const ItemList = () => {
                     </TableCell>
                     <TableCell>-</TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" asChild>
-                        <Link to={`/inventory/items/${item.id}`}>View</Link>
-                      </Button>
+                      <PermissionGate resource="items" action="read">
+                        <Button variant="outline" asChild>
+                          <Link to={`/inventory/items/${item.id}`}>View</Link>
+                        </Button>
+                      </PermissionGate>
                     </TableCell>
                   </TableRow>
                 ))}
