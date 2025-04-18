@@ -1,5 +1,5 @@
 
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   Home, 
   Package, 
@@ -24,18 +24,25 @@ const menuItems = [
 ];
 
 export const Navigation = () => {
+  const location = useLocation();
+  
   return (
     <SidebarMenu>
-      {menuItems.map((item) => (
-        <SidebarMenuItem key={item.title}>
-          <SidebarMenuButton asChild>
-            <Link to={item.path}>
-              <item.icon className="mr-2 h-4 w-4" />
-              <span>{item.title}</span>
-            </Link>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
+      {menuItems.map((item) => {
+        const isActive = location.pathname === item.path || 
+                         (item.path !== '/' && location.pathname.startsWith(item.path));
+        
+        return (
+          <SidebarMenuItem key={item.title}>
+            <SidebarMenuButton asChild isActive={isActive}>
+              <Link to={item.path}>
+                <item.icon className="mr-2 h-4 w-4" />
+                <span>{item.title}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        );
+      })}
     </SidebarMenu>
   );
 };
