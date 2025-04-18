@@ -14,11 +14,38 @@ import { supabase } from "@/integrations/supabase/client";
 import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PermissionGate } from "@/components/PermissionGate";
+import { useDevMode } from "@/contexts/DevModeContext";
 
 export const ItemList = () => {
+  const { isDevMode } = useDevMode();
+  console.log("[ItemList] Rendering, devMode:", isDevMode);
+  
   const { data: items, isLoading } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
+      console.log("[ItemList] Fetching items data");
+      
+      if (isDevMode) {
+        // Provide mock data in dev mode
+        console.log("[ItemList] Using mock data in dev mode");
+        return [
+          {
+            id: "mock-1",
+            sku: "ITEM-001",
+            name: "Mock Item 1",
+            item_type: "product",
+            item_pricing: [{ price: 19.99 }],
+          },
+          {
+            id: "mock-2",
+            sku: "ITEM-002",
+            name: "Mock Item 2",
+            item_type: "service",
+            item_pricing: [{ price: 29.99 }],
+          },
+        ];
+      }
+      
       const { data, error } = await supabase
         .from("item_record")
         .select(`
@@ -28,7 +55,10 @@ export const ItemList = () => {
         .eq('is_active', true)
         .order('name', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error("[ItemList] Error fetching items:", error);
+        throw error;
+      }
       return data;
     },
   });
@@ -53,7 +83,10 @@ export const ItemList = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div>Loading...</div>
+            <div className="flex items-center justify-center py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-500"></div>
+              <span className="ml-2">Loading items...</span>
+            </div>
           ) : (
             <Table>
               <TableHeader>

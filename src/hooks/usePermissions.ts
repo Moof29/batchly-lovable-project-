@@ -17,14 +17,10 @@ export const usePermissions = () => {
   const { user } = useAuth();
   const { isDevMode, devRole } = useDevMode();
 
-  console.log('usePermissions', { isDevMode, devRole, user });
-
   // Synchronous function for dev mode permissions check
   const checkDevModePermission = useCallback((resource: PermissionResource, action: PermissionAction): boolean => {
-    console.log('checkDevModePermission', { resource, action, devRole });
-    
     if (!DEV_MODE_PERMISSIONS[devRole]) {
-      console.error(`No permissions defined for role: ${devRole}`);
+      console.warn(`No permissions defined for role: ${devRole}`);
       return false;
     }
     
@@ -34,7 +30,7 @@ export const usePermissions = () => {
     }
     
     const hasPermission = DEV_MODE_PERMISSIONS[devRole][resource].includes(action);
-    console.log(`Permission check: ${devRole} - ${resource}.${action} = ${hasPermission}`);
+    console.log(`[DevMode] Permission check: ${devRole} - ${resource}.${action} = ${hasPermission}`);
     
     return hasPermission;
   }, [devRole]);

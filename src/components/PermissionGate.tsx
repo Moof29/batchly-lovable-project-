@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { usePermissions, PermissionAction, PermissionResource } from '@/hooks/usePermissions';
 import { useDevMode } from '@/contexts/DevModeContext';
-import { DEV_MODE_PERMISSIONS } from '@/config/permissions'; 
 
 interface PermissionGateProps {
   resource: PermissionResource;
@@ -17,10 +16,9 @@ export const PermissionGate: React.FC<PermissionGateProps> = ({
   children,
   fallback = null,
 }) => {
-  const { checkPermission } = usePermissions();
+  const { checkPermission, checkDevModePermission } = usePermissions();
   const { isDevMode, devRole } = useDevMode();
   const [hasPermission, setHasPermission] = useState<boolean>(false);
-  const [isChecking, setIsChecking] = useState<boolean>(true);
   
   // Effect to check permissions
   useEffect(() => {
@@ -32,23 +30,20 @@ export const PermissionGate: React.FC<PermissionGateProps> = ({
         
         if (isDevMode) {
           // Direct sync check for dev mode
-          permitted = DEV_MODE_PERMISSIONS[devRole]?.[resource]?.includes(action) || false;
-          console.log(`Dev mode permission check: ${devRole}.${resource}.${action} = ${permitted}`);
+          permitted = checkDevModePermission(resource, action);
         } else {
           // Async check for normal mode
           permitted = await checkPermission(resource, action);
-          console.log(`Normal permission check: ${resource}.${action} = ${permitted}`);
         }
         
         if (isMounted) {
+          console.log(`[PermissionGate] ${resource}.${action} = ${permitted} (devMode: ${isDevMode}, role: ${devRole})`);
           setHasPermission(permitted);
-          setIsChecking(false);
         }
       } catch (error) {
-        console.error('Permission check error:', error);
+        console.error('[PermissionGate] Error:', error);
         if (isMounted) {
           setHasPermission(false);
-          setIsChecking(false);
         }
       }
     };
@@ -58,12 +53,7 @@ export const PermissionGate: React.FC<PermissionGateProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [resource, action, isDevMode, devRole, checkPermission]);
-  
-  // Render early while checking
-  if (isChecking) {
-    return null;
-  }
+  }, [resource, action, isDevMode, devRole, checkPermission, checkDevModePermission]);
   
   // Render based on permissions
   return hasPermission ? <>{children}</> : <>{fallback}</>;

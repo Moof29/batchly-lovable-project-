@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserRole } from '@/types/auth';
+import { toast } from '@/hooks/use-toast';
 
 interface DevModeContextType {
   isDevMode: boolean;
@@ -26,7 +27,7 @@ export const DevModeProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
       
       if (savedDevRole && ['admin', 'sales_manager', 'warehouse_staff', 'delivery_driver', 'customer_service'].includes(savedDevRole)) {
-        setDevRole(savedDevRole);
+        setDevRole(savedDevRole as UserRole);
       }
     } catch (error) {
       console.error("Error loading dev mode settings:", error);
@@ -40,12 +41,19 @@ export const DevModeProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Save dev mode settings to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('batchly-dev-mode', isDevMode.toString());
-  }, [isDevMode]);
-
-  useEffect(() => {
-    localStorage.setItem('batchly-dev-role', devRole);
-  }, [devRole]);
+    try {
+      localStorage.setItem('batchly-dev-mode', isDevMode.toString());
+      
+      if (isDevMode) {
+        toast({
+          title: 'Dev Mode ' + (isDevMode ? 'Activated' : 'Deactivated'),
+          description: `Current role: ${devRole.replace('_', ' ')}`,
+        });
+      }
+    } catch (error) {
+      console.error("Error saving dev mode settings:", error);
+    }
+  }, [isDevMode, devRole]);
 
   const toggleDevMode = () => {
     setIsDevMode(prevState => !prevState);

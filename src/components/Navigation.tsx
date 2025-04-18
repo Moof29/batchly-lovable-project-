@@ -15,24 +15,31 @@ export const Navigation = () => {
   const { isDevMode, devRole } = useDevMode();
   const menuItems = useRoleBasedMenu();
   
-  console.log('Navigation component', { 
+  console.log('[Navigation] Rendering with:', { 
     isDevMode, 
     devRole, 
-    menuItemsCount: menuItems?.length,
-    currentPath: location.pathname
+    menuItemsCount: menuItems?.length || 0,
+    currentPath: location.pathname,
+    expandedItems
   });
   
-  // Ensure there's at least one menu item in dev mode
+  // Auto-expand the current section based on the URL path
   useEffect(() => {
-    if (isDevMode && (!menuItems || menuItems.length === 0)) {
-      console.warn('No menu items available - redirecting to dashboard');
+    if (menuItems && menuItems.length > 0) {
+      const currentMainPath = '/' + location.pathname.split('/')[1];
       
-      // Force navigation to dashboard if no menu items
-      if (location.pathname !== '/') {
-        navigate('/', { replace: true });
+      // Find the matching menu item for the current path
+      const matchingItem = menuItems.find(item => 
+        item.path === currentMainPath || 
+        location.pathname.startsWith(item.path)
+      );
+      
+      if (matchingItem && !expandedItems.includes(matchingItem.title)) {
+        console.log(`[Navigation] Auto-expanding ${matchingItem.title} based on URL path`);
+        setExpandedItems(prev => [...prev, matchingItem.title]);
       }
     }
-  }, [isDevMode, menuItems, navigate, location.pathname]);
+  }, [location.pathname, menuItems]);
   
   // Load expanded state from localStorage on mount
   useEffect(() => {
@@ -45,7 +52,7 @@ export const Navigation = () => {
         }
       }
     } catch (e) {
-      console.error('Failed to parse saved sidebar state', e);
+      console.error('[Navigation] Failed to parse saved sidebar state', e);
     }
   }, []);
 
@@ -54,16 +61,18 @@ export const Navigation = () => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(expandedItems));
     } catch (e) {
-      console.error('Failed to save sidebar state', e);
+      console.error('[Navigation] Failed to save sidebar state', e);
     }
   }, [expandedItems]);
 
   const isActive = (path: string): boolean => {
+    console.log(`[Navigation] Checking if ${path} is active for current path ${location.pathname}`);
     return location.pathname === path || 
            (path !== '/' && location.pathname.startsWith(path));
   };
 
   const toggleExpand = (title: string) => {
+    console.log(`[Navigation] Toggling expansion for ${title}`);
     setExpandedItems(prev => 
       prev.includes(title) 
         ? prev.filter(item => item !== title)
@@ -71,20 +80,15 @@ export const Navigation = () => {
     );
   };
   
-  // Auto-expand the current section
+  // Default to dashboard if no menu items are available
   useEffect(() => {
-    if (menuItems && menuItems.length > 0) {
-      const currentMainPath = '/' + location.pathname.split('/')[1];
-      const matchingItem = menuItems.find(item => item.path === currentMainPath);
-      
-      if (matchingItem && !expandedItems.includes(matchingItem.title)) {
-        setExpandedItems(prev => [...prev, matchingItem.title]);
-      }
+    if (isDevMode && (!menuItems || menuItems.length === 0) && location.pathname !== '/') {
+      console.warn('[Navigation] No menu items available for this role - redirecting to dashboard');
+      navigate('/', { replace: true });
     }
-  }, [location.pathname, menuItems, expandedItems]);
+  }, [isDevMode, menuItems, navigate, location.pathname]);
   
   if (!menuItems || menuItems.length === 0) {
-    console.warn('No menu items available to render');
     return (
       <SidebarMenu>
         <div className="p-4 text-sm text-gray-500">

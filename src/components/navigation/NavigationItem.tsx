@@ -26,8 +26,8 @@ export const NavigationItem = ({
 
   // Auto-expand current section on route changes
   useEffect(() => {
-    const currentMainPath = '/' + location.pathname.split('/')[1];
-    if (item.path === currentMainPath && !isExpanded) {
+    if (location.pathname.startsWith(item.path) && item.path !== '/' && !isExpanded) {
+      console.log(`[Navigation] Auto-expanding ${item.title} for path ${location.pathname}`);
       onToggleExpand(item.title);
     }
   }, [location.pathname, item.path, item.title, isExpanded, onToggleExpand]);

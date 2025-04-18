@@ -9,37 +9,36 @@ export const useDevAuth = () => {
   const { isDevMode, devRole } = useDevMode();
 
   useEffect(() => {
-    console.log('useDevAuth effect running', { isDevMode, devRole });
+    // Clear existing timeouts to prevent multiple toasts
+    const timeoutId = setTimeout(() => {
+      if (isDevMode) {
+        console.log('[useDevAuth] Creating mock user with role:', devRole);
+        
+        const mockUser: User = {
+          id: 'dev-user-id',
+          email: 'dev@example.com',
+          first_name: 'Dev',
+          last_name: 'User',
+          role: devRole,
+          organization_id: 'dev-org-id'
+        };
+        
+        setUser(mockUser);
+        
+        toast({ 
+          title: 'Dev Mode Active', 
+          description: `Logged in as ${devRole.replace('_', ' ')}`,
+          variant: 'default'
+        });
+      } else {
+        console.log('[useDevAuth] Dev mode disabled, clearing mock user');
+        setUser(null);
+      }
+    }, 100);
     
-    if (isDevMode) {
-      console.log('Creating mock user with role:', devRole);
-      
-      const mockUser: User = {
-        id: 'dev-user-id',
-        email: 'dev@example.com',
-        first_name: 'Dev',
-        last_name: 'User',
-        role: devRole,
-        organization_id: 'dev-org-id'
-      };
-      
-      setUser(mockUser);
-      
-      toast({ 
-        title: 'Dev Mode Active', 
-        description: `Logged in as ${devRole.replace('_', ' ')}`,
-        variant: 'default'
-      });
-      
-      console.log('Dev mode user created:', mockUser);
-    } else {
-      console.log('Dev mode disabled, clearing mock user');
-      setUser(null);
-    }
+    return () => clearTimeout(timeoutId);
   }, [isDevMode, devRole]);
 
-  console.log('useDevAuth return value:', { user, isDevMode });
-  
   return {
     user,
     setUser,
