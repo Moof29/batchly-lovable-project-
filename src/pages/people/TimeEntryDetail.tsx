@@ -4,9 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const TimeEntryDetail = () => {
   const { id } = useParams();
+  const isMobile = useIsMobile();
 
   const { data: timeEntry, isLoading } = useQuery({
     queryKey: ["timeEntry", id],
@@ -26,13 +28,13 @@ export const TimeEntryDetail = () => {
     },
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!timeEntry) return <div>Time entry not found</div>;
+  if (isLoading) return <div className="p-4">Loading...</div>;
+  if (!timeEntry) return <div className="p-4">Time entry not found</div>;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">
+    <div className="space-y-4 md:space-y-6 p-4 md:p-0">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <h1 className="text-xl md:text-2xl font-semibold tracking-tight">
           Time Entry Details
         </h1>
         <Badge variant={timeEntry.billable ? "default" : "secondary"}>
@@ -40,7 +42,7 @@ export const TimeEntryDetail = () => {
         </Badge>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Basic Information</CardTitle>
@@ -103,7 +105,7 @@ export const TimeEntryDetail = () => {
               <CardTitle>Description</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm">{timeEntry.description}</p>
+              <p className="text-sm break-words">{timeEntry.description}</p>
             </CardContent>
           </Card>
         )}
