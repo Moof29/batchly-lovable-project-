@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { User } from '@/types/auth';
+import { User, UserRole } from '@/types/auth';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useSupabaseAuth = () => {
@@ -31,12 +31,18 @@ export const useSupabaseAuth = () => {
               }
 
               if (profile) {
+                // Map database role to UserRole type, handling 'customer' specially
+                let role = profile.role as string;
+                if (role === 'customer') {
+                  role = 'customer_service'; // Map 'customer' to 'customer_service' as fallback
+                }
+
                 setUser({
                   id: session.user.id,
                   email: session.user.email || '',
                   first_name: profile.first_name,
                   last_name: profile.last_name,
-                  role: profile.role,
+                  role: role as UserRole,
                   avatar_url: profile.avatar_url,
                   organization_id: profile.organization_id
                 });
@@ -58,12 +64,18 @@ export const useSupabaseAuth = () => {
           if (error) {
             console.error('Error fetching user profile:', error);
           } else if (profile) {
+            // Map database role to UserRole type, handling 'customer' specially
+            let role = profile.role as string;
+            if (role === 'customer') {
+              role = 'customer_service'; // Map 'customer' to 'customer_service' as fallback
+            }
+
             setUser({
               id: session.user.id,
               email: session.user.email || '',
               first_name: profile.first_name,
               last_name: profile.last_name,
-              role: profile.role,
+              role: role as UserRole,
               avatar_url: profile.avatar_url,
               organization_id: profile.organization_id
             });
