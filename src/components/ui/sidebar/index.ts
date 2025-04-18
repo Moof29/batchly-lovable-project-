@@ -34,6 +34,8 @@ export {
 } from "./context"
 
 // Compatibility exports for NavigationMenu component
-export const SidebarGroup = SidebarContent;
-export const SidebarGroupLabel = SidebarHeader;
-export const SidebarGroupContent = SidebarContent;
+export {
+  SidebarContent as SidebarGroup,
+  SidebarHeader as SidebarGroupLabel,
+  SidebarContent as SidebarGroupContent
+};
