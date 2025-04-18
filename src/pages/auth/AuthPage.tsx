@@ -38,7 +38,10 @@ export const AuthPage: React.FC = () => {
 
   // Effect to redirect if already authenticated or if dev mode is active
   useEffect(() => {
+    console.log("[AuthPage] Checking authentication state:", { isAuthenticated, isDevMode });
+    
     if (isAuthenticated || isDevMode) {
+      console.log(`[AuthPage] Redirecting to ${from}`);
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, isDevMode, navigate, from]);
@@ -86,13 +89,26 @@ export const AuthPage: React.FC = () => {
     }
   };
 
-  // If dev mode is active or already authenticated, we shouldn't render this page
-  // But we'll leave this check here as a backup to the useEffect
-  if (isDevMode) {
+  // If already authenticated, show a message instead of redirecting immediately
+  if (isAuthenticated || isDevMode) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-brand-500" />
-        <span className="ml-2 text-xl font-medium">Dev Mode Active - Redirecting...</span>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Already Authenticated</CardTitle>
+            <CardDescription>
+              {isDevMode ? "Dev Mode is active." : "You are already logged in."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              className="w-full" 
+              onClick={() => navigate('/')}
+            >
+              Go to Dashboard
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }

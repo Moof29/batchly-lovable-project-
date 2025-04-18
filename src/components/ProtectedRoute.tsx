@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UserRole } from "@/types/auth";
 import { Loader2 } from "lucide-react";
 import { useDevMode } from "@/contexts/DevModeContext";
-import React from "react";
+import React, { useEffect } from "react";
 
 interface ProtectedRouteProps {
   requiredRole?: UserRole;
@@ -16,6 +16,15 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole, el
   const { isDevMode, devRole } = useDevMode();
   const location = useLocation();
 
+  useEffect(() => {
+    console.log("[ProtectedRoute] Auth state:", { 
+      isAuthenticated, loading, isDevMode, 
+      path: location.pathname,
+      userRole: user?.role,
+      devRole
+    });
+  }, [isAuthenticated, loading, isDevMode, user, location.pathname, devRole]);
+
   // Show loading state
   if (loading) {
     return (
@@ -26,8 +35,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole, el
     );
   }
 
-  // If not authenticated, redirect to login
+  // If not authenticated and not in dev mode, redirect to login
   if (!isAuthenticated && !isDevMode) {
+    console.log("[ProtectedRoute] Not authenticated and not in dev mode, redirecting to /auth");
     return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
   }
 

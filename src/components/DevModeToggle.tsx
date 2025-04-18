@@ -32,6 +32,7 @@ export const DevModeToggle: React.FC = () => {
   ];
 
   const handleGoToDashboard = () => {
+    console.log("Navigating to dashboard");
     navigate('/');
   };
 

@@ -56,6 +56,7 @@ const App = () => (
               <Sonner />
               <DevModeToggle />
               <Routes>
+                {/* Auth route - explicitly outside the ProtectedRoute component */}
                 <Route path="/auth" element={<AuthPage />} />
                 
                 <Route element={<ProtectedRoute />}>
