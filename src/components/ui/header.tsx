@@ -1,7 +1,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bell, Search, User } from "lucide-react";
+import { Bell, Search } from "lucide-react";
+import { UserProfileMenu } from "@/components/UserProfileMenu";
 
 export function Header() {
   return (
@@ -29,14 +30,7 @@ export function Header() {
             <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-primary" />
             <span className="sr-only">Notifications</span>
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full text-muted-foreground hover:text-foreground"
-          >
-            <User className="h-5 w-5" />
-            <span className="sr-only">User menu</span>
-          </Button>
+          <UserProfileMenu />
         </div>
       </div>
     </header>
