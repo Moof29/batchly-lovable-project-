@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,8 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { DemoAccountsSection } from "@/components/auth/DemoAccountsSection";
+import { Separator } from "@/components/ui/separator";
 
 export const AuthPage: React.FC = () => {
   const { login, signup, loading, isAuthenticated } = useAuth();
@@ -18,6 +21,7 @@ export const AuthPage: React.FC = () => {
   const location = useLocation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>("login");
+  const [showDemoSection, setShowDemoSection] = useState(false);
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState("");
@@ -250,6 +254,27 @@ export const AuthPage: React.FC = () => {
             </div>
           </CardFooter>
         </Card>
+
+        <div className="w-full">
+          <Button
+            variant="ghost"
+            className="flex w-full items-center justify-center text-sm text-muted-foreground"
+            onClick={() => setShowDemoSection(!showDemoSection)}
+          >
+            {showDemoSection ? (
+              <>Hide Demo Options <ChevronUp className="ml-1 h-4 w-4" /></>
+            ) : (
+              <>Want to try before signing up? <ChevronDown className="ml-1 h-4 w-4" /></>
+            )}
+          </Button>
+          
+          {showDemoSection && (
+            <>
+              <Separator className="my-4" />
+              <DemoAccountsSection />
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -26,7 +26,9 @@ import {
   FileText,
   Wallet,
   Package,
-  Users
+  Users,
+  Info,
+  ShieldAlert
 } from "lucide-react";
 
 import { QBOConnectionStatus } from "@/components/integrations/QBOConnectionStatus";
@@ -34,6 +36,7 @@ import { QBOSyncStatus } from "@/components/integrations/QBOSyncStatus";
 import { QBOSyncSettings } from "@/components/integrations/QBOSyncSettings";
 import { QBOSyncLogs } from "@/components/integrations/QBOSyncLogs";
 import { QBOMockConnectionModal } from "@/components/integrations/QBOMockConnectionModal";
+import { RestrictedFeatureAlert } from "@/components/RestrictedFeatureAlert";
 
 import { useQBOIntegration } from "@/hooks/useQBOIntegration";
 
@@ -61,16 +64,12 @@ export const QBOIntegrationPage = () => {
   if (!hasAccess) {
     return (
       <div className="space-y-6">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Access Denied</AlertTitle>
-          <AlertDescription>
-            Only administrators can access QuickBooks Online integration settings.
-          </AlertDescription>
-        </Alert>
-        <Button variant="outline" asChild>
-          <Link to="/settings">Return to Settings</Link>
-        </Button>
+        <RestrictedFeatureAlert
+          title="Access Denied: QuickBooks Integration"
+          description="Only administrators can access QuickBooks Online integration settings. This feature is restricted as it affects company-wide financial data synchronization."
+          requiredRole="admin"
+          showSettingsButton={true}
+        />
       </div>
     );
   }
@@ -85,14 +84,36 @@ export const QBOIntegrationPage = () => {
           </p>
         </div>
         {isDevMode && (
-          <Button 
-            variant="outline" 
-            onClick={() => setShowMockModal(true)}
-          >
-            Configure Mock QBO
-          </Button>
+          <div className="flex items-center gap-2">
+            <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200">Demo Mode</Badge>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowMockModal(true)}
+            >
+              Configure Mock QBO
+            </Button>
+          </div>
         )}
       </div>
+      
+      {isDevMode && (
+        <Alert className="bg-brand-50 border-brand-200">
+          <Info className="h-4 w-4 text-brand-500" />
+          <AlertTitle>Demo Mode Active</AlertTitle>
+          <AlertDescription>
+            This is a demonstration of the QuickBooks Online integration interface. In demo mode, all actions are simulated and no real data is affected.
+            <div className="mt-2 text-sm">
+              <p className="font-medium">Demo Administrator Features:</p>
+              <ul className="list-disc list-inside pl-2 text-muted-foreground">
+                <li>Connect and disconnect from QuickBooks</li>
+                <li>Configure sync settings for different data types</li>
+                <li>View sync logs and troubleshoot integration issues</li>
+                <li>Trigger manual data synchronization</li>
+              </ul>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
       
       <QBOConnectionStatus 
         isConnected={isConnected} 
@@ -208,6 +229,21 @@ export const QBOIntegrationPage = () => {
                     </Button>
                   </div>
                 </div>
+
+                {isDevMode && (
+                  <>
+                    <Separator />
+                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
+                      <p className="text-sm font-medium text-amber-800 flex items-center">
+                        <ShieldAlert className="h-4 w-4 mr-2" />
+                        Admin Only Feature
+                      </p>
+                      <p className="text-xs text-amber-600 mt-1">
+                        The QuickBooks integration troubleshooting tools are only accessible to administrators. Other roles won't have access to this section.
+                      </p>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
