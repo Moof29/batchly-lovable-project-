@@ -467,6 +467,65 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_role_permissions: {
+        Row: {
+          created_at: string | null
+          custom_role_id: string | null
+          id: string
+          permission: Database["public"]["Enums"]["role_permission"]
+        }
+        Insert: {
+          created_at?: string | null
+          custom_role_id?: string | null
+          id?: string
+          permission: Database["public"]["Enums"]["role_permission"]
+        }
+        Update: {
+          created_at?: string | null
+          custom_role_id?: string | null
+          id?: string
+          permission?: Database["public"]["Enums"]["role_permission"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_role_permissions_custom_role_id_fkey"
+            columns: ["custom_role_id"]
+            isOneToOne: false
+            referencedRelation: "custom_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custom_roles: {
+        Row: {
+          base_role: Database["public"]["Enums"]["user_role"]
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          base_role: Database["public"]["Enums"]["user_role"]
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          base_role?: Database["public"]["Enums"]["user_role"]
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       customer_profile: {
         Row: {
           balance: number | null
@@ -1467,6 +1526,39 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          organization_id: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          organization_id?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          organization_id?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       purchase_order: {
         Row: {
           created_at: string | null
@@ -1640,6 +1732,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      role_permission_mapping: {
+        Row: {
+          created_at: string | null
+          id: string
+          organization_id: string
+          permission: Database["public"]["Enums"]["role_permission"]
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          organization_id: string
+          permission: Database["public"]["Enums"]["role_permission"]
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          organization_id?: string
+          permission?: Database["public"]["Enums"]["role_permission"]
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       sales_order: {
         Row: {
@@ -2737,10 +2856,39 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      user_has_permission: {
+        Args: { permission: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      role_permission:
+        | "view_dashboard"
+        | "manage_users"
+        | "manage_roles"
+        | "configure_integrations"
+        | "manage_organization_settings"
+        | "view_customers"
+        | "manage_customers"
+        | "view_sales"
+        | "manage_sales"
+        | "view_inventory"
+        | "manage_inventory"
+        | "view_fulfillment"
+        | "manage_fulfillment"
+        | "view_deliveries"
+        | "manage_deliveries"
+        | "view_customer_service"
+        | "manage_customer_service"
+        | "view_reports"
+        | "export_data"
+      user_role:
+        | "admin"
+        | "sales_manager"
+        | "warehouse_staff"
+        | "delivery_driver"
+        | "customer_service"
+        | "customer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2855,6 +3003,36 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      role_permission: [
+        "view_dashboard",
+        "manage_users",
+        "manage_roles",
+        "configure_integrations",
+        "manage_organization_settings",
+        "view_customers",
+        "manage_customers",
+        "view_sales",
+        "manage_sales",
+        "view_inventory",
+        "manage_inventory",
+        "view_fulfillment",
+        "manage_fulfillment",
+        "view_deliveries",
+        "manage_deliveries",
+        "view_customer_service",
+        "manage_customer_service",
+        "view_reports",
+        "export_data",
+      ],
+      user_role: [
+        "admin",
+        "sales_manager",
+        "warehouse_staff",
+        "delivery_driver",
+        "customer_service",
+        "customer",
+      ],
+    },
   },
 } as const
