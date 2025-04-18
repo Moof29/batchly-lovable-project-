@@ -12,8 +12,3 @@ export type SidebarContext = {
   isMobile: boolean
   toggleSidebar: () => void
 }
-
-export interface SheetContentProps
-  extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
-    VariantProps<typeof sheetVariants> {}
-

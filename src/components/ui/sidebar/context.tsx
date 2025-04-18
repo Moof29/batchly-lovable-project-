@@ -1,6 +1,7 @@
+
 import * as React from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { SidebarContext } from "./types"
+import type { SidebarContext as SidebarContextType } from "./types"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 
@@ -10,7 +11,7 @@ const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
-const SidebarContext = React.createContext<SidebarContext | null>(null)
+const SidebarContext = React.createContext<SidebarContextType | null>(null)
 
 export function useSidebar() {
   const context = React.useContext(SidebarContext)

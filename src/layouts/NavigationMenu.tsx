@@ -1,8 +1,7 @@
 
 import { 
-  SidebarGroup, 
-  SidebarGroupLabel, 
-  SidebarGroupContent 
+  SidebarContent,
+  SidebarHeader,
 } from '@/components/ui/sidebar';
 import { Logo } from '@/components/Logo';
 import { Navigation } from '@/components/Navigation';
@@ -10,16 +9,14 @@ import { Navigation } from '@/components/Navigation';
 export const NavigationMenu = () => {
   return (
     <>
-      <SidebarGroup className="border-b border-border/50 pb-4 mb-2">
+      <SidebarContent className="border-b border-border/50 pb-4 mb-2">
         <Logo />
-      </SidebarGroup>
+      </SidebarContent>
 
-      <SidebarGroup>
-        <SidebarGroupLabel className="sr-only">Navigation</SidebarGroupLabel>
-        <SidebarGroupContent>
-          <Navigation />
-        </SidebarGroupContent>
-      </SidebarGroup>
+      <SidebarContent>
+        <SidebarHeader className="sr-only">Navigation</SidebarHeader>
+        <Navigation />
+      </SidebarContent>
     </>
   );
 };
