@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { SidebarMenu } from '@/components/ui/sidebar';
 import { NavigationItem } from './navigation/NavigationItem';
 import { useRoleBasedMenu } from '@/hooks/useRoleBasedMenu';
@@ -9,6 +9,7 @@ const STORAGE_KEY = 'batchly-sidebar-expanded';
 
 export const Navigation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const menuItems = useRoleBasedMenu();
   
@@ -23,7 +24,13 @@ export const Navigation = () => {
         console.error('Failed to parse saved sidebar state', e);
       }
     }
-  }, []);
+
+    // If on inventory/items path, redirect to root dashboard
+    // This is a temporary fix for the user's current issue
+    if (location.pathname === '/inventory/items') {
+      navigate('/', { replace: true });
+    }
+  }, [location.pathname, navigate]);
 
   // Save expanded state to localStorage whenever it changes
   useEffect(() => {
