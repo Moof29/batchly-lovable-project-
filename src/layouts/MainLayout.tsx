@@ -11,7 +11,7 @@ export const MainLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="min-h-screen flex w-full bg-background">
       <Sidebar 
         className="border-r border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-        collapsible={isMobile ? "offcanvas" : "icon"}
+        data-collapsible={isMobile ? "offcanvas" : "icon"}
       >
         <SidebarContent>
           <NavigationMenu />

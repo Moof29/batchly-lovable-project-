@@ -5,29 +5,29 @@ export * from "./context"
 export * from "./menu"
 export * from "./types"
 
-// Re-export the context provider and hook
+// Re-export the context provider and hook for convenience
 export {
   SidebarProvider,
   useSidebar
 } from "./context"
 
-// We don't need to re-export components that are already exported via export *
-// The compatibility exports below are causing the error
-// because they're trying to re-export components that are already exported
-
-// Compatibility exports for NavigationMenu component
-// Only include these if needed and properly imported
+// Re-export these specific components for backwards compatibility
 export {
   SidebarContent,
   SidebarHeader
 } from "./base"
 
-// No need to re-export SidebarContent twice
-// export {
-//   SidebarContent as SidebarGroupContent
-// } from "./base"
+// Re-export SidebarMenuButton from menu.tsx
+export {
+  SidebarMenu,
+  SidebarMenuItem
+} from "./menu"
 
-// Instead, provide type aliases if needed
-export type SidebarGroup = typeof SidebarHeader
+// For compatibility with previous API usage patterns
+import { SidebarContent, SidebarHeader } from "./base"
+import { SidebarMenu, SidebarMenuItem } from "./menu"
+
+// Type aliases for backwards compatibility
+export type SidebarGroup = typeof SidebarContent
 export type SidebarGroupLabel = typeof SidebarHeader
 export type SidebarGroupContent = typeof SidebarContent

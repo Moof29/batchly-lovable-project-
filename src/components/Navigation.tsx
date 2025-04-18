@@ -10,9 +10,9 @@ import {
 } from 'lucide-react';
 import { 
   SidebarMenu, 
-  SidebarMenuItem, 
-  SidebarMenuButton 
+  SidebarMenuItem 
 } from '@/components/ui/sidebar';
+import { Button } from '@/components/ui/button';
 
 const menuItems = [
   { title: 'Dashboard', icon: Home, path: '/' },
@@ -34,12 +34,16 @@ export const Navigation = () => {
         
         return (
           <SidebarMenuItem key={item.title}>
-            <SidebarMenuButton asChild isActive={isActive}>
+            <Button 
+              variant="ghost" 
+              className={`w-full justify-start ${isActive ? 'bg-gray-100 text-gray-900 font-medium' : ''}`}
+              asChild
+            >
               <Link to={item.path}>
                 <item.icon className="mr-2 h-4 w-4" />
                 <span>{item.title}</span>
               </Link>
-            </SidebarMenuButton>
+            </Button>
           </SidebarMenuItem>
         );
       })}
