@@ -35,6 +35,7 @@ import { AccountsReceivable } from "./pages/payments/AccountsReceivable";
 import { AccountsPayable } from "./pages/payments/AccountsPayable";
 import { SettingsLayout } from "./pages/settings/SettingsLayout";
 import { GeneralSettings } from "./pages/settings/GeneralSettings";
+import { IntegrationsSettingsPage } from "./pages/settings/IntegrationsSettingsPage";
 import { BillList } from "./pages/purchases/BillList";
 import { InvoiceList } from "./pages/sales/InvoiceList";
 import { BillDetail } from "./pages/purchases/BillDetail";
@@ -102,6 +103,7 @@ const App = () => (
                   
                   <Route path="/settings" element={<SettingsLayout />}>
                     <Route index element={<ProtectedRoute requiredRole="admin" element={<GeneralSettings />} />} />
+                    <Route path="integrations" element={<ProtectedRoute requiredRole="admin" element={<IntegrationsSettingsPage />} />} />
                   </Route>
                 </Route>
                 

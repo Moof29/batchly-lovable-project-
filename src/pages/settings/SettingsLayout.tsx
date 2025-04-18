@@ -10,6 +10,7 @@ export const SettingsLayout = () => {
     { name: "General", path: "/settings" },
     { name: "Users", path: "/settings/users" },
     { name: "Company", path: "/settings/company" },
+    { name: "Integrations", path: "/settings/integrations" },
     { name: "Billing", path: "/settings/billing" },
   ];
 
