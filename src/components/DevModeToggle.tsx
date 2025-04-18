@@ -31,7 +31,7 @@ export const DevModeToggle: React.FC = () => {
   ];
 
   return (
-    <div className={`fixed bottom-4 right-4 z-50 p-3 rounded-md shadow-lg transition-all ${isDevMode ? 'bg-purple-50 border border-purple-200' : 'bg-gray-50 border border-gray-200'}`}>
+    <div className={`fixed top-4 right-4 z-[9999] w-64 p-3 rounded-md shadow-lg transition-all ${isDevMode ? 'bg-purple-50 border border-purple-200' : 'bg-gray-50 border border-gray-200'}`}>
       <div className="flex items-center space-x-2 mb-2">
         <Bug className={`h-5 w-5 ${isDevMode ? 'text-purple-600' : 'text-gray-600'}`} />
         <Label htmlFor="dev-mode" className="font-medium">Dev Mode</Label>
