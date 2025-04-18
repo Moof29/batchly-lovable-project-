@@ -24,8 +24,8 @@ export const FeatureAccessAlert: React.FC<FeatureAccessAlertProps> = ({
   const { user, hasPermission } = useAuth();
   const { isDevMode, devRole } = useDevMode();
   
-  // Check if user has required permissions
-  const hasAccess = hasPermission(requiredRole) || (isDevMode && requiredRole === devRole);
+  // Check if user has required permissions, considering dev mode
+  const hasAccess = hasPermission(requiredRole);
   
   if (!hasAccess) {
     return (
