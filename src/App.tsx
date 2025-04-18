@@ -1,3 +1,4 @@
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -49,6 +50,7 @@ const App = () => (
             
             {/* Sales Module */}
             <Route path="/sales" element={<SalesLayout />}>
+              <Route index element={<SalesOrderList />} />
               <Route path="orders" element={<SalesOrderList />} />
               <Route path="orders/:id" element={<SalesOrderDetail />} />
               <Route path="order-templates" element={<CustomerList />} />
@@ -58,6 +60,7 @@ const App = () => (
             
             {/* Purchases Module */}
             <Route path="/purchases" element={<PurchasesLayout />}>
+              <Route index element={<PurchaseOrderList />} />
               <Route path="orders" element={<PurchaseOrderList />} />
               <Route path="orders/:id" element={<PurchaseOrderDetail />} />
               <Route path="bills" element={<BillList />} />
@@ -66,12 +69,14 @@ const App = () => (
             
             {/* Inventory Module */}
             <Route path="/inventory" element={<InventoryLayout />}>
+              <Route index element={<ItemList />} />
               <Route path="items" element={<ItemList />} />
               <Route path="items/:id" element={<ItemDetail />} />
             </Route>
             
             {/* People Module */}
             <Route path="/people" element={<PeopleLayout />}>
+              <Route index element={<CustomerList />} />
               <Route path="customers" element={<CustomerList />} />
               <Route path="customers/:id" element={<CustomerDetail />} />
               <Route path="vendors" element={<VendorList />} />
@@ -84,6 +89,7 @@ const App = () => (
             
             {/* Payments Module */}
             <Route path="/payments" element={<PaymentsLayout />}>
+              <Route index element={<AccountsReceivable />} />
               <Route path="accounts-receivable" element={<AccountsReceivable />} />
               <Route path="accounts-payable" element={<AccountsPayable />} />
             </Route>
