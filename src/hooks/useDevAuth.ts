@@ -1,47 +1,15 @@
 
-import { useState, useEffect } from 'react';
-import { User, UserRole } from '@/types/auth';
-import { useDevMode } from '@/contexts/DevModeContext';
-import { toast } from './use-toast';
+// This file is no longer needed as we've moved the dev auth logic directly into AuthContext
+// It's kept as an empty file for now to avoid breaking imports, but should be refactored later
+
+import { User } from '@/types/auth';
 
 export const useDevAuth = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const { isDevMode, devRole } = useDevMode();
-
-  useEffect(() => {
-    // Clear existing timeouts to prevent multiple toasts
-    const timeoutId = setTimeout(() => {
-      if (isDevMode) {
-        console.log('[useDevAuth] Creating mock user with role:', devRole);
-        
-        const mockUser: User = {
-          id: 'dev-user-id',
-          email: 'dev@example.com',
-          first_name: 'Dev',
-          last_name: 'User',
-          role: devRole,
-          organization_id: 'dev-org-id'
-        };
-        
-        setUser(mockUser);
-        
-        toast({ 
-          title: 'Dev Mode Active', 
-          description: `Logged in as ${devRole.replace('_', ' ')}`,
-          variant: 'default'
-        });
-      } else {
-        console.log('[useDevAuth] Dev mode disabled, clearing mock user');
-        setUser(null);
-      }
-    }, 100);
-    
-    return () => clearTimeout(timeoutId);
-  }, [isDevMode, devRole]);
-
+  console.warn('useDevAuth is deprecated, use useAuth from AuthContext directly');
+  
   return {
-    user,
-    setUser,
-    isDevMode
+    user: null,
+    setUser: () => {},
+    isDevMode: false
   };
 };

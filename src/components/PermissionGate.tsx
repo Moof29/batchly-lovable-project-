@@ -31,9 +31,11 @@ export const PermissionGate: React.FC<PermissionGateProps> = ({
         if (isDevMode) {
           // Direct sync check for dev mode
           permitted = checkDevModePermission(resource, action);
+          console.log(`[PermissionGate] Dev Mode: ${resource}.${action} = ${permitted} (role: ${devRole})`);
         } else {
           // Async check for normal mode
           permitted = await checkPermission(resource, action);
+          console.log(`[PermissionGate] Normal Mode: ${resource}.${action} = ${permitted}`);
         }
         
         if (isMounted) {

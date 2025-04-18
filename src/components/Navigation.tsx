@@ -3,8 +3,9 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SidebarMenu } from '@/components/ui/sidebar';
 import { NavigationItem } from './navigation/NavigationItem';
-import { useRoleBasedMenu } from '@/hooks/useRoleBasedMenu';
+import { useAuth } from '@/contexts/AuthContext';
 import { useDevMode } from '@/contexts/DevModeContext';
+import { getMenuItemsByRole } from '@/config/menuItems';
 
 const STORAGE_KEY = 'batchly-sidebar-expanded';
 
@@ -13,11 +14,17 @@ export const Navigation = () => {
   const navigate = useNavigate();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const { isDevMode, devRole } = useDevMode();
-  const menuItems = useRoleBasedMenu();
+  const { user } = useAuth();
+  
+  // Get menu items based on the active role (dev role in dev mode, or user role)
+  const role = isDevMode ? devRole : (user?.role || 'customer_service');
+  const menuItems = getMenuItemsByRole(role);
   
   console.log('[Navigation] Rendering with:', { 
     isDevMode, 
-    devRole, 
+    devRole,
+    userRole: user?.role,
+    activeRole: role,
     menuItemsCount: menuItems?.length || 0,
     currentPath: location.pathname,
     expandedItems
@@ -39,7 +46,7 @@ export const Navigation = () => {
         setExpandedItems(prev => [...prev, matchingItem.title]);
       }
     }
-  }, [location.pathname, menuItems]);
+  }, [location.pathname, menuItems, expandedItems]);
   
   // Load expanded state from localStorage on mount
   useEffect(() => {
@@ -82,11 +89,11 @@ export const Navigation = () => {
   
   // Default to dashboard if no menu items are available
   useEffect(() => {
-    if (isDevMode && (!menuItems || menuItems.length === 0) && location.pathname !== '/') {
+    if ((!menuItems || menuItems.length === 0) && location.pathname !== '/' && user) {
       console.warn('[Navigation] No menu items available for this role - redirecting to dashboard');
       navigate('/', { replace: true });
     }
-  }, [isDevMode, menuItems, navigate, location.pathname]);
+  }, [menuItems, navigate, location.pathname, user]);
   
   if (!menuItems || menuItems.length === 0) {
     return (

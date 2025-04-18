@@ -10,10 +10,15 @@ interface DevModeContextType {
   setDevRole: (role: UserRole) => void;
 }
 
-const DevModeContext = createContext<DevModeContextType | undefined>(undefined);
+const DevModeContext = createContext<DevModeContextType>({
+  isDevMode: false,
+  toggleDevMode: () => {},
+  devRole: 'admin',
+  setDevRole: () => {}
+});
 
 export const DevModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isDevMode, setIsDevMode] = useState<boolean>(false);
+  const [isDevMode, setIsDevMode] = useState<boolean>(true); // Default to true for easy testing
   const [devRole, setDevRole] = useState<UserRole>('admin');
 
   // Load dev mode settings from localStorage on component mount
@@ -22,12 +27,18 @@ export const DevModeProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const savedDevMode = localStorage.getItem('batchly-dev-mode');
       const savedDevRole = localStorage.getItem('batchly-dev-role') as UserRole | null;
 
-      if (savedDevMode) {
+      if (savedDevMode !== null) {
         setIsDevMode(savedDevMode === 'true');
+      } else {
+        // If not found in localStorage, default to true and save it
+        localStorage.setItem('batchly-dev-mode', 'true');
       }
       
       if (savedDevRole && ['admin', 'sales_manager', 'warehouse_staff', 'delivery_driver', 'customer_service'].includes(savedDevRole)) {
         setDevRole(savedDevRole as UserRole);
+      } else {
+        // If not found or invalid, default to admin and save it
+        localStorage.setItem('batchly-dev-role', 'admin');
       }
     } catch (error) {
       console.error("Error loading dev mode settings:", error);
@@ -43,8 +54,11 @@ export const DevModeProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     try {
       localStorage.setItem('batchly-dev-mode', isDevMode.toString());
+      localStorage.setItem('batchly-dev-role', devRole);
       
       if (isDevMode) {
+        console.log(`[DevModeContext] Dev Mode is ${isDevMode ? 'on' : 'off'}, role: ${devRole}`);
+        
         toast({
           title: 'Dev Mode ' + (isDevMode ? 'Activated' : 'Deactivated'),
           description: `Current role: ${devRole.replace('_', ' ')}`,
