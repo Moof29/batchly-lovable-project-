@@ -31,15 +31,15 @@ export const DevModeToggle: React.FC = () => {
   ];
 
   return (
-    <div className={`fixed top-0 left-0 mt-20 ml-4 z-50 p-3 rounded-md shadow-md transition-all ${isDevMode ? 'bg-red-50 border border-red-200' : 'bg-gray-50 border border-gray-200'}`}>
+    <div className={`fixed bottom-4 right-4 z-50 p-3 rounded-md shadow-lg transition-all ${isDevMode ? 'bg-purple-50 border border-purple-200' : 'bg-gray-50 border border-gray-200'}`}>
       <div className="flex items-center space-x-2 mb-2">
-        <Bug className={`h-5 w-5 ${isDevMode ? 'text-red-600' : 'text-gray-600'}`} />
+        <Bug className={`h-5 w-5 ${isDevMode ? 'text-purple-600' : 'text-gray-600'}`} />
         <Label htmlFor="dev-mode" className="font-medium">Dev Mode</Label>
         <Switch 
           id="dev-mode" 
           checked={isDevMode} 
           onCheckedChange={toggleDevMode}
-          className={isDevMode ? "data-[state=checked]:bg-red-500" : ""}
+          className={isDevMode ? "data-[state=checked]:bg-purple-500" : ""}
         />
       </div>
       
@@ -65,7 +65,7 @@ export const DevModeToggle: React.FC = () => {
       )}
 
       {isDevMode && (
-        <div className="mt-3 text-xs text-red-600 font-medium">
+        <div className="mt-3 text-xs text-purple-600 font-medium">
           Dev Mode Active - Bypassing authentication
         </div>
       )}
