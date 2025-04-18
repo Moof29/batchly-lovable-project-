@@ -7,10 +7,10 @@ import {
   ShoppingCart, 
   FileJson, 
   Database,
-  Inventory,
+  Package2, // Replaced 'Inventory' with 'Package2'
   Truck,
   MapPin,
-  Return,
+  RotateCcw, // Replaced 'Return' with 'RotateCcw'
   Calendar
 } from "lucide-react";
 
@@ -87,7 +87,7 @@ export const Dashboard = () => {
         <RoleBasedView allowedRoles={['admin', 'warehouse_staff']}>
           <Card>
             <CardHeader className="flex flex-row items-center gap-2">
-              <Inventory className="h-5 w-5" />
+              <Package2 className="h-5 w-5" />
               <CardTitle>Inventory Management</CardTitle>
             </CardHeader>
             <CardContent>
@@ -129,7 +129,7 @@ export const Dashboard = () => {
         <RoleBasedView allowedRoles={['admin', 'customer_service']}>
           <Card>
             <CardHeader className="flex flex-row items-center gap-2">
-              <Return className="h-5 w-5" />
+              <RotateCcw className="h-5 w-5" />
               <CardTitle>Returns</CardTitle>
             </CardHeader>
             <CardContent>
