@@ -1,9 +1,6 @@
 
-import * as React from "react"
-import { VariantProps } from "class-variance-authority"
-import { sidebarMenuButtonVariants } from "./menu-button"
-
-export type SidebarContext = {
+// Define the type for the sidebar context
+export type SidebarContextType = {
   state: "expanded" | "collapsed"
   open: boolean
   setOpen: (open: boolean) => void

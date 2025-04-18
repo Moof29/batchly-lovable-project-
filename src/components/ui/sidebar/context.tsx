@@ -1,7 +1,7 @@
 
 import * as React from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
-import type { SidebarContext as SidebarContextType } from "./types"
+import type { SidebarContextType } from "./types"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 

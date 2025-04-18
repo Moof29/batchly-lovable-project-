@@ -1,19 +1,21 @@
 
+// Export all components from their respective files
 export * from "./base"
 export * from "./context"
 export * from "./menu"
 export * from "./menu-button"
 export * from "./types"
 
-// Re-export specific components for backwards compatibility
-export {
+// Re-export specific components from base.tsx for backwards compatibility
+import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
   SidebarFooter
 } from "./base"
 
-export {
+// Re-export specific components from menu.tsx
+import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuSub,
@@ -24,18 +26,46 @@ export {
   SidebarMenuSkeleton
 } from "./menu"
 
-export {
+// Re-export the menu button
+import {
   SidebarMenuButton
 } from "./menu-button"
 
-export {
+// Re-export the context provider and hook
+import {
   SidebarProvider,
   useSidebar
 } from "./context"
+
+// Now export all specifically imported components
+export {
+  // From base
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarFooter,
+  
+  // From menu
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
+  SidebarMenuAction,
+  SidebarMenuBadge,
+  SidebarMenuSkeleton,
+  
+  // From menu-button
+  SidebarMenuButton,
+  
+  // From context
+  SidebarProvider,
+  useSidebar
+}
 
 // Compatibility exports for NavigationMenu component
 export {
   SidebarContent as SidebarGroup,
   SidebarHeader as SidebarGroupLabel,
   SidebarContent as SidebarGroupContent
-};
+}
