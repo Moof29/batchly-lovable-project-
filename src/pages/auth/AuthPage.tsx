@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useDevMode } from "@/contexts/DevModeContext";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,8 @@ import { Loader2 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
 export const AuthPage: React.FC = () => {
-  const { login, signup, loading } = useAuth();
+  const { login, signup, loading, isAuthenticated } = useAuth();
+  const { isDevMode } = useDevMode();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -30,12 +32,19 @@ export const AuthPage: React.FC = () => {
 
   const from = location.state?.from || "/";
 
+  // Effect to redirect if already authenticated or if dev mode is active
+  useEffect(() => {
+    if (isAuthenticated || isDevMode) {
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, isDevMode, navigate, from]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
       await login(loginEmail, loginPassword);
-      navigate(from, { replace: true });
+      // Redirect is handled by the useEffect above
     } catch (error) {
       toast({
         title: "Login Failed",
@@ -72,6 +81,17 @@ export const AuthPage: React.FC = () => {
       });
     }
   };
+
+  // If dev mode is active or already authenticated, we shouldn't render this page
+  // But we'll leave this check here as a backup to the useEffect
+  if (isDevMode) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-brand-500" />
+        <span className="ml-2 text-xl font-medium">Dev Mode Active - Redirecting...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">

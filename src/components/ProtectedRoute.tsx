@@ -1,3 +1,4 @@
+
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserRole } from "@/types/auth";
@@ -12,7 +13,7 @@ interface ProtectedRouteProps {
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole, element }) => {
   const { isAuthenticated, loading, user, hasPermission } = useAuth();
-  const { isDevMode } = useDevMode();
+  const { isDevMode, devRole } = useDevMode();
   const location = useLocation();
 
   // Show loading state
@@ -30,8 +31,28 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole, el
     return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
   }
 
+  // If dev mode is active, we check against the dev role instead of the actual user role
+  const checkPermission = () => {
+    if (isDevMode) {
+      // In dev mode, use the selected role for permission checks
+      return !requiredRole || ROLE_HIERARCHY[devRole] >= ROLE_HIERARCHY[requiredRole];
+    } else {
+      // In normal mode, use the user's actual permissions
+      return !requiredRole || hasPermission(requiredRole);
+    }
+  };
+
+  // Import ROLE_HIERARCHY for dev mode permission checking
+  const ROLE_HIERARCHY: { [key in UserRole]: number } = {
+    'admin': 100,
+    'sales_manager': 80,
+    'warehouse_staff': 60,
+    'delivery_driver': 40,
+    'customer_service': 20
+  };
+
   // If role check is required and user doesn't have permission
-  if (requiredRole && !hasPermission(requiredRole)) {
+  if (requiredRole && !checkPermission()) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen text-center px-4">
         <h1 className="text-3xl font-bold mb-4">Access Denied</h1>
@@ -39,7 +60,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole, el
           You don't have the required permissions to access this page.
           {user && (
             <span className="block mt-2">
-              Your current role <span className="font-medium">{user.role}</span> doesn't have access to this area.
+              Your current role <span className="font-medium">{isDevMode ? devRole : user.role}</span> doesn't have access to this area.
             </span>
           )}
         </p>

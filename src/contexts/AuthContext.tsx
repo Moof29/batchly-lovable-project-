@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, UserRole, AuthContextType, hasRolePermission } from '@/types/auth';
@@ -31,6 +30,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           };
           
           setUser(mockUser);
+          toast({ 
+            title: 'Dev Mode Active', 
+            description: `Logged in as ${devRole}`,
+            variant: 'default'
+          });
           setLoading(false);
           return;
         }
@@ -104,22 +108,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initializeUser();
   }, [isDevMode, devRole]);
 
+  // Effect to update user when dev role changes
+  useEffect(() => {
+    if (isDevMode) {
+      const mockUser: User = {
+        id: 'dev-user-id',
+        email: 'dev@example.com',
+        first_name: 'Dev',
+        last_name: 'User',
+        role: devRole,
+        organization_id: 'dev-org-id'
+      };
+      
+      setUser(mockUser);
+      toast({ 
+        title: 'Dev Role Changed', 
+        description: `Now using ${devRole} role`,
+        variant: 'default'
+      });
+    }
+  }, [isDevMode, devRole]);
+
   const login = async (email: string, password: string) => {
     try {
       setLoading(true);
       
       if (isDevMode) {
-        const mockUser: User = {
-          id: 'dev-user-id',
-          email: email,
-          first_name: 'Dev',
-          last_name: 'User',
-          role: devRole,
-          organization_id: 'dev-org-id'
-        };
-        
-        setUser(mockUser);
-        toast({ title: 'Dev Mode Login', description: `Logged in as ${devRole}` });
+        // For dev mode, we don't need to do anything since the user
+        // is already set in the useEffect above
         return;
       }
       
@@ -225,7 +241,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     login,
     logout,
     signup,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user || isDevMode,  // Important: Consider dev mode as authenticated
     hasPermission
   };
 
