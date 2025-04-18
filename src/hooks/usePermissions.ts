@@ -4,14 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCallback } from 'react';
 import { useDevMode } from '@/contexts/DevModeContext';
 import { UserRole } from '@/types/auth';
-import { DEV_MODE_PERMISSIONS } from '@/config/permissions';
+import { DEV_MODE_PERMISSIONS, PermissionAction, PermissionResource } from '@/config/permissions';
 
-export type PermissionAction = 'create' | 'read' | 'update' | 'delete' | 'manage';
-export type PermissionResource = 
-  | 'users' | 'customers' | 'vendors' | 'employees'
-  | 'inventory' | 'items' | 'sales_orders' | 'purchase_orders'
-  | 'invoices' | 'bills' | 'payments' | 'accounts'
-  | 'time_tracking' | 'reports' | 'settings' | 'integrations';
+export type { PermissionAction, PermissionResource } from '@/config/permissions';
 
 export const usePermissions = () => {
   const { user } = useAuth();

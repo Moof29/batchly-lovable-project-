@@ -32,13 +32,18 @@ export function NavigationMenu() {
     return true;
   };
 
+  const isActive = (path: string): boolean => {
+    return location.pathname === path || 
+           (path !== '/' && location.pathname.startsWith(path));
+  };
+
   return (
     <div className="space-y-1 py-2">
       {filteredMenuItems.filter(shouldShowMenuItem).map((item) => (
         <NavigationItem
           key={item.path}
           item={item}
-          isActive={location.pathname === item.path || location.pathname.startsWith(`${item.path}/`)}
+          isActive={isActive(item.path)}
         />
       ))}
     </div>
