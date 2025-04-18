@@ -24,10 +24,22 @@ export const FeatureAccessAlert: React.FC<FeatureAccessAlertProps> = ({
   const { user, hasPermission } = useAuth();
   const { isDevMode, devRole } = useDevMode();
   
+  // Determine user's role for display
+  const userRole = isDevMode ? devRole : (user?.role || 'customer_service');
+  
   // Check if user has required permissions, considering dev mode
   const hasAccess = isDevMode 
-    ? hasPermission(requiredRole) // This already considers devRole if in dev mode
-    : user && hasPermission(requiredRole);
+    ? hasPermission(requiredRole) 
+    : (user && hasPermission(requiredRole));
+  
+  console.log('FeatureAccessAlert', { 
+    feature, 
+    requiredRole, 
+    userRole,
+    isDevMode, 
+    devRole, 
+    hasAccess
+  });
   
   if (!hasAccess) {
     return (
@@ -41,15 +53,9 @@ export const FeatureAccessAlert: React.FC<FeatureAccessAlertProps> = ({
             <Info className="h-4 w-4 mr-2 text-yellow-600" />
             <span>
               This feature requires <span className="font-medium capitalize">{requiredRole.replace('_', ' ')}</span> permissions.
-              {isDevMode ? (
-                <span className="block mt-1">
-                  Your current role is <span className="font-medium capitalize">{devRole.replace('_', ' ')}</span>.
-                </span>
-              ) : user && (
-                <span className="block mt-1">
-                  Your current role is <span className="font-medium capitalize">{user.role.replace('_', ' ')}</span>.
-                </span>
-              )}
+              <span className="block mt-1">
+                Your current role is <span className="font-medium capitalize">{userRole.replace('_', ' ')}</span>.
+              </span>
             </span>
           </div>
           

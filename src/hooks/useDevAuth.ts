@@ -9,7 +9,11 @@ export const useDevAuth = () => {
   const { isDevMode, devRole } = useDevMode();
 
   useEffect(() => {
+    console.log('useDevAuth effect running', { isDevMode, devRole });
+    
     if (isDevMode) {
+      console.log('Creating mock user with role:', devRole);
+      
       const mockUser: User = {
         id: 'dev-user-id',
         email: 'dev@example.com',
@@ -20,16 +24,22 @@ export const useDevAuth = () => {
       };
       
       setUser(mockUser);
+      
       toast({ 
         title: 'Dev Mode Active', 
-        description: `Logged in as ${devRole}`,
+        description: `Logged in as ${devRole.replace('_', ' ')}`,
         variant: 'default'
       });
+      
+      console.log('Dev mode user created:', mockUser);
     } else {
+      console.log('Dev mode disabled, clearing mock user');
       setUser(null);
     }
   }, [isDevMode, devRole]);
 
+  console.log('useDevAuth return value:', { user, isDevMode });
+  
   return {
     user,
     setUser,

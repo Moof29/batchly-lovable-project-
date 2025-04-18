@@ -17,15 +17,24 @@ export const DevModeProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Load dev mode settings from localStorage on component mount
   useEffect(() => {
-    const savedDevMode = localStorage.getItem('batchly-dev-mode');
-    const savedDevRole = localStorage.getItem('batchly-dev-role') as UserRole | null;
+    try {
+      const savedDevMode = localStorage.getItem('batchly-dev-mode');
+      const savedDevRole = localStorage.getItem('batchly-dev-role') as UserRole | null;
 
-    if (savedDevMode) {
-      setIsDevMode(savedDevMode === 'true');
-    }
-    
-    if (savedDevRole && ['admin', 'sales_manager', 'warehouse_staff', 'delivery_driver', 'customer_service'].includes(savedDevRole)) {
-      setDevRole(savedDevRole);
+      if (savedDevMode) {
+        setIsDevMode(savedDevMode === 'true');
+      }
+      
+      if (savedDevRole && ['admin', 'sales_manager', 'warehouse_staff', 'delivery_driver', 'customer_service'].includes(savedDevRole)) {
+        setDevRole(savedDevRole);
+      }
+    } catch (error) {
+      console.error("Error loading dev mode settings:", error);
+      // Reset to defaults if there's an error
+      localStorage.setItem('batchly-dev-mode', 'true');
+      localStorage.setItem('batchly-dev-role', 'admin');
+      setIsDevMode(true);
+      setDevRole('admin');
     }
   }, []);
 

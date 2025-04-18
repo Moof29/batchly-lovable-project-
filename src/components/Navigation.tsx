@@ -12,20 +12,27 @@ export const Navigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const { isDevMode } = useDevMode();
+  const { isDevMode, devRole } = useDevMode();
   const menuItems = useRoleBasedMenu();
+  
+  console.log('Navigation component', { 
+    isDevMode, 
+    devRole, 
+    menuItemsCount: menuItems?.length,
+    currentPath: location.pathname
+  });
   
   // Ensure there's at least one menu item in dev mode
   useEffect(() => {
-    if (isDevMode && menuItems.length === 0) {
-      console.warn('No menu items available - check role permissions');
+    if (isDevMode && (!menuItems || menuItems.length === 0)) {
+      console.warn('No menu items available - redirecting to dashboard');
       
       // Force navigation to dashboard if no menu items
       if (location.pathname !== '/') {
         navigate('/', { replace: true });
       }
     }
-  }, [isDevMode, menuItems.length, navigate, location.pathname]);
+  }, [isDevMode, menuItems, navigate, location.pathname]);
   
   // Load expanded state from localStorage on mount
   useEffect(() => {
@@ -66,13 +73,26 @@ export const Navigation = () => {
   
   // Auto-expand the current section
   useEffect(() => {
-    const currentMainPath = '/' + location.pathname.split('/')[1];
-    const matchingItem = menuItems.find(item => item.path === currentMainPath);
-    
-    if (matchingItem && !expandedItems.includes(matchingItem.title)) {
-      setExpandedItems(prev => [...prev, matchingItem.title]);
+    if (menuItems && menuItems.length > 0) {
+      const currentMainPath = '/' + location.pathname.split('/')[1];
+      const matchingItem = menuItems.find(item => item.path === currentMainPath);
+      
+      if (matchingItem && !expandedItems.includes(matchingItem.title)) {
+        setExpandedItems(prev => [...prev, matchingItem.title]);
+      }
     }
   }, [location.pathname, menuItems, expandedItems]);
+  
+  if (!menuItems || menuItems.length === 0) {
+    console.warn('No menu items available to render');
+    return (
+      <SidebarMenu>
+        <div className="p-4 text-sm text-gray-500">
+          No menu items available. Please check permissions.
+        </div>
+      </SidebarMenu>
+    );
+  }
   
   return (
     <SidebarMenu>

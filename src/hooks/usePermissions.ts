@@ -1,7 +1,6 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { useDevMode } from '@/contexts/DevModeContext';
 import { UserRole } from '@/types/auth';
@@ -18,39 +17,26 @@ export const usePermissions = () => {
   const { user } = useAuth();
   const { isDevMode, devRole } = useDevMode();
 
-  // Only fetch permissions from database when not in dev mode and user is logged in
-  const shouldFetchPermissions = !isDevMode && !!user;
+  console.log('usePermissions', { isDevMode, devRole, user });
 
-  const { data: rolePermissions } = useQuery({
-    queryKey: ['rolePermissions', user?.id, isDevMode],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('role_permissions')
-        .select('*');
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: shouldFetchPermissions,
-  });
-
-  const { data: userPermissions } = useQuery({
-    queryKey: ['userPermissions', user?.id, isDevMode],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_permissions')
-        .select('*')
-        .eq('user_id', user?.id);
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: shouldFetchPermissions,
-  });
-
-  // Synchronous function for dev mode checks
+  // Synchronous function for dev mode permissions check
   const checkDevModePermission = useCallback((resource: PermissionResource, action: PermissionAction): boolean => {
-    return DEV_MODE_PERMISSIONS[devRole]?.[resource]?.includes(action) || false;
+    console.log('checkDevModePermission', { resource, action, devRole });
+    
+    if (!DEV_MODE_PERMISSIONS[devRole]) {
+      console.error(`No permissions defined for role: ${devRole}`);
+      return false;
+    }
+    
+    if (!DEV_MODE_PERMISSIONS[devRole][resource]) {
+      console.warn(`No permissions defined for resource: ${resource} and role: ${devRole}`);
+      return false;
+    }
+    
+    const hasPermission = DEV_MODE_PERMISSIONS[devRole][resource].includes(action);
+    console.log(`Permission check: ${devRole} - ${resource}.${action} = ${hasPermission}`);
+    
+    return hasPermission;
   }, [devRole]);
 
   const checkPermission = useCallback(
@@ -81,13 +67,11 @@ export const usePermissions = () => {
         return false;
       }
     },
-    [user, isDevMode, devRole, checkDevModePermission]
+    [user, isDevMode, checkDevModePermission]
   );
 
   return {
     checkPermission,
     checkDevModePermission,
-    rolePermissions,
-    userPermissions,
   };
 };

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PermissionGate } from "@/components/PermissionGate";
 import { useDevMode } from "@/contexts/DevModeContext";
@@ -19,11 +19,14 @@ import { useDevMode } from "@/contexts/DevModeContext";
 export const CustomerList = () => {
   const { isDevMode } = useDevMode();
 
-  const { data: customers, isLoading } = useQuery({
-    queryKey: ["customers"],
+  const { data: customers, isLoading, error } = useQuery({
+    queryKey: ["customers", isDevMode],
     queryFn: async () => {
+      console.log("Fetching customers, dev mode:", isDevMode);
+      
       // In dev mode, return mock customer data
       if (isDevMode) {
+        console.log("Returning mock customer data");
         return [
           { 
             id: 'mock-id-1', 
@@ -49,16 +52,32 @@ export const CustomerList = () => {
         ];
       }
 
-      const { data, error } = await supabase
-        .from("customer_profile")
-        .select("*")
-        .eq('is_active', true)
-        .order('display_name', { ascending: true });
+      console.log("Fetching from Supabase");
+      try {
+        const { data, error } = await supabase
+          .from("customer_profile")
+          .select("*")
+          .eq('is_active', true)
+          .order('display_name', { ascending: true });
 
-      if (error) throw error;
-      return data;
+        if (error) {
+          console.error("Supabase error:", error);
+          throw error;
+        }
+        
+        console.log(`Got ${data?.length || 0} customers from Supabase`);
+        return data || [];
+      } catch (e) {
+        console.error("Error fetching customers:", e);
+        throw e;
+      }
     },
+    retry: 1,
   });
+
+  if (error) {
+    console.error("Query error:", error);
+  }
 
   return (
     <div className="space-y-6">
@@ -89,8 +108,15 @@ export const CustomerList = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div>Loading...</div>
-          ) : (
+            <div className="flex items-center justify-center p-8">
+              <Loader2 className="h-8 w-8 animate-spin text-brand-500 mr-2" />
+              <span>Loading customers...</span>
+            </div>
+          ) : error ? (
+            <div className="p-8 text-center text-red-500">
+              Error loading customers. Please try again.
+            </div>
+          ) : customers && customers.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -102,7 +128,7 @@ export const CustomerList = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {customers?.map((customer) => (
+                {customers.map((customer) => (
                   <TableRow key={customer.id}>
                     <TableCell>{customer.display_name}</TableCell>
                     <TableCell>{customer.email}</TableCell>
@@ -117,6 +143,10 @@ export const CustomerList = () => {
                 ))}
               </TableBody>
             </Table>
+          ) : (
+            <div className="p-8 text-center text-gray-500">
+              No customers found. {isDevMode && "This might be a permissions issue."}
+            </div>
           )}
         </CardContent>
       </Card>
