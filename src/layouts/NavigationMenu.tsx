@@ -1,22 +1,46 @@
 
-import { 
-  SidebarContent,
-  SidebarHeader,
-} from '@/components/ui/sidebar';
-import { Logo } from '@/components/Logo';
-import { Navigation } from '@/components/Navigation';
+import { useAuth } from '@/contexts/AuthContext';
+import { useDevMode } from '@/contexts/DevModeContext';
+import { menuItems } from '@/config/menuItems';
+import { MenuItem } from '@/types/navigation';
+import { NavigationItem } from '@/components/navigation/NavigationItem';
+import { useRoleBasedMenu } from '@/hooks/useRoleBasedMenu';
+import { useLocation } from 'react-router-dom';
 
-export const NavigationMenu = () => {
+export function NavigationMenu() {
+  const { user, isAuthenticated } = useAuth();
+  const { isDevMode, devRole } = useDevMode();
+  const { filteredMenuItems } = useRoleBasedMenu();
+  const location = useLocation();
+
+  const shouldShowMenuItem = (item: MenuItem): boolean => {
+    // Check if item should be hidden in dev mode
+    if (isDevMode && item.showInDevMode === false) {
+      return false;
+    }
+    
+    // Check if item should be hidden when authenticated
+    if (isAuthenticated && item.showWhenAuthenticated === false) {
+      return false;
+    }
+    
+    // If not authenticated and not in dev mode, only show auth page
+    if (!isAuthenticated && !isDevMode) {
+      return item.path === "/auth";
+    }
+    
+    return true;
+  };
+
   return (
-    <>
-      <SidebarContent className="border-b border-border/50 pb-4 mb-2">
-        <Logo />
-      </SidebarContent>
-
-      <SidebarContent>
-        <SidebarHeader className="sr-only">Navigation</SidebarHeader>
-        <Navigation />
-      </SidebarContent>
-    </>
+    <div className="space-y-1 py-2">
+      {filteredMenuItems.filter(shouldShowMenuItem).map((item) => (
+        <NavigationItem
+          key={item.path}
+          item={item}
+          isActive={location.pathname === item.path || location.pathname.startsWith(`${item.path}/`)}
+        />
+      ))}
+    </div>
   );
-};
+}

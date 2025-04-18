@@ -1,16 +1,13 @@
 
 import { LucideIcon } from 'lucide-react';
-
-export interface SubModule {
-  id: string;
-  name: string;
-  path: string;
-}
+import { UserRole } from './auth';
 
 export interface MenuItem {
-  id: string;
   title: string;
-  icon: LucideIcon;
   path: string;
-  subModules?: SubModule[];
+  icon?: LucideIcon;
+  permissions: UserRole[];
+  children?: MenuItem[];
+  showInDevMode?: boolean; // Whether to show in dev mode
+  showWhenAuthenticated?: boolean; // Whether to show when authenticated
 }
