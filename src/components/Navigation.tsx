@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Home, 
@@ -25,6 +26,7 @@ const getMenuItemsByRole = (role: UserRole) => {
 
   // Base items visible to all roles
   items.push({ 
+    id: 'dashboard',
     title: 'Dashboard', 
     icon: Home, 
     path: '/' 
@@ -34,134 +36,146 @@ const getMenuItemsByRole = (role: UserRole) => {
   if (role === 'admin') {
     items.push(
       { 
+        id: 'inventory-admin',
         title: 'Inventory', 
         icon: Package, 
         path: '/inventory',
         subModules: [
-          { name: 'Items', path: '/inventory/items' }
+          { id: 'items-admin', name: 'Items', path: '/inventory/items' }
         ]
       },
       { 
+        id: 'people-admin',
         title: 'People', 
         icon: Users, 
         path: '/people',
         subModules: [
-          { name: 'Customers', path: '/people/customers' },
-          { name: 'Vendors', path: '/people/vendors' },
-          { name: 'Employees', path: '/people/employees' },
-          { name: 'Time Tracking', path: '/people/time-tracking' }
+          { id: 'customers-admin', name: 'Customers', path: '/people/customers' },
+          { id: 'vendors-admin', name: 'Vendors', path: '/people/vendors' },
+          { id: 'employees-admin', name: 'Employees', path: '/people/employees' },
+          { id: 'time-tracking-admin', name: 'Time Tracking', path: '/people/time-tracking' }
         ]
       },
       { 
+        id: 'sales-admin',
         title: 'Sales', 
         icon: ShoppingCart, 
         path: '/sales',
         subModules: [
-          { name: 'Orders', path: '/sales/orders' },
-          { name: 'Invoices', path: '/sales/invoices' },
-          { name: 'Order Templates', path: '/sales/order-templates' }
+          { id: 'orders-admin', name: 'Orders', path: '/sales/orders' },
+          { id: 'invoices-admin', name: 'Invoices', path: '/sales/invoices' },
+          { id: 'order-templates-admin', name: 'Order Templates', path: '/sales/order-templates' }
         ]
       },
       { 
+        id: 'purchases-admin',
         title: 'Purchases', 
         icon: DollarSign, 
         path: '/purchases',
         subModules: [
-          { name: 'Orders', path: '/purchases/orders' },
-          { name: 'Bills', path: '/purchases/bills' }
+          { id: 'orders-purchases-admin', name: 'Orders', path: '/purchases/orders' },
+          { id: 'bills-admin', name: 'Bills', path: '/purchases/bills' }
         ]
       },
       { 
+        id: 'settings-admin',
         title: 'Settings', 
         icon: Settings, 
         path: '/settings',
         subModules: [
-          { name: 'General', path: '/settings' },
-          { name: 'Users', path: '/settings/users' },
-          { name: 'Company', path: '/settings/company' },
-          { name: 'Billing', path: '/settings/billing' }
+          { id: 'general-admin', name: 'General', path: '/settings' },
+          { id: 'users-admin', name: 'Users', path: '/settings/users' },
+          { id: 'company-admin', name: 'Company', path: '/settings/company' },
+          { id: 'billing-admin', name: 'Billing', path: '/settings/billing' }
         ]
       }
     );
   }
 
   // Sales Manager specific items
-  if (role === 'sales_manager' || role === 'admin') {
+  if (role === 'sales_manager' && role !== 'admin') {
     items.push(
       { 
+        id: 'sales-manager',
         title: 'Sales', 
         icon: ShoppingCart, 
         path: '/sales',
         subModules: [
-          { name: 'Orders', path: '/sales/orders' },
-          { name: 'Invoices', path: '/sales/invoices' }
+          { id: 'orders-sales', name: 'Orders', path: '/sales/orders' },
+          { id: 'invoices-sales', name: 'Invoices', path: '/sales/invoices' }
         ]
       },
       { 
+        id: 'people-sales',
         title: 'People', 
         icon: Users, 
         path: '/people',
         subModules: [
-          { name: 'Customers', path: '/people/customers' }
+          { id: 'customers-sales', name: 'Customers', path: '/people/customers' }
         ]
       }
     );
   }
 
   // Warehouse Staff specific items
-  if (role === 'warehouse_staff' || role === 'admin') {
+  if (role === 'warehouse_staff' && role !== 'admin') {
     items.push(
       { 
+        id: 'inventory-warehouse',
         title: 'Inventory', 
         icon: Package, 
         path: '/inventory',
         subModules: [
-          { name: 'Items', path: '/inventory/items' }
+          { id: 'items-warehouse', name: 'Items', path: '/inventory/items' }
         ]
       },
       { 
+        id: 'purchases-warehouse',
         title: 'Purchases', 
         icon: DollarSign, 
         path: '/purchases',
         subModules: [
-          { name: 'Orders', path: '/purchases/orders' }
+          { id: 'orders-purchases', name: 'Orders', path: '/purchases/orders' }
         ]
       }
     );
   }
 
   // Delivery Driver specific items
-  if (role === 'delivery_driver' || role === 'admin') {
+  if (role === 'delivery_driver' && role !== 'admin') {
     items.push(
       { 
+        id: 'deliveries-driver',
         title: 'Deliveries', 
         icon: Truck, 
         path: '/deliveries',
         subModules: [
-          { name: 'Routes', path: '/deliveries/routes' },
-          { name: 'Schedule', path: '/deliveries/schedule' }
+          { id: 'routes-driver', name: 'Routes', path: '/deliveries/routes' },
+          { id: 'schedule-driver', name: 'Schedule', path: '/deliveries/schedule' }
         ]
       }
     );
   }
 
   // Customer Service specific items
-  if (role === 'customer_service' || role === 'admin') {
+  if (role === 'customer_service' && role !== 'admin') {
     items.push(
       { 
+        id: 'people-cs',
         title: 'People', 
         icon: Users, 
         path: '/people',
         subModules: [
-          { name: 'Customers', path: '/people/customers' }
+          { id: 'customers-cs', name: 'Customers', path: '/people/customers' }
         ]
       },
       { 
+        id: 'sales-cs',
         title: 'Sales', 
         icon: ShoppingCart, 
         path: '/sales',
         subModules: [
-          { name: 'Orders', path: '/sales/orders' }
+          { id: 'orders-cs', name: 'Orders', path: '/sales/orders' }
         ]
       }
     );
@@ -180,7 +194,7 @@ export const Navigation = () => {
   // Get menu items based on user role
   const menuItems = user ? getMenuItemsByRole(user.role) : [];
   
-  // Load expanded state from localStorage on mount
+  // Load expanded state from localStorage on mount and handle auto-expand
   useEffect(() => {
     const savedExpanded = localStorage.getItem(STORAGE_KEY);
     if (savedExpanded) {
@@ -190,15 +204,18 @@ export const Navigation = () => {
       } catch (e) {
         console.error('Failed to parse saved sidebar state', e);
       }
-    } else {
-      // Auto-expand the current section based on the URL path
-      const currentMainPath = '/' + location.pathname.split('/')[1];
-      const currentModule = menuItems.find(item => item.path === currentMainPath);
-      if (currentModule?.title) {
-        setExpandedItems([currentModule.title]);
-      }
     }
-  }, [location.pathname, menuItems]);
+  }, []);
+  
+  // Auto-expand the current section based on URL path changes
+  useEffect(() => {
+    const currentMainPath = '/' + location.pathname.split('/')[1];
+    const currentModule = menuItems.find(item => item.path === currentMainPath);
+    
+    if (currentModule?.title && !expandedItems.includes(currentModule.title)) {
+      setExpandedItems(prev => [...prev, currentModule.title]);
+    }
+  }, [location.pathname, menuItems, expandedItems]);
 
   // Save expanded state to localStorage whenever it changes
   useEffect(() => {
@@ -220,15 +237,8 @@ export const Navigation = () => {
                         (item.path !== '/' && location.pathname.startsWith(item.path));
         const isExpanded = expandedItems.includes(item.title);
         
-        // Auto-expand when navigating to a submodule page
-        useEffect(() => {
-          if (isActive && item.subModules && !isExpanded) {
-            setExpandedItems(prev => [...prev, item.title]);
-          }
-        }, [location.pathname, isActive, item.title, isExpanded]);
-        
         return (
-          <SidebarMenuItem key={item.title}>
+          <SidebarMenuItem key={item.id}>
             <Button 
               variant="ghost" 
               className={`w-full justify-start ${isActive ? 'bg-gray-100 text-gray-900 font-medium' : ''}`}
@@ -255,7 +265,7 @@ export const Navigation = () => {
                   const isSubActive = location.pathname === subModule.path || location.pathname.startsWith(subModule.path);
                   
                   return (
-                    <SidebarMenuSubItem key={subModule.path}>
+                    <SidebarMenuSubItem key={subModule.id}>
                       <Button
                         variant="ghost"
                         size="sm"
