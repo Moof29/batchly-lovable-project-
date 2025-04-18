@@ -2,26 +2,30 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserRole } from '@/types/auth';
 import { toast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface DevModeContextType {
   isDevMode: boolean;
   toggleDevMode: () => void;
   devRole: UserRole;
   setDevRole: (role: UserRole) => void;
+  resetDevMode: () => void;
 }
 
 const DevModeContext = createContext<DevModeContextType>({
   isDevMode: false,
   toggleDevMode: () => {},
   devRole: 'admin',
-  setDevRole: () => {}
+  setDevRole: () => {},
+  resetDevMode: () => {}
 });
 
 export const DevModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isDevMode, setIsDevMode] = useState<boolean>(true); // Default to true for easy testing
+  const [isDevMode, setIsDevMode] = useState<boolean>(true);
   const [devRole, setDevRole] = useState<UserRole>('admin');
+  const navigate = useNavigate();
 
-  // Load dev mode settings from localStorage on component mount
   useEffect(() => {
     try {
       const savedDevMode = localStorage.getItem('batchly-dev-mode');
@@ -30,51 +34,55 @@ export const DevModeProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (savedDevMode !== null) {
         setIsDevMode(savedDevMode === 'true');
       } else {
-        // If not found in localStorage, default to true and save it
         localStorage.setItem('batchly-dev-mode', 'true');
       }
       
       if (savedDevRole && ['admin', 'sales_manager', 'warehouse_staff', 'delivery_driver', 'customer_service'].includes(savedDevRole)) {
         setDevRole(savedDevRole as UserRole);
       } else {
-        // If not found or invalid, default to admin and save it
         localStorage.setItem('batchly-dev-role', 'admin');
       }
     } catch (error) {
       console.error("Error loading dev mode settings:", error);
-      // Reset to defaults if there's an error
-      localStorage.setItem('batchly-dev-mode', 'true');
-      localStorage.setItem('batchly-dev-role', 'admin');
       setIsDevMode(true);
       setDevRole('admin');
     }
   }, []);
 
-  // Save dev mode settings to localStorage whenever they change
   useEffect(() => {
     try {
       localStorage.setItem('batchly-dev-mode', isDevMode.toString());
       localStorage.setItem('batchly-dev-role', devRole);
       
-      if (isDevMode) {
-        console.log(`[DevModeContext] Dev Mode is ${isDevMode ? 'on' : 'off'}, role: ${devRole}`);
-        
-        toast({
-          title: 'Dev Mode ' + (isDevMode ? 'Activated' : 'Deactivated'),
-          description: `Current role: ${devRole.replace('_', ' ')}`,
-        });
-      }
+      console.log(`[DevModeContext] Dev Mode: ${isDevMode}, Role: ${devRole}`);
+      
+      toast({
+        title: 'Dev Mode ' + (isDevMode ? 'Activated' : 'Deactivated'),
+        description: `Current role: ${devRole.replace('_', ' ')}`,
+      });
     } catch (error) {
       console.error("Error saving dev mode settings:", error);
     }
   }, [isDevMode, devRole]);
 
   const toggleDevMode = () => {
-    setIsDevMode(prevState => !prevState);
+    setIsDevMode(prev => !prev);
+  };
+
+  const resetDevMode = () => {
+    setIsDevMode(true);
+    setDevRole('admin');
+    localStorage.setItem('batchly-dev-mode', 'true');
+    localStorage.setItem('batchly-dev-role', 'admin');
+    navigate('/');
+    toast({
+      title: 'Dev Mode Reset',
+      description: 'Dev mode has been reset to admin role',
+    });
   };
 
   return (
-    <DevModeContext.Provider value={{ isDevMode, toggleDevMode, devRole, setDevRole }}>
+    <DevModeContext.Provider value={{ isDevMode, toggleDevMode, devRole, setDevRole, resetDevMode }}>
       {children}
     </DevModeContext.Provider>
   );
