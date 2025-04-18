@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { useDevMode } from '@/contexts/DevModeContext';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -12,10 +13,12 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { UserRole } from '@/types/auth';
-import { Bug } from 'lucide-react';
+import { Bug, MinimizeIcon, MaximizeIcon } from 'lucide-react';
+import { Button } from './ui/button';
 
 export const DevModeToggle: React.FC = () => {
   const { isDevMode, toggleDevMode, devRole, setDevRole } = useDevMode();
+  const [isMinimized, setIsMinimized] = useState(false);
 
   const handleRoleChange = (value: string) => {
     setDevRole(value as UserRole);
@@ -30,42 +33,56 @@ export const DevModeToggle: React.FC = () => {
   ];
 
   return (
-    <div className={`fixed top-16 right-4 z-50 w-64 p-3 rounded-md shadow-lg transition-all ${isDevMode ? 'bg-purple-50 border border-purple-200' : 'bg-gray-50 border border-gray-200'}`}>
-      <div className="flex items-center space-x-2 mb-2">
-        <Bug className={`h-5 w-5 ${isDevMode ? 'text-purple-600' : 'text-gray-600'}`} />
-        <Label htmlFor="dev-mode" className="font-medium">Dev Mode</Label>
-        <Switch 
-          id="dev-mode" 
-          checked={isDevMode} 
-          onCheckedChange={toggleDevMode}
-          className={isDevMode ? "data-[state=checked]:bg-purple-500" : ""}
-        />
+    <div className={`fixed top-16 right-4 z-50 transition-all ${isDevMode ? 'bg-purple-50 border border-purple-200' : 'bg-gray-50 border border-gray-200'} rounded-md shadow-lg ${isMinimized ? 'w-auto' : 'w-64'}`}>
+      <div className="flex items-center justify-between p-3">
+        <div className="flex items-center space-x-2">
+          <Bug className={`h-5 w-5 ${isDevMode ? 'text-purple-600' : 'text-gray-600'}`} />
+          <Label htmlFor="dev-mode" className={`font-medium ${isMinimized ? 'hidden' : ''}`}>Dev Mode</Label>
+          <Switch 
+            id="dev-mode" 
+            checked={isDevMode} 
+            onCheckedChange={toggleDevMode}
+            className={isDevMode ? "data-[state=checked]:bg-purple-500" : ""}
+          />
+        </div>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="h-8 w-8 p-0"
+          onClick={() => setIsMinimized(!isMinimized)}
+        >
+          {isMinimized ? (
+            <MaximizeIcon className="h-4 w-4" />
+          ) : (
+            <MinimizeIcon className="h-4 w-4" />
+          )}
+        </Button>
       </div>
       
-      {isDevMode && (
-        <div className="mt-3 relative">
-          <Label htmlFor="role-select" className="mb-1 block">Current Role:</Label>
-          <Select value={devRole} onValueChange={handleRoleChange}>
-            <SelectTrigger id="role-select" className="w-full">
-              <SelectValue placeholder="Select a role" />
-            </SelectTrigger>
-            <SelectContent position="popper" sideOffset={5} className="z-[9999]">
-              <SelectGroup>
-                <SelectLabel>Available Roles</SelectLabel>
-                {roles.map((role) => (
-                  <SelectItem key={role.value} value={role.value}>
-                    {role.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-      )}
+      {!isMinimized && isDevMode && (
+        <div className="px-3 pb-3">
+          <div className="mt-3 relative">
+            <Label htmlFor="role-select" className="mb-1 block">Current Role:</Label>
+            <Select value={devRole} onValueChange={handleRoleChange}>
+              <SelectTrigger id="role-select" className="w-full">
+                <SelectValue placeholder="Select a role" />
+              </SelectTrigger>
+              <SelectContent position="popper" sideOffset={5} className="z-[9999]">
+                <SelectGroup>
+                  <SelectLabel>Available Roles</SelectLabel>
+                  {roles.map((role) => (
+                    <SelectItem key={role.value} value={role.value}>
+                      {role.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
 
-      {isDevMode && (
-        <div className="mt-3 text-xs text-purple-600 font-medium">
-          Dev Mode Active - Bypassing authentication
+          <div className="mt-3 text-xs text-purple-600 font-medium">
+            Dev Mode Active - Bypassing authentication
+          </div>
         </div>
       )}
     </div>
