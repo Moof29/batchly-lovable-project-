@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Home, 
@@ -7,7 +6,8 @@ import {
   DollarSign, 
   Settings,
   ShoppingCart,
-  ChevronRight
+  ChevronRight,
+  Truck
 } from 'lucide-react';
 import { 
   SidebarMenu, 
@@ -17,69 +17,168 @@ import {
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { UserRole } from '@/types/auth';
 
-const menuItems = [
-  { 
+const getMenuItemsByRole = (role: UserRole) => {
+  const items = [];
+
+  // Base items visible to all roles
+  items.push({ 
     title: 'Dashboard', 
     icon: Home, 
     path: '/' 
-  },
-  { 
-    title: 'Inventory', 
-    icon: Package, 
-    path: '/inventory',
-    subModules: [
-      { name: 'Items', path: '/inventory/items' }
-    ]
-  },
-  { 
-    title: 'People', 
-    icon: Users, 
-    path: '/people',
-    subModules: [
-      { name: 'Customers', path: '/people/customers' },
-      { name: 'Vendors', path: '/people/vendors' },
-      { name: 'Employees', path: '/people/employees' },
-      { name: 'Time Tracking', path: '/people/time-tracking' }
-    ]
-  },
-  { 
-    title: 'Sales', 
-    icon: ShoppingCart, 
-    path: '/sales',
-    subModules: [
-      { name: 'Orders', path: '/sales/orders' },
-      { name: 'Invoices', path: '/sales/invoices' },
-      { name: 'Order Templates', path: '/sales/order-templates' }
-    ]
-  },
-  { 
-    title: 'Purchases', 
-    icon: DollarSign, 
-    path: '/purchases',
-    subModules: [
-      { name: 'Orders', path: '/purchases/orders' },
-      { name: 'Bills', path: '/purchases/bills' }
-    ]
-  },
-  { 
-    title: 'Settings', 
-    icon: Settings, 
-    path: '/settings',
-    subModules: [
-      { name: 'General', path: '/settings' },
-      { name: 'Users', path: '/settings/users' },
-      { name: 'Company', path: '/settings/company' },
-      { name: 'Billing', path: '/settings/billing' }
-    ]
-  },
-];
+  });
+
+  // Admin has access to everything
+  if (role === 'admin') {
+    items.push(
+      { 
+        title: 'Inventory', 
+        icon: Package, 
+        path: '/inventory',
+        subModules: [
+          { name: 'Items', path: '/inventory/items' }
+        ]
+      },
+      { 
+        title: 'People', 
+        icon: Users, 
+        path: '/people',
+        subModules: [
+          { name: 'Customers', path: '/people/customers' },
+          { name: 'Vendors', path: '/people/vendors' },
+          { name: 'Employees', path: '/people/employees' },
+          { name: 'Time Tracking', path: '/people/time-tracking' }
+        ]
+      },
+      { 
+        title: 'Sales', 
+        icon: ShoppingCart, 
+        path: '/sales',
+        subModules: [
+          { name: 'Orders', path: '/sales/orders' },
+          { name: 'Invoices', path: '/sales/invoices' },
+          { name: 'Order Templates', path: '/sales/order-templates' }
+        ]
+      },
+      { 
+        title: 'Purchases', 
+        icon: DollarSign, 
+        path: '/purchases',
+        subModules: [
+          { name: 'Orders', path: '/purchases/orders' },
+          { name: 'Bills', path: '/purchases/bills' }
+        ]
+      },
+      { 
+        title: 'Settings', 
+        icon: Settings, 
+        path: '/settings',
+        subModules: [
+          { name: 'General', path: '/settings' },
+          { name: 'Users', path: '/settings/users' },
+          { name: 'Company', path: '/settings/company' },
+          { name: 'Billing', path: '/settings/billing' }
+        ]
+      }
+    );
+  }
+
+  // Sales Manager specific items
+  if (role === 'sales_manager' || role === 'admin') {
+    items.push(
+      { 
+        title: 'Sales', 
+        icon: ShoppingCart, 
+        path: '/sales',
+        subModules: [
+          { name: 'Orders', path: '/sales/orders' },
+          { name: 'Invoices', path: '/sales/invoices' }
+        ]
+      },
+      { 
+        title: 'People', 
+        icon: Users, 
+        path: '/people',
+        subModules: [
+          { name: 'Customers', path: '/people/customers' }
+        ]
+      }
+    );
+  }
+
+  // Warehouse Staff specific items
+  if (role === 'warehouse_staff' || role === 'admin') {
+    items.push(
+      { 
+        title: 'Inventory', 
+        icon: Package, 
+        path: '/inventory',
+        subModules: [
+          { name: 'Items', path: '/inventory/items' }
+        ]
+      },
+      { 
+        title: 'Purchases', 
+        icon: DollarSign, 
+        path: '/purchases',
+        subModules: [
+          { name: 'Orders', path: '/purchases/orders' }
+        ]
+      }
+    );
+  }
+
+  // Delivery Driver specific items
+  if (role === 'delivery_driver' || role === 'admin') {
+    items.push(
+      { 
+        title: 'Deliveries', 
+        icon: Truck, 
+        path: '/deliveries',
+        subModules: [
+          { name: 'Routes', path: '/deliveries/routes' },
+          { name: 'Schedule', path: '/deliveries/schedule' }
+        ]
+      }
+    );
+  }
+
+  // Customer Service specific items
+  if (role === 'customer_service' || role === 'admin') {
+    items.push(
+      { 
+        title: 'People', 
+        icon: Users, 
+        path: '/people',
+        subModules: [
+          { name: 'Customers', path: '/people/customers' }
+        ]
+      },
+      { 
+        title: 'Sales', 
+        icon: ShoppingCart, 
+        path: '/sales',
+        subModules: [
+          { name: 'Orders', path: '/sales/orders' }
+        ]
+      }
+    );
+  }
+
+  return items;
+};
 
 const STORAGE_KEY = 'batchly-sidebar-expanded';
 
 export const Navigation = () => {
   const location = useLocation();
+  const { user } = useAuth();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  
+  // Get menu items based on user role
+  const menuItems = user ? getMenuItemsByRole(user.role) : [];
   
   // Load expanded state from localStorage on mount
   useEffect(() => {
@@ -99,7 +198,7 @@ export const Navigation = () => {
         setExpandedItems([currentModule.title]);
       }
     }
-  }, [location.pathname]);
+  }, [location.pathname, menuItems]);
 
   // Save expanded state to localStorage whenever it changes
   useEffect(() => {
