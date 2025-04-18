@@ -5,10 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { DevModeProvider } from "@/contexts/DevModeContext";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import AuthPage from "./pages/AuthPage";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -46,65 +42,53 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <BrowserRouter>
-        <AuthProvider>
-          <DevModeProvider>
-            <SidebarProvider defaultOpen={true}>
-              <Toaster />
-              <Sonner />
-              <Routes>
-                <Route path="/auth" element={<AuthPage />} />
-                <Route 
-                  path="/" 
-                  element={
-                    <ProtectedRoute>
-                      <Index />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route path="/sales" element={<SalesLayout />}>
-                  <Route index element={<SalesOrderList />} />
-                  <Route path="orders" element={<SalesOrderList />} />
-                  <Route path="orders/:id" element={<SalesOrderDetail />} />
-                  <Route path="order-templates" element={<CustomerList />} />
-                  <Route path="invoices" element={<InvoiceList />} />
-                  <Route path="invoices/:id" element={<InvoiceDetail />} />
-                </Route>
-                <Route path="/purchases" element={<PurchasesLayout />}>
-                  <Route index element={<PurchaseOrderList />} />
-                  <Route path="orders" element={<PurchaseOrderList />} />
-                  <Route path="orders/:id" element={<PurchaseOrderDetail />} />
-                  <Route path="bills" element={<BillList />} />
-                  <Route path="bills/:id" element={<BillDetail />} />
-                </Route>
-                <Route path="/inventory" element={<InventoryLayout />}>
-                  <Route index element={<ItemList />} />
-                  <Route path="items" element={<ItemList />} />
-                  <Route path="items/:id" element={<ItemDetail />} />
-                </Route>
-                <Route path="/people" element={<PeopleLayout />}>
-                  <Route index element={<CustomerList />} />
-                  <Route path="customers" element={<CustomerList />} />
-                  <Route path="customers/:id" element={<CustomerDetail />} />
-                  <Route path="vendors" element={<VendorList />} />
-                  <Route path="vendors/:id" element={<VendorDetail />} />
-                  <Route path="employees" element={<EmployeeList />} />
-                  <Route path="employees/:id" element={<EmployeeDetail />} />
-                  <Route path="time-tracking" element={<TimeTrackingList />} />
-                  <Route path="time-tracking/:id" element={<TimeEntryDetail />} />
-                </Route>
-                <Route path="/payments" element={<PaymentsLayout />}>
-                  <Route index element={<AccountsReceivable />} />
-                  <Route path="accounts-receivable" element={<AccountsReceivable />} />
-                  <Route path="accounts-payable" element={<AccountsPayable />} />
-                </Route>
-                <Route path="/settings" element={<SettingsLayout />}>
-                  <Route index element={<GeneralSettings />} />
-                </Route>
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </SidebarProvider>
-          </DevModeProvider>
-        </AuthProvider>
+        <SidebarProvider defaultOpen={true}>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/sales" element={<SalesLayout />}>
+              <Route index element={<SalesOrderList />} />
+              <Route path="orders" element={<SalesOrderList />} />
+              <Route path="orders/:id" element={<SalesOrderDetail />} />
+              <Route path="order-templates" element={<CustomerList />} />
+              <Route path="invoices" element={<InvoiceList />} />
+              <Route path="invoices/:id" element={<InvoiceDetail />} />
+            </Route>
+            <Route path="/purchases" element={<PurchasesLayout />}>
+              <Route index element={<PurchaseOrderList />} />
+              <Route path="orders" element={<PurchaseOrderList />} />
+              <Route path="orders/:id" element={<PurchaseOrderDetail />} />
+              <Route path="bills" element={<BillList />} />
+              <Route path="bills/:id" element={<BillDetail />} />
+            </Route>
+            <Route path="/inventory" element={<InventoryLayout />}>
+              <Route index element={<ItemList />} />
+              <Route path="items" element={<ItemList />} />
+              <Route path="items/:id" element={<ItemDetail />} />
+            </Route>
+            <Route path="/people" element={<PeopleLayout />}>
+              <Route index element={<CustomerList />} />
+              <Route path="customers" element={<CustomerList />} />
+              <Route path="customers/:id" element={<CustomerDetail />} />
+              <Route path="vendors" element={<VendorList />} />
+              <Route path="vendors/:id" element={<VendorDetail />} />
+              <Route path="employees" element={<EmployeeList />} />
+              <Route path="employees/:id" element={<EmployeeDetail />} />
+              <Route path="time-tracking" element={<TimeTrackingList />} />
+              <Route path="time-tracking/:id" element={<TimeEntryDetail />} />
+            </Route>
+            <Route path="/payments" element={<PaymentsLayout />}>
+              <Route index element={<AccountsReceivable />} />
+              <Route path="accounts-receivable" element={<AccountsReceivable />} />
+              <Route path="accounts-payable" element={<AccountsPayable />} />
+            </Route>
+            <Route path="/settings" element={<SettingsLayout />}>
+              <Route index element={<GeneralSettings />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </SidebarProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
