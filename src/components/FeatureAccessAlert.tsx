@@ -29,7 +29,7 @@ export const FeatureAccessAlert: React.FC<FeatureAccessAlertProps> = ({
   
   if (!hasAccess) {
     return (
-      <Alert variant="warning" className="mb-6">
+      <Alert className="mb-6 border-yellow-500 bg-yellow-50">
         <ShieldAlert className="h-4 w-4" />
         <AlertTitle>Access Restricted: {feature}</AlertTitle>
         <AlertDescription className="space-y-2">

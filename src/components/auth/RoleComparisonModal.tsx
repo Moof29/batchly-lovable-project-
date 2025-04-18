@@ -104,14 +104,14 @@ export const RoleComparisonModal: React.FC<RoleComparisonModalProps> = ({ open, 
                   <TableCell className="text-center"><CheckCircle2 className="h-5 w-5 text-green-600 mx-auto" /></TableCell>
                   <TableCell className="text-center"><XCircle className="h-5 w-5 text-red-400 mx-auto" /></TableCell>
                   <TableCell className="text-center"><XCircle className="h-5 w-5 text-red-400 mx-auto" /></TableCell>
-                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" title="View only" /></TableCell>
+                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" aria-label="View only" /></TableCell>
                 </TableRow>
 
                 {/* Inventory */}
                 <TableRow>
                   <TableCell className="font-medium">Manage Inventory</TableCell>
                   <TableCell className="text-center"><CheckCircle2 className="h-5 w-5 text-green-600 mx-auto" /></TableCell>
-                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" title="View only" /></TableCell>
+                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" aria-label="View only" /></TableCell>
                   <TableCell className="text-center"><CheckCircle2 className="h-5 w-5 text-green-600 mx-auto" /></TableCell>
                   <TableCell className="text-center"><XCircle className="h-5 w-5 text-red-400 mx-auto" /></TableCell>
                   <TableCell className="text-center"><XCircle className="h-5 w-5 text-red-400 mx-auto" /></TableCell>
@@ -124,15 +124,15 @@ export const RoleComparisonModal: React.FC<RoleComparisonModalProps> = ({ open, 
                   <TableCell className="text-center"><CheckCircle2 className="h-5 w-5 text-green-600 mx-auto" /></TableCell>
                   <TableCell className="text-center"><XCircle className="h-5 w-5 text-red-400 mx-auto" /></TableCell>
                   <TableCell className="text-center"><XCircle className="h-5 w-5 text-red-400 mx-auto" /></TableCell>
-                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" title="View only" /></TableCell>
+                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" aria-label="View only" /></TableCell>
                 </TableRow>
 
                 {/* Delivery Routes */}
                 <TableRow>
                   <TableCell className="font-medium">Manage Deliveries</TableCell>
                   <TableCell className="text-center"><CheckCircle2 className="h-5 w-5 text-green-600 mx-auto" /></TableCell>
-                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" title="View only" /></TableCell>
-                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" title="View only" /></TableCell>
+                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" aria-label="View only" /></TableCell>
+                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" aria-label="View only" /></TableCell>
                   <TableCell className="text-center"><CheckCircle2 className="h-5 w-5 text-green-600 mx-auto" /></TableCell>
                   <TableCell className="text-center"><XCircle className="h-5 w-5 text-red-400 mx-auto" /></TableCell>
                 </TableRow>
@@ -141,10 +141,10 @@ export const RoleComparisonModal: React.FC<RoleComparisonModalProps> = ({ open, 
                 <TableRow>
                   <TableCell className="font-medium">View All Reports</TableCell>
                   <TableCell className="text-center"><CheckCircle2 className="h-5 w-5 text-green-600 mx-auto" /></TableCell>
-                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" title="Sales reports only" /></TableCell>
-                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" title="Inventory reports only" /></TableCell>
-                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" title="Delivery reports only" /></TableCell>
-                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" title="Customer reports only" /></TableCell>
+                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" aria-label="Sales reports only" /></TableCell>
+                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" aria-label="Inventory reports only" /></TableCell>
+                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" aria-label="Delivery reports only" /></TableCell>
+                  <TableCell className="text-center"><CircleDot className="h-5 w-5 text-amber-500 mx-auto" aria-label="Customer reports only" /></TableCell>
                 </TableRow>
 
                 {/* Company Settings */}
