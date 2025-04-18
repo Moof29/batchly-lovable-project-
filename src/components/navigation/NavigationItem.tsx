@@ -8,16 +8,30 @@ import { ChevronDown } from 'lucide-react';
 interface NavigationItemProps {
   item: MenuItem;
   isActive: boolean;
+  expandedItems?: string[];
+  onToggleExpand?: (title: string) => void;
 }
 
-export function NavigationItem({ item, isActive }: NavigationItemProps) {
+export function NavigationItem({ 
+  item, 
+  isActive,
+  expandedItems = [],
+  onToggleExpand
+}: NavigationItemProps) {
   const [isOpen, setIsOpen] = useState(false);
   const hasChildren = item.children && item.children.length > 0;
+  
+  // Use expandedItems prop if provided, otherwise use local state
+  const isExpanded = expandedItems ? expandedItems.includes(item.title) : isOpen;
 
   const toggleSubmenu = (e: React.MouseEvent) => {
     if (hasChildren) {
       e.preventDefault();
-      setIsOpen(!isOpen);
+      if (onToggleExpand) {
+        onToggleExpand(item.title);
+      } else {
+        setIsOpen(!isOpen);
+      }
     }
   };
 
@@ -39,13 +53,13 @@ export function NavigationItem({ item, isActive }: NavigationItemProps) {
         {hasChildren && (
           <ChevronDown
             className={cn("h-4 w-4 transition-transform", {
-              "transform rotate-180": isOpen,
+              "transform rotate-180": isExpanded,
             })}
           />
         )}
       </Link>
 
-      {hasChildren && isOpen && (
+      {hasChildren && isExpanded && (
         <div className="mt-1 pl-4 border-l border-gray-200 ml-3">
           {item.children?.map((child) => (
             <Link

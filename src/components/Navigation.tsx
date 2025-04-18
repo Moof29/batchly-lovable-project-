@@ -107,15 +107,20 @@ export const Navigation = () => {
   
   return (
     <SidebarMenu>
-      {menuItems.map((item) => (
-        <NavigationItem
-          key={item.id}
-          item={item}
-          isActive={isActive}
-          expandedItems={expandedItems}
-          onToggleExpand={toggleExpand}
-        />
-      ))}
+      {menuItems.map((menuItem) => {
+        // Add 'id' property to each menu item if it's missing
+        const item = menuItem.id ? menuItem : { ...menuItem, id: menuItem.title };
+        
+        return (
+          <NavigationItem
+            key={item.id}
+            item={item}
+            isActive={isActive(item.path)}
+            expandedItems={expandedItems}
+            onToggleExpand={toggleExpand}
+          />
+        );
+      })}
     </SidebarMenu>
   );
 };

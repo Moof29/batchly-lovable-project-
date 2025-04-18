@@ -10,6 +10,8 @@ import {
   LogIn
 } from 'lucide-react';
 import { MenuItem } from '@/types/navigation';
+import { UserRole } from '@/types/auth';
+import { ROLE_HIERARCHY } from '@/config/permissions';
 
 export const menuItems: MenuItem[] = [
   {
@@ -133,3 +135,36 @@ export const menuItems: MenuItem[] = [
     permissions: ['admin']
   }
 ];
+
+// Function to get menu items filtered by role
+export const getMenuItemsByRole = (role: UserRole) => {
+  // Function to filter menu items based on role permissions
+  const filterMenuItemsByRole = (items: MenuItem[], role: UserRole): MenuItem[] => {
+    return items.filter(item => {
+      // Check if the user has permission for this item
+      const hasItemPermission = hasPermission(item.permissions, role);
+      
+      // If no permission, don't show this item
+      if (!hasItemPermission) return false;
+      
+      // Filter children recursively
+      const filteredChildren = item.children 
+        ? filterMenuItemsByRole(item.children, role)
+        : undefined;
+        
+      // Return the item with filtered children
+      return {
+        ...item,
+        children: filteredChildren
+      };
+    });
+  };
+
+  return filterMenuItemsByRole(menuItems, role);
+};
+
+// Helper function to check role permissions
+const hasPermission = (requiredRoles: UserRole[], userRole: UserRole): boolean => {
+  if (requiredRoles.length === 0) return true; // No permissions required
+  return requiredRoles.some(role => ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[role]);
+};
