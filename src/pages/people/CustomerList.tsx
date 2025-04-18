@@ -14,11 +14,41 @@ import { supabase } from "@/integrations/supabase/client";
 import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PermissionGate } from "@/components/PermissionGate";
+import { useDevMode } from "@/contexts/DevModeContext";
 
 export const CustomerList = () => {
+  const { isDevMode } = useDevMode();
+
   const { data: customers, isLoading } = useQuery({
     queryKey: ["customers"],
     queryFn: async () => {
+      // In dev mode, return mock customer data
+      if (isDevMode) {
+        return [
+          { 
+            id: 'mock-id-1', 
+            display_name: 'Acme Corporation', 
+            email: 'contact@acmecorp.com', 
+            phone: '(555) 123-4567',
+            balance: 1200.00
+          },
+          { 
+            id: 'mock-id-2', 
+            display_name: 'TechStart Inc', 
+            email: 'info@techstart.com', 
+            phone: '(555) 987-6543',
+            balance: 450.75
+          },
+          { 
+            id: 'mock-id-3', 
+            display_name: 'Global Widgets', 
+            email: 'sales@globalwidgets.com', 
+            phone: '(555) 456-7890',
+            balance: 0.00
+          }
+        ];
+      }
+
       const { data, error } = await supabase
         .from("customer_profile")
         .select("*")

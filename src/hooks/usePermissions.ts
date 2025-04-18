@@ -18,12 +18,12 @@ export const usePermissions = () => {
   const { user } = useAuth();
   const { isDevMode, devRole } = useDevMode();
 
+  // Only fetch permissions from database when not in dev mode and user is logged in
+  const shouldFetchPermissions = !isDevMode && !!user;
+
   const { data: rolePermissions } = useQuery({
-    queryKey: ['rolePermissions', user?.id],
+    queryKey: ['rolePermissions', user?.id, isDevMode],
     queryFn: async () => {
-      // Skip database query in dev mode
-      if (isDevMode) return [];
-      
       const { data, error } = await supabase
         .from('role_permissions')
         .select('*');
@@ -31,15 +31,12 @@ export const usePermissions = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!user && !isDevMode,
+    enabled: shouldFetchPermissions,
   });
 
   const { data: userPermissions } = useQuery({
-    queryKey: ['userPermissions', user?.id],
+    queryKey: ['userPermissions', user?.id, isDevMode],
     queryFn: async () => {
-      // Skip database query in dev mode
-      if (isDevMode) return [];
-      
       const { data, error } = await supabase
         .from('user_permissions')
         .select('*')
@@ -48,20 +45,24 @@ export const usePermissions = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!user && !isDevMode,
+    enabled: shouldFetchPermissions,
   });
+
+  // Synchronous function for dev mode checks
+  const checkDevModePermission = useCallback((resource: PermissionResource, action: PermissionAction): boolean => {
+    return DEV_MODE_PERMISSIONS[devRole]?.[resource]?.includes(action) || false;
+  }, [devRole]);
 
   const checkPermission = useCallback(
     async (resource: PermissionResource, action: PermissionAction): Promise<boolean> => {
-      // If dev mode is active, use the mock permissions
+      // If in dev mode, use the mock permissions
       if (isDevMode) {
-        return DEV_MODE_PERMISSIONS[devRole][resource]?.includes(action) || false;
+        return checkDevModePermission(resource, action);
       }
       
       // If no user, no permissions
       if (!user) return false;
 
-      // For non-dev mode, use the database permission check
       try {
         const { data, error } = await supabase.rpc('user_has_permission', {
           p_user_id: user.id,
@@ -80,11 +81,12 @@ export const usePermissions = () => {
         return false;
       }
     },
-    [user, isDevMode, devRole]
+    [user, isDevMode, devRole, checkDevModePermission]
   );
 
   return {
     checkPermission,
+    checkDevModePermission,
     rolePermissions,
     userPermissions,
   };

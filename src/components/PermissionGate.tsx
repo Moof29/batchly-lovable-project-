@@ -20,10 +20,17 @@ export const PermissionGate: React.FC<PermissionGateProps> = ({
 }) => {
   const { checkPermission } = usePermissions();
   const { isDevMode, devRole } = useDevMode();
+  
+  // For immediate dev mode permission checks
+  if (isDevMode) {
+    const hasDevPermission = DEV_MODE_PERMISSIONS[devRole][resource]?.includes(action) || false;
+    return hasDevPermission ? <>{children}</> : <>{fallback}</>;
+  }
 
   const { data: hasPermission, isLoading } = useQuery({
     queryKey: ['permission', resource, action, isDevMode, devRole],
     queryFn: () => checkPermission(resource, action),
+    enabled: !isDevMode, // Only run this query if not in dev mode
   });
 
   if (isLoading) return null;
