@@ -16,7 +16,7 @@ import {
   SidebarMenuSubItem
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const menuItems = [
   { 
@@ -75,9 +75,36 @@ const menuItems = [
   },
 ];
 
+const STORAGE_KEY = 'batchly-sidebar-expanded';
+
 export const Navigation = () => {
   const location = useLocation();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  
+  // Load expanded state from localStorage on mount
+  useEffect(() => {
+    const savedExpanded = localStorage.getItem(STORAGE_KEY);
+    if (savedExpanded) {
+      try {
+        const parsed = JSON.parse(savedExpanded);
+        setExpandedItems(parsed);
+      } catch (e) {
+        console.error('Failed to parse saved sidebar state', e);
+      }
+    } else {
+      // Auto-expand the current section based on the URL path
+      const currentMainPath = '/' + location.pathname.split('/')[1];
+      const currentModule = menuItems.find(item => item.path === currentMainPath);
+      if (currentModule?.title) {
+        setExpandedItems([currentModule.title]);
+      }
+    }
+  }, [location.pathname]);
+
+  // Save expanded state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(expandedItems));
+  }, [expandedItems]);
   
   const toggleExpand = (title: string) => {
     setExpandedItems(prev => 
@@ -93,6 +120,13 @@ export const Navigation = () => {
         const isActive = location.pathname === item.path || 
                         (item.path !== '/' && location.pathname.startsWith(item.path));
         const isExpanded = expandedItems.includes(item.title);
+        
+        // Auto-expand when navigating to a submodule page
+        useEffect(() => {
+          if (isActive && item.subModules && !isExpanded) {
+            setExpandedItems(prev => [...prev, item.title]);
+          }
+        }, [location.pathname, isActive, item.title, isExpanded]);
         
         return (
           <SidebarMenuItem key={item.title}>
@@ -119,7 +153,7 @@ export const Navigation = () => {
             {item.subModules && isExpanded && (
               <SidebarMenuSub>
                 {item.subModules.map((subModule) => {
-                  const isSubActive = location.pathname === subModule.path;
+                  const isSubActive = location.pathname === subModule.path || location.pathname.startsWith(subModule.path);
                   
                   return (
                     <SidebarMenuSubItem key={subModule.path}>
@@ -144,4 +178,3 @@ export const Navigation = () => {
     </SidebarMenu>
   );
 };
-
