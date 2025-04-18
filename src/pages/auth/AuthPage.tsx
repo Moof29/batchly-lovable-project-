@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -78,7 +77,9 @@ export const AuthPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
       <div className="max-w-md w-full space-y-8">
         <div className="flex flex-col items-center">
-          <Logo className="w-20 h-20" />
+          <div className="w-20 h-20">
+            <Logo />
+          </div>
           <h1 className="mt-2 text-3xl font-bold">Batchly</h1>
           <p className="text-gray-600">ERP for Businesses</p>
         </div>

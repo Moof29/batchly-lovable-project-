@@ -100,8 +100,8 @@ const App = () => (
                     <Route path="accounts-payable" element={<AccountsPayable />} />
                   </Route>
                   
-                  <Route path="/settings" element={<SettingsLayout />} requiredRole="admin">
-                    <Route index element={<GeneralSettings />} />
+                  <Route path="/settings" element={<SettingsLayout />}>
+                    <Route index element={<ProtectedRoute requiredRole="admin" element={<GeneralSettings />} />} />
                   </Route>
                 </Route>
                 

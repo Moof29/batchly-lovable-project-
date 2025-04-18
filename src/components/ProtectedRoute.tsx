@@ -3,12 +3,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UserRole } from "@/types/auth";
 import { Loader2 } from "lucide-react";
 import { useDevMode } from "@/contexts/DevModeContext";
+import React from "react";
 
 interface ProtectedRouteProps {
   requiredRole?: UserRole;
+  element?: React.ReactElement;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole, element }) => {
   const { isAuthenticated, loading, user, hasPermission } = useAuth();
   const { isDevMode } = useDevMode();
   const location = useLocation();
@@ -56,5 +58,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) 
   }
 
   // Otherwise, render the protected content
-  return <Outlet />;
+  // If element prop is provided, render that instead of the Outlet
+  return element ? element : <Outlet />;
 };
