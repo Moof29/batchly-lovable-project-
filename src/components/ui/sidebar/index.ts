@@ -3,20 +3,20 @@
 export * from "./base"
 export * from "./context"
 export * from "./menu"
-export * from "./menu-button"
 export * from "./types"
 
-// Re-export specific components
+// Re-export specific components from base.tsx
 export {
   Sidebar,
   SidebarContent,
   SidebarHeader,
 } from "./base"
 
+// Re-export specific components from menu.tsx
 export {
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton,
+  SidebarMenuSubButton as SidebarMenuButton,
 } from "./menu"
 
 // Re-export the context provider and hook

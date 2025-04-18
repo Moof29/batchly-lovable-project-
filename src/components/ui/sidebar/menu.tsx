@@ -52,7 +52,7 @@ export const SidebarMenuSubItem = React.forwardRef<
 >(({ ...props }, ref) => <li ref={ref} {...props} />)
 SidebarMenuSubItem.displayName = "SidebarMenuSubItem"
 
-export const SidebarMenuSubButton = React.forwardRef<
+export const SidebarMenuButton = React.forwardRef<
   HTMLAnchorElement,
   React.ComponentProps<"a"> & {
     asChild?: boolean
@@ -80,7 +80,9 @@ export const SidebarMenuSubButton = React.forwardRef<
     />
   )
 })
-SidebarMenuSubButton.displayName = "SidebarMenuSubButton"
+SidebarMenuButton.displayName = "SidebarMenuButton"
+
+export const SidebarMenuSubButton = SidebarMenuButton;
 
 export const SidebarMenuAction = React.forwardRef<
   HTMLButtonElement,

@@ -1,6 +1,6 @@
 
 import { Header } from "@/components/ui/header";
-import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarProvider } from "@/components/ui/sidebar";
 import { NavigationMenu } from "./NavigationMenu";
 import { useIsMobile } from "@/hooks/use-mobile";
 

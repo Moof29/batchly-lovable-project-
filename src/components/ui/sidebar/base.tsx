@@ -7,9 +7,10 @@ import { useSidebar } from "./context"
 export const Sidebar = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
-    variant?: "default" | "floating"
+    variant?: "default" | "floating";
+    collapsible?: "icon" | "offcanvas" | boolean;
   }
->(({ variant = "default", className, children, ...props }, ref) => {
+>(({ variant = "default", collapsible, className, children, ...props }, ref) => {
   const { isMobile, openMobile, setOpenMobile } = useSidebar()
 
   if (isMobile) {
@@ -29,6 +30,7 @@ export const Sidebar = React.forwardRef<
         "flex h-screen w-64 flex-col border-r bg-background",
         className
       )}
+      data-collapsible={collapsible || undefined}
       {...props}
     >
       {children}
