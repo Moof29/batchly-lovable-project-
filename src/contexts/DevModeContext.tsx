@@ -2,8 +2,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserRole } from '@/types/auth';
 import { toast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
 
 interface DevModeContextType {
   isDevMode: boolean;
@@ -24,7 +22,6 @@ const DevModeContext = createContext<DevModeContextType>({
 export const DevModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isDevMode, setIsDevMode] = useState<boolean>(true);
   const [devRole, setDevRole] = useState<UserRole>('admin');
-  const navigate = useNavigate();
 
   useEffect(() => {
     try {
@@ -74,7 +71,6 @@ export const DevModeProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setDevRole('admin');
     localStorage.setItem('batchly-dev-mode', 'true');
     localStorage.setItem('batchly-dev-role', 'admin');
-    navigate('/');
     toast({
       title: 'Dev Mode Reset',
       description: 'Dev mode has been reset to admin role',
