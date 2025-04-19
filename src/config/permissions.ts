@@ -1,4 +1,3 @@
-
 import { UserRole } from '@/types/auth';
 
 // Role hierarchy for permission checks
@@ -11,11 +10,6 @@ export const ROLE_HIERARCHY: { [key in UserRole]: number } = {
   'customer_service': 20
 };
 
-export const hasRolePermission = (userRole: UserRole, requiredRole: UserRole): boolean => {
-  return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
-};
-
-// Permission types that are also defined in usePermissions.ts
 export type PermissionAction = 'create' | 'read' | 'update' | 'delete' | 'manage';
 export type PermissionResource = 
   | 'users' | 'customers' | 'vendors' | 'employees'
@@ -23,7 +17,7 @@ export type PermissionResource =
   | 'invoices' | 'bills' | 'payments' | 'accounts'
   | 'time_tracking' | 'reports' | 'settings' | 'integrations';
 
-// Define dev mode permissions based on roles
+// Define permissions based on roles
 export const DEV_MODE_PERMISSIONS: Record<UserRole, Record<PermissionResource, PermissionAction[]>> = {
   admin: {
     users: ['create', 'read', 'update', 'delete', 'manage'],
@@ -115,4 +109,8 @@ export const DEV_MODE_PERMISSIONS: Record<UserRole, Record<PermissionResource, P
     settings: [],
     integrations: []
   }
+};
+
+export const hasRolePermission = (userRole: UserRole, requiredRole: UserRole): boolean => {
+  return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
 };
