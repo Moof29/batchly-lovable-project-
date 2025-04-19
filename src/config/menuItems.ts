@@ -16,7 +16,7 @@ import { ROLE_HIERARCHY } from '@/config/permissions';
 export const menuItems: MenuItem[] = [
   {
     title: 'Dashboard',
-    path: '/',
+    path: '/dashboard',  // Updated from '/' to '/dashboard'
     icon: Home,
     permissions: ['customer_service']
   },
