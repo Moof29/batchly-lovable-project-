@@ -7,24 +7,39 @@ import {
   ShoppingCart, 
   FileJson, 
   Database,
-  Package2, // Replaced 'Inventory' with 'Package2'
+  Package2,
   Truck,
   MapPin,
-  RotateCcw, // Replaced 'Return' with 'RotateCcw'
+  RotateCcw,
   Calendar
 } from "lucide-react";
+import { useEffect } from "react";
 
 export const Dashboard = () => {
   const { user } = useAuth();
+
+  useEffect(() => {
+    console.log('[Dashboard] User:', user);
+  }, [user]);
+
+  // Ensure user exists before rendering
+  if (!user) {
+    console.warn('[Dashboard] No user found');
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Loading user information...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">
-          Welcome, {user?.first_name}
+          Welcome, {user.first_name || 'User'}
         </h1>
         <span className="text-sm text-muted-foreground capitalize">
-          Role: {user?.role.replace('_', ' ')}
+          Role: {user.role.replace('_', ' ')}
         </span>
       </div>
 
