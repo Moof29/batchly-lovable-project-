@@ -3,24 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Users, 
   ShoppingCart, 
-  FileJson, 
-  Database,
   Package2,
   Truck,
-  MapPin,
-  RotateCcw,
-  Calendar
+  DollarSign,
+  BarChart2
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { RoleBasedView } from "@/components/RoleBasedView";
-import { useEffect } from "react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export const DashboardPage = () => {
   const { user } = useAuth();
-
-  useEffect(() => {
-    console.log('[Dashboard] User:', user);
-  }, [user]);
 
   if (!user) {
     return (
@@ -34,132 +26,85 @@ export const DashboardPage = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">
-          Welcome, {user.first_name || 'User'}
+          Dashboard Overview
         </h1>
         <span className="text-sm text-muted-foreground capitalize">
-          Role: {user.role.replace('_', ' ')}
+          Welcome, {user.first_name || 'User'}
         </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <RoleBasedView allowedRoles={['admin']}>
-          <Card className="bg-white rounded-xl shadow-lg">
-            <CardHeader className="flex flex-row items-center gap-2">
-              <Users className="h-5 w-5" />
-              <CardTitle>User Management</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Manage user accounts, roles, and permissions
-              </p>
-            </CardContent>
-          </Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="bg-white rounded-xl shadow-lg">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Customers</CardTitle>
+            <Users className="h-5 w-5 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">1,234</div>
+            <p className="text-xs text-muted-foreground">+12% from last month</p>
+          </CardContent>
+        </Card>
 
-          <Card className="bg-white rounded-xl shadow-lg">
-            <CardHeader className="flex flex-row items-center gap-2">
-              <FileJson className="h-5 w-5" />
-              <CardTitle>QuickBooks Integration</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Configure and monitor QuickBooks sync settings
-              </p>
-            </CardContent>
-          </Card>
+        <Card className="bg-white rounded-xl shadow-lg">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+            <ShoppingCart className="h-5 w-5 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">456</div>
+            <p className="text-xs text-muted-foreground">+8% from last month</p>
+          </CardContent>
+        </Card>
 
-          <Card className="bg-white rounded-xl shadow-lg">
-            <CardHeader className="flex flex-row items-center gap-2">
-              <Database className="h-5 w-5" />
-              <CardTitle>System Analytics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                View system-wide reports and analytics
-              </p>
-            </CardContent>
-          </Card>
-        </RoleBasedView>
-
-        <RoleBasedView allowedRoles={['admin', 'sales_manager']}>
-          <Card className="bg-white rounded-xl shadow-lg">
-            <CardHeader className="flex flex-row items-center gap-2">
-              <ShoppingCart className="h-5 w-5" />
-              <CardTitle>Sales Dashboard</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                View sales performance and manage orders
-              </p>
-            </CardContent>
-          </Card>
-        </RoleBasedView>
-
-        <RoleBasedView allowedRoles={['admin', 'warehouse_staff']}>
-          <Card className="bg-white rounded-xl shadow-lg">
-            <CardHeader className="flex flex-row items-center gap-2">
-              <Package2 className="h-5 w-5" />
-              <CardTitle>Inventory Management</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Monitor stock levels and manage inventory
-              </p>
-            </CardContent>
-          </Card>
-        </RoleBasedView>
-
-        <RoleBasedView allowedRoles={['admin', 'delivery_driver']}>
-          <Card className="bg-white rounded-xl shadow-lg">
-            <CardHeader className="flex flex-row items-center gap-2">
-              <Truck className="h-5 w-5" />
-              <CardTitle>Delivery Routes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                View delivery schedule and manage routes
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white rounded-xl shadow-lg">
-            <CardHeader className="flex flex-row items-center gap-2">
-              <MapPin className="h-5 w-5" />
-              <CardTitle>Customer Locations</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Access delivery addresses and contact info
-              </p>
-            </CardContent>
-          </Card>
-        </RoleBasedView>
-
-        <RoleBasedView allowedRoles={['admin', 'customer_service']}>
-          <Card className="bg-white rounded-xl shadow-lg">
-            <CardHeader className="flex flex-row items-center gap-2">
-              <RotateCcw className="h-5 w-5" />
-              <CardTitle>Returns</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Process customer returns and refunds
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white rounded-xl shadow-lg">
-            <CardHeader className="flex flex-row items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              <CardTitle>Order Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Track and update customer order status
-              </p>
-            </CardContent>
-          </Card>
-        </RoleBasedView>
+        <Card className="bg-white rounded-xl shadow-lg">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <DollarSign className="h-5 w-5 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">$45,231</div>
+            <p className="text-xs text-muted-foreground">+15% from last month</p>
+          </CardContent>
+        </Card>
       </div>
+
+      <Card className="bg-white rounded-xl shadow-lg">
+        <CardHeader>
+          <CardTitle>Recent Orders</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Order ID</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Total</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>#1234</TableCell>
+                <TableCell>John Doe</TableCell>
+                <TableCell>Shipped</TableCell>
+                <TableCell>$250.00</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>#5678</TableCell>
+                <TableCell>Jane Smith</TableCell>
+                <TableCell>Pending</TableCell>
+                <TableCell>$175.50</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>#9012</TableCell>
+                <TableCell>Mike Johnson</TableCell>
+                <TableCell>Processing</TableCell>
+                <TableCell>$385.75</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -41,6 +41,7 @@ import { BillDetail } from "./pages/purchases/BillDetail";
 import { InvoiceDetail } from "./pages/sales/InvoiceDetail";
 import { TimeEntryDetail } from "./pages/people/TimeEntryDetail";
 import DashboardPage from "./pages/dashboard/DashboardPage";
+import { Dashboard } from "./pages/Dashboard";  // This will update the import
 
 const queryClient = new QueryClient();
 
@@ -55,13 +56,16 @@ const App = () => (
               <Sonner />
               <DevModeToggle />
               <Routes>
+                {/* Update the root route to point to dashboard */}
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                
                 {/* Auth route - explicitly outside the ProtectedRoute component */}
                 <Route path="/auth" element={<AuthPage />} />
                 
                 <Route element={<ProtectedRoute />}>
                   {/* Update dashboard route */}
-                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                  <Route path="/dashboard" element={<DashboardPage />} />
+                  
                   
                   <Route path="/sales" element={<SalesLayout />}>
                     <Route index element={<SalesOrderList />} />
