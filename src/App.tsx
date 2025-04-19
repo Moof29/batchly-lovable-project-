@@ -1,3 +1,4 @@
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -56,8 +57,13 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/auth" element={<AuthPage />} />
+                
+                {/* Dashboard is protected but maintains its own layout */}
+                <Route path="/dashboard" element={
+                  <ProtectedRoute element={<DashboardPage />} />
+                } />
+                
                 <Route element={<ProtectedRoute />}>
-                  <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/sales" element={<SalesLayout />}>
                     <Route index element={<SalesOrderList />} />
                     <Route path="orders" element={<SalesOrderList />} />
@@ -66,6 +72,7 @@ const App = () => (
                     <Route path="invoices" element={<InvoiceList />} />
                     <Route path="invoices/:id" element={<InvoiceDetail />} />
                   </Route>
+                  
                   <Route path="/purchases" element={<PurchasesLayout />}>
                     <Route index element={<PurchaseOrderList />} />
                     <Route path="orders" element={<PurchaseOrderList />} />
@@ -73,11 +80,13 @@ const App = () => (
                     <Route path="bills" element={<BillList />} />
                     <Route path="bills/:id" element={<BillDetail />} />
                   </Route>
+                  
                   <Route path="/inventory" element={<InventoryLayout />}>
                     <Route index element={<ItemList />} />
                     <Route path="items" element={<ItemList />} />
                     <Route path="items/:id" element={<ItemDetail />} />
                   </Route>
+                  
                   <Route path="/people" element={<PeopleLayout />}>
                     <Route index element={<CustomerList />} />
                     <Route path="customers" element={<CustomerList />} />
@@ -89,16 +98,19 @@ const App = () => (
                     <Route path="time-tracking" element={<TimeTrackingList />} />
                     <Route path="time-tracking/:id" element={<TimeEntryDetail />} />
                   </Route>
+                  
                   <Route path="/payments" element={<PaymentsLayout />}>
                     <Route index element={<AccountsReceivable />} />
                     <Route path="accounts-receivable" element={<AccountsReceivable />} />
                     <Route path="accounts-payable" element={<AccountsPayable />} />
                   </Route>
+                  
                   <Route path="/settings" element={<SettingsLayout />}>
                     <Route index element={<ProtectedRoute requiredRole="admin" element={<GeneralSettings />} />} />
                     <Route path="integrations" element={<ProtectedRoute requiredRole="admin" element={<IntegrationsSettingsPage />} />} />
                   </Route>
                 </Route>
+                
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </SidebarProvider>
