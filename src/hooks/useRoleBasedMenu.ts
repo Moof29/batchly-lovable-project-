@@ -33,7 +33,7 @@ export const useRoleBasedMenu = () => {
         // Filter children recursively
         const filteredChildren = item.children 
           ? filterMenuItemsByRole(item.children, role)
-          : undefined;
+          : [];
           
         // Return the item with filtered children
         return {
