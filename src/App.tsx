@@ -63,8 +63,7 @@ const App = () => (
                 <Route path="/auth" element={<AuthPage />} />
                 
                 <Route element={<ProtectedRoute />}>
-                  {/* Update dashboard route */}
-                  
+                  {/* Sales routes */}
                   <Route path="/sales" element={<SalesLayout />}>
                     <Route index element={<SalesOrderList />} />
                     <Route path="orders" element={<SalesOrderList />} />
