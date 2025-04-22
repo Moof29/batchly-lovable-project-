@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from 'uuid';
@@ -343,7 +344,13 @@ class QBOService {
 
     if (errorMessage) {
       updateData.error_message = errorMessage;
-      updateData.retry_count = supabase.rpc('increment_retry_count', { op_id: operationId });
+      // Replace the RPC call with a direct update of retry_count
+      updateData.retry_count = supabase
+        .from('qbo_sync_operation')
+        .select('retry_count')
+        .eq('id', operationId)
+        .single()
+        .then(result => (result.data?.retry_count || 0) + 1);
     }
 
     const { error } = await supabase
