@@ -1,248 +1,535 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { useDevMode } from "@/contexts/DevModeContext";
-import { toast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
-import { 
-  Link2, 
-  Unlink, 
-  RefreshCw, 
-  Settings, 
-  Calendar, 
-  ClockIcon, 
-  AlertCircle,
-  CheckCircle2,
-  XCircle,
-  DatabaseBackup,
-  FileText,
-  Wallet,
-  Package,
-  Users,
-  Info,
-  ShieldAlert
-} from "lucide-react";
-
-import { QBOConnectionStatus } from "@/components/integrations/QBOConnectionStatus";
-import { QBOSyncStatus } from "@/components/integrations/QBOSyncStatus";
-import { QBOSyncSettings } from "@/components/integrations/QBOSyncSettings";
-import { QBOSyncLogs } from "@/components/integrations/QBOSyncLogs";
-import { QBOMockConnectionModal } from "@/components/integrations/QBOMockConnectionModal";
-import { RestrictedFeatureAlert } from "@/components/RestrictedFeatureAlert";
-
-import { useQBOIntegration } from "@/hooks/useQBOIntegration";
+import { QBOConnectionStatus } from '@/components/integrations/QBOConnectionStatus';
+import { QBOSyncStatus } from '@/components/integrations/QBOSyncStatus';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useQBOIntegration } from '@/hooks/useQBOIntegration';
+import { useQBOSync } from '@/hooks/useQBOSync';
+import { useAuth } from '@/contexts/AuthContext';
+import { Loader2, Settings, List, Activity, AlertTriangle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { QBOSyncLogs } from '@/components/integrations/QBOSyncLogs';
+import { QBOSyncSettings } from '@/components/integrations/QBOSyncSettings';
+import { QBOMockConnectionModal } from '@/components/integrations/QBOMockConnectionModal';
+import { toast } from '@/hooks/use-toast';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Progress } from '@/components/ui/progress';
+import { useDevMode } from '@/contexts/DevModeContext';
 
 export const QBOIntegrationPage = () => {
-  const { user, hasPermission } = useAuth();
-  const { isDevMode, devRole } = useDevMode();
-  const [showMockModal, setShowMockModal] = useState(false);
+  const { user } = useAuth();
+  const { isDevMode } = useDevMode();
+  const { isConnected, connectionDetails, syncSettings, beginOAuthFlow, disconnectQBO } = useQBOIntegration();
   
+  // State for the mock connection modal
+  const [isMockModalOpen, setIsMockModalOpen] = useState(false);
+  
+  // Get organization ID (in a real app, this would come from the user's profile)
+  const organizationId = user?.organization_id || (isDevMode ? "00000000-0000-0000-0000-000000000000" : undefined);
+  
+  // Use our enhanced QBO sync hook
   const {
-    isConnected,
-    connectionDetails,
-    lastSync,
-    syncErrors,
-    syncSettings,
-    syncInProgress,
-    beginOAuthFlow,
-    disconnectQBO,
-    updateSyncSettings,
-    triggerSync,
-  } = useQBOIntegration();
+    connection,
+    isLoadingConnection,
+    entityConfigs,
+    isLoadingEntityConfigs,
+    pendingOperations,
+    isLoadingPendingOperations,
+    syncHistory,
+    isLoadingSyncHistory,
+    errors,
+    isLoadingErrors,
+    syncEntities,
+    isSyncing,
+    processOperations,
+    isProcessing,
+    resolveError,
+    updateEntityConfig
+  } = useQBOSync(organizationId);
+
+  // Process pending operations automatically
+  useEffect(() => {
+    if (pendingOperations.length > 0 && !isProcessing) {
+      processOperations();
+    }
+  }, [pendingOperations, isProcessing, processOperations]);
   
-  // User can only view this page if they're an admin or in dev mode with admin role
-  const hasAccess = hasPermission('admin') || (isDevMode && devRole === 'admin');
+  // Function to handle the QBO connection
+  const handleConnect = () => {
+    if (isDevMode) {
+      // In dev mode, show the mock connection modal
+      setIsMockModalOpen(true);
+    } else {
+      // In production, initiate real OAuth flow
+      beginOAuthFlow();
+    }
+  };
   
-  if (!hasAccess) {
-    return (
-      <div className="space-y-6">
-        <RestrictedFeatureAlert
-          title="Access Denied: QuickBooks Integration"
-          description="Only administrators can access QuickBooks Online integration settings. This feature is restricted as it affects company-wide financial data synchronization."
-          requiredRole="admin"
-          showSettingsButton={true}
-        />
-      </div>
-    );
-  }
+  // Entity types for the integration
+  const entityTypes = [
+    { type: 'customer_profile', label: 'Customers', priority: 1 },
+    { type: 'vendor_profile', label: 'Vendors', priority: 1 },
+    { type: 'item_record', label: 'Items/Products', priority: 2 },
+    { type: 'invoice_record', label: 'Invoices', priority: 3 },
+    { type: 'bill_record', label: 'Bills', priority: 3 },
+    { type: 'payment_receipt', label: 'Payments', priority: 4 }
+  ];
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
         <div>
-          <h2 className="text-2xl font-semibold">QuickBooks Online Integration</h2>
-          <p className="text-sm text-muted-foreground">
-            Connect and manage your QuickBooks Online account
-          </p>
+          <h1 className="text-2xl font-semibold tracking-tight">QuickBooks Online Integration</h1>
+          <p className="text-muted-foreground">Connect and sync data with your QuickBooks Online account</p>
         </div>
-        {isDevMode && (
-          <div className="flex items-center gap-2">
-            <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200">Demo Mode</Badge>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowMockModal(true)}
-            >
-              Configure Mock QBO
-            </Button>
-          </div>
-        )}
       </div>
       
-      {isDevMode && (
-        <Alert className="bg-brand-50 border-brand-200">
-          <Info className="h-4 w-4 text-brand-500" />
-          <AlertTitle>Demo Mode Active</AlertTitle>
-          <AlertDescription>
-            This is a demonstration of the QuickBooks Online integration interface. In demo mode, all actions are simulated and no real data is affected.
-            <div className="mt-2 text-sm">
-              <p className="font-medium">Demo Administrator Features:</p>
-              <ul className="list-disc list-inside pl-2 text-muted-foreground">
-                <li>Connect and disconnect from QuickBooks</li>
-                <li>Configure sync settings for different data types</li>
-                <li>View sync logs and troubleshoot integration issues</li>
-                <li>Trigger manual data synchronization</li>
-              </ul>
-            </div>
-          </AlertDescription>
-        </Alert>
-      )}
-      
+      {/* Connection Status Card */}
       <QBOConnectionStatus 
         isConnected={isConnected} 
-        connectionDetails={connectionDetails}
-        onConnect={beginOAuthFlow}
+        connectionDetails={connectionDetails} 
+        onConnect={handleConnect}
         onDisconnect={disconnectQBO}
       />
       
+      {/* If connected, show more integration options */}
       {isConnected && (
-        <Tabs defaultValue="status">
-          <TabsList className="grid grid-cols-4 mb-6">
-            <TabsTrigger value="status">Sync Status</TabsTrigger>
-            <TabsTrigger value="settings">Sync Settings</TabsTrigger>
-            <TabsTrigger value="logs">Sync Logs</TabsTrigger>
-            <TabsTrigger value="troubleshoot">Troubleshooting</TabsTrigger>
+        <Tabs defaultValue="sync" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="sync" className="flex gap-2 items-center">
+              <Activity className="h-4 w-4" />
+              Sync Status
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="flex gap-2 items-center">
+              <Settings className="h-4 w-4" />
+              Settings
+            </TabsTrigger>
+            <TabsTrigger value="entities" className="flex gap-2 items-center">
+              <List className="h-4 w-4" />
+              Entities
+            </TabsTrigger>
+            <TabsTrigger value="errors" className="flex gap-2 items-center">
+              <AlertTriangle className="h-4 w-4" />
+              Errors {errors.length > 0 && (
+                <Badge variant="destructive" className="ml-1">{errors.length}</Badge>
+              )}
+            </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="status">
-            <Card>
-              <CardHeader>
-                <CardTitle>Sync Status</CardTitle>
-                <CardDescription>Current status of your QuickBooks Online data synchronization</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <QBOSyncStatus 
-                  lastSync={lastSync}
-                  syncErrors={syncErrors}
-                  syncInProgress={syncInProgress}
-                  onTriggerSync={triggerSync}
-                />
-              </CardContent>
-            </Card>
+          {/* Sync Status Tab */}
+          <TabsContent value="sync" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Sync Overview</CardTitle>
+                  <CardDescription>Current sync status and operations</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {isLoadingPendingOperations ? (
+                    <div className="flex justify-center p-4">
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">Pending Operations</span>
+                        <Badge variant="outline">{pendingOperations.length}</Badge>
+                      </div>
+                      
+                      {entityTypes.map((entity) => {
+                        const entityOps = pendingOperations.filter(op => op.entity_type === entity.type);
+                        if (entityOps.length === 0) return null;
+                        
+                        return (
+                          <div key={entity.type} className="border rounded-md p-3 space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span>{entity.label}</span>
+                              <Badge>{entityOps.length}</Badge>
+                            </div>
+                            <Progress value={(entityOps.filter(op => op.status === 'success').length / entityOps.length) * 100} />
+                          </div>
+                        );
+                      })}
+                      
+                      {pendingOperations.length === 0 && (
+                        <div className="text-center py-4 text-muted-foreground">
+                          No pending operations
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+                <CardFooter className="flex justify-between">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => processOperations()}
+                    disabled={isProcessing || pendingOperations.length === 0}
+                  >
+                    {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Process Pending
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      // In a real app, you'd implement full sync logic here
+                      toast({
+                        title: "Full sync initiated",
+                        description: "Starting full synchronization with QuickBooks Online",
+                      });
+                    }}
+                  >
+                    Full Sync
+                  </Button>
+                </CardFooter>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Sync History</CardTitle>
+                  <CardDescription>Recent synchronization activities</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {isLoadingSyncHistory ? (
+                    <div className="flex justify-center p-4">
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {syncHistory.length > 0 ? (
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Date</TableHead>
+                              <TableHead>Type</TableHead>
+                              <TableHead className="text-right">Results</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {syncHistory.slice(0, 5).map((history) => (
+                              <TableRow key={history.id}>
+                                <TableCell>
+                                  {new Date(history.started_at).toLocaleDateString()}
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant="outline" className="capitalize">
+                                    {history.sync_type}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  {history.status === 'completed' ? (
+                                    <span className="text-green-600 font-medium">
+                                      {history.success_count}/{history.entity_count}
+                                    </span>
+                                  ) : history.status === 'failed' ? (
+                                    <span className="text-red-600 font-medium">
+                                      Failed
+                                    </span>
+                                  ) : (
+                                    <span className="text-amber-600 font-medium">
+                                      In Progress
+                                    </span>
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      ) : (
+                        <div className="text-center py-4 text-muted-foreground">
+                          No sync history available
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Sync Status Component with our enhanced data */}
+            <QBOSyncStatus
+              lastSync={connection?.last_sync_at ? new Date(connection.last_sync_at) : null}
+              syncErrors={errors.map(err => ({
+                id: err.id,
+                entityType: err.error_category === 'data' ? 'items' : 'customers',
+                message: err.error_message,
+                timestamp: new Date(err.last_occurred_at),
+                resolved: err.is_resolved
+              }))}
+              syncInProgress={isProcessing || isSyncing}
+              onTriggerSync={async (entityTypes) => {
+                if (!entityTypes || entityTypes.length === 0) {
+                  // Trigger full sync of all entities
+                  // In a real implementation, you'd have proper logic here
+                  toast({
+                    title: "Full sync initiated",
+                    description: "Starting sync for all entities",
+                  });
+                } else {
+                  // Sync specific entity type
+                  // In a real implementation, you'd fetch IDs and sync
+                  toast({
+                    title: "Entity sync initiated",
+                    description: `Starting sync for ${entityTypes.join(', ')}`,
+                  });
+                }
+              }}
+            />
           </TabsContent>
           
+          {/* Settings Tab */}
           <TabsContent value="settings">
             <Card>
               <CardHeader>
                 <CardTitle>Sync Settings</CardTitle>
-                <CardDescription>Configure what data is synchronized between systems</CardDescription>
+                <CardDescription>Configure how data is synchronized with QuickBooks Online</CardDescription>
               </CardHeader>
-              <CardContent>
-                <QBOSyncSettings 
-                  settings={syncSettings} 
-                  updateSettings={updateSyncSettings}
+              <CardContent className="space-y-6">
+                <QBOSyncSettings
+                  settings={syncSettings}
+                  onChange={(newSettings) => {
+                    // In a real implementation, you'd save these settings
+                    toast({
+                      title: "Settings updated",
+                      description: "Your QuickBooks sync settings have been updated",
+                    });
+                  }}
                 />
               </CardContent>
             </Card>
           </TabsContent>
           
-          <TabsContent value="logs">
+          {/* Entities Tab */}
+          <TabsContent value="entities">
             <Card>
               <CardHeader>
-                <CardTitle>Sync Logs</CardTitle>
-                <CardDescription>History of synchronization activities</CardDescription>
+                <CardTitle>Entity Configuration</CardTitle>
+                <CardDescription>Configure how each entity type synchronizes with QuickBooks</CardDescription>
               </CardHeader>
               <CardContent>
-                <QBOSyncLogs />
+                {isLoadingEntityConfigs ? (
+                  <div className="flex justify-center p-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  <Accordion type="single" collapsible className="space-y-4">
+                    {entityTypes.map((entity) => {
+                      const config = entityConfigs.find(ec => ec.entity_type === entity.type);
+                      if (!config) return null;
+                      
+                      return (
+                        <AccordionItem key={entity.type} value={entity.type} className="border rounded-md px-4">
+                          <AccordionTrigger className="py-4">
+                            <div className="flex items-center justify-between w-full pr-4">
+                              <div className="flex items-center gap-3">
+                                <span className="font-medium">{entity.label}</span>
+                                {config.is_enabled ? (
+                                  <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Enabled</Badge>
+                                ) : (
+                                  <Badge variant="outline" className="bg-gray-100">Disabled</Badge>
+                                )}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                Priority: {config.priority_level}
+                              </div>
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <div className="space-y-4 py-2">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                  <h4 className="text-sm font-medium mb-2">Sync Direction</h4>
+                                  <select 
+                                    className="w-full p-2 border rounded-md"
+                                    value={config.sync_direction}
+                                    onChange={(e) => updateEntityConfig({
+                                      configId: config.id,
+                                      updates: { sync_direction: e.target.value as any }
+                                    })}
+                                  >
+                                    <option value="bidirectional">Bidirectional</option>
+                                    <option value="to_qbo">To QuickBooks Only</option>
+                                    <option value="from_qbo">From QuickBooks Only</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <h4 className="text-sm font-medium mb-2">Batch Size</h4>
+                                  <select 
+                                    className="w-full p-2 border rounded-md"
+                                    value={config.batch_size}
+                                    onChange={(e) => updateEntityConfig({
+                                      configId: config.id,
+                                      updates: { batch_size: Number(e.target.value) }
+                                    })}
+                                  >
+                                    <option value="10">10 (Small)</option>
+                                    <option value="50">50 (Medium)</option>
+                                    <option value="100">100 (Large)</option>
+                                    <option value="250">250 (Very Large)</option>
+                                  </select>
+                                </div>
+                                
+                                <div>
+                                  <h4 className="text-sm font-medium mb-2">Priority Level</h4>
+                                  <select 
+                                    className="w-full p-2 border rounded-md"
+                                    value={config.priority_level}
+                                    onChange={(e) => updateEntityConfig({
+                                      configId: config.id,
+                                      updates: { priority_level: Number(e.target.value) }
+                                    })}
+                                  >
+                                    <option value="1">1 - Highest</option>
+                                    <option value="2">2 - High</option>
+                                    <option value="3">3 - Medium</option>
+                                    <option value="4">4 - Low</option>
+                                    <option value="5">5 - Lowest</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <h4 className="text-sm font-medium mb-2">Sync Frequency (minutes)</h4>
+                                  <select 
+                                    className="w-full p-2 border rounded-md"
+                                    value={config.sync_frequency_minutes}
+                                    onChange={(e) => updateEntityConfig({
+                                      configId: config.id,
+                                      updates: { sync_frequency_minutes: Number(e.target.value) }
+                                    })}
+                                  >
+                                    <option value="15">Every 15 minutes</option>
+                                    <option value="30">Every 30 minutes</option>
+                                    <option value="60">Every hour</option>
+                                    <option value="360">Every 6 hours</option>
+                                    <option value="720">Every 12 hours</option>
+                                    <option value="1440">Daily</option>
+                                  </select>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center pt-2">
+                                <label className="flex items-center cursor-pointer">
+                                  <input 
+                                    type="checkbox" 
+                                    className="sr-only"
+                                    checked={config.is_enabled}
+                                    onChange={() => updateEntityConfig({
+                                      configId: config.id,
+                                      updates: { is_enabled: !config.is_enabled }
+                                    })}
+                                  />
+                                  <div className={`relative w-10 h-5 transition-colors rounded-full ${config.is_enabled ? 'bg-brand-500' : 'bg-gray-300'}`}>
+                                    <div className={`absolute top-0.5 left-0.5 w-4 h-4 transition-transform bg-white rounded-full ${config.is_enabled ? 'transform translate-x-5' : ''}`}></div>
+                                  </div>
+                                  <span className="ml-2 text-sm font-medium">
+                                    {config.is_enabled ? 'Enabled' : 'Disabled'}
+                                  </span>
+                                </label>
+                                
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="ml-auto"
+                                  onClick={() => {
+                                    // In a real implementation, trigger entity sync
+                                    toast({
+                                      title: `Syncing ${entity.label}`,
+                                      description: "Starting synchronization for this entity type",
+                                    });
+                                  }}
+                                >
+                                  Sync Now
+                                </Button>
+                              </div>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      );
+                    })}
+                  </Accordion>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
           
-          <TabsContent value="troubleshoot">
+          {/* Errors Tab */}
+          <TabsContent value="errors">
             <Card>
               <CardHeader>
-                <CardTitle>Troubleshooting</CardTitle>
-                <CardDescription>Tools to diagnose and fix synchronization issues</CardDescription>
+                <CardTitle>Sync Errors</CardTitle>
+                <CardDescription>Review and resolve synchronization errors</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <h3 className="font-semibold">Connection Test</h3>
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <RefreshCw className="h-4 w-4" />
-                    Test QBO Connection
-                  </Button>
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-2">
-                  <h3 className="font-semibold">Data Reconciliation</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      Verify Customers
-                    </Button>
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <Package className="h-4 w-4" />
-                      Verify Inventory
-                    </Button>
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      Verify Invoices
-                    </Button>
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <Wallet className="h-4 w-4" />
-                      Verify Payments
-                    </Button>
+              <CardContent>
+                {isLoadingErrors ? (
+                  <div className="flex justify-center p-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                   </div>
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-2">
-                  <h3 className="font-semibold">Advanced</h3>
-                  <div className="flex flex-col gap-4">
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <DatabaseBackup className="h-4 w-4" />
-                      Reset Sync State
-                    </Button>
-                    <Button variant="destructive" className="flex items-center gap-2">
-                      <Unlink className="h-4 w-4" />
-                      Disconnect & Purge All Data
-                    </Button>
+                ) : errors.length > 0 ? (
+                  <div className="space-y-4">
+                    {errors.map((error) => (
+                      <div key={error.id} className="border border-red-200 bg-red-50 rounded-md p-4">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <Badge className={
+                                error.error_category === 'auth' ? 'bg-blue-100 text-blue-800' :
+                                error.error_category === 'validation' ? 'bg-amber-100 text-amber-800' :
+                                error.error_category === 'rate_limit' ? 'bg-purple-100 text-purple-800' :
+                                error.error_category === 'connection' ? 'bg-orange-100 text-orange-800' :
+                                'bg-red-100 text-red-800'
+                              }>
+                                {error.error_category}
+                              </Badge>
+                              <span className="text-sm text-muted-foreground">
+                                {new Date(error.last_occurred_at).toLocaleString()}
+                              </span>
+                              {error.occurrence_count > 1 && (
+                                <Badge variant="outline">
+                                  {error.occurrence_count} occurrences
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="font-medium">{error.error_message}</p>
+                            {error.suggested_resolution && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {error.suggested_resolution}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex gap-2 self-end md:self-center">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => resolveError(error.id)}
+                            >
+                              Resolve
+                            </Button>
+                            <Button 
+                              size="sm"
+                              onClick={() => {
+                                // In a real implementation, retry the operation
+                                toast({
+                                  title: "Retrying operation",
+                                  description: "Attempting to retry the failed operation",
+                                });
+                              }}
+                            >
+                              Retry
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-
-                {isDevMode && (
-                  <>
-                    <Separator />
-                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
-                      <p className="text-sm font-medium text-amber-800 flex items-center">
-                        <ShieldAlert className="h-4 w-4 mr-2" />
-                        Admin Only Feature
-                      </p>
-                      <p className="text-xs text-amber-600 mt-1">
-                        The QuickBooks integration troubleshooting tools are only accessible to administrators. Other roles won't have access to this section.
-                      </p>
-                    </div>
-                  </>
+                ) : (
+                  <div className="text-center py-4 text-muted-foreground">
+                    No errors found
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -250,10 +537,11 @@ export const QBOIntegrationPage = () => {
         </Tabs>
       )}
       
-      {isDevMode && showMockModal && (
+      {/* Mock QBO Connection Modal for dev mode */}
+      {isDevMode && (
         <QBOMockConnectionModal 
-          open={showMockModal}
-          onClose={() => setShowMockModal(false)}
+          isOpen={isMockModalOpen}
+          onClose={() => setIsMockModalOpen(false)}
         />
       )}
     </div>

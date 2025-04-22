@@ -305,6 +305,7 @@ export type Database = {
           memo: string | null
           organization_id: string | null
           qbo_id: string | null
+          qbo_sync_status: string | null
           status: string | null
           sync_status: string | null
           total: number | null
@@ -325,6 +326,7 @@ export type Database = {
           memo?: string | null
           organization_id?: string | null
           qbo_id?: string | null
+          qbo_sync_status?: string | null
           status?: string | null
           sync_status?: string | null
           total?: number | null
@@ -345,6 +347,7 @@ export type Database = {
           memo?: string | null
           organization_id?: string | null
           qbo_id?: string | null
+          qbo_sync_status?: string | null
           status?: string | null
           sync_status?: string | null
           total?: number | null
@@ -555,6 +558,7 @@ export type Database = {
           payment_terms: string | null
           phone: string | null
           qbo_id: string | null
+          qbo_sync_status: string | null
           shipping_address_line1: string | null
           shipping_address_line2: string | null
           shipping_city: string | null
@@ -596,6 +600,7 @@ export type Database = {
           payment_terms?: string | null
           phone?: string | null
           qbo_id?: string | null
+          qbo_sync_status?: string | null
           shipping_address_line1?: string | null
           shipping_address_line2?: string | null
           shipping_city?: string | null
@@ -637,6 +642,7 @@ export type Database = {
           payment_terms?: string | null
           phone?: string | null
           qbo_id?: string | null
+          qbo_sync_status?: string | null
           shipping_address_line1?: string | null
           shipping_address_line2?: string | null
           shipping_city?: string | null
@@ -1000,6 +1006,7 @@ export type Database = {
           organization_id: string | null
           po_number: string | null
           qbo_id: string | null
+          qbo_sync_status: string | null
           ship_date: string | null
           shipping_method: string | null
           shipping_total: number | null
@@ -1034,6 +1041,7 @@ export type Database = {
           organization_id?: string | null
           po_number?: string | null
           qbo_id?: string | null
+          qbo_sync_status?: string | null
           ship_date?: string | null
           shipping_method?: string | null
           shipping_total?: number | null
@@ -1068,6 +1076,7 @@ export type Database = {
           organization_id?: string | null
           po_number?: string | null
           qbo_id?: string | null
+          qbo_sync_status?: string | null
           ship_date?: string | null
           shipping_method?: string | null
           shipping_total?: number | null
@@ -1246,6 +1255,7 @@ export type Database = {
           purchase_cost: number | null
           purchase_description: string | null
           qbo_id: string | null
+          qbo_sync_status: string | null
           reorder_point: number | null
           size: string | null
           size_unit: string | null
@@ -1276,6 +1286,7 @@ export type Database = {
           purchase_cost?: number | null
           purchase_description?: string | null
           qbo_id?: string | null
+          qbo_sync_status?: string | null
           reorder_point?: number | null
           size?: string | null
           size_unit?: string | null
@@ -1306,6 +1317,7 @@ export type Database = {
           purchase_cost?: number | null
           purchase_description?: string | null
           qbo_id?: string | null
+          qbo_sync_status?: string | null
           reorder_point?: number | null
           size?: string | null
           size_unit?: string | null
@@ -1418,6 +1430,7 @@ export type Database = {
           payment_status: string | null
           process_payment: boolean | null
           qbo_id: string | null
+          qbo_sync_status: string | null
           reference_number: string | null
           sync_status: string | null
           total_amount: number
@@ -1446,6 +1459,7 @@ export type Database = {
           payment_status?: string | null
           process_payment?: boolean | null
           qbo_id?: string | null
+          qbo_sync_status?: string | null
           reference_number?: string | null
           sync_status?: string | null
           total_amount: number
@@ -1474,6 +1488,7 @@ export type Database = {
           payment_status?: string | null
           process_payment?: boolean | null
           qbo_id?: string | null
+          qbo_sync_status?: string | null
           reference_number?: string | null
           sync_status?: string | null
           total_amount?: number
@@ -1774,6 +1789,568 @@ export type Database = {
             columns: ["purchase_order_id"]
             isOneToOne: false
             referencedRelation: "purchase_order"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qbo_connection: {
+        Row: {
+          created_at: string | null
+          environment: string
+          id: string
+          is_active: boolean | null
+          last_connected_at: string | null
+          last_sync_at: string | null
+          organization_id: string | null
+          qbo_access_token: string | null
+          qbo_company_id: string
+          qbo_realm_id: string
+          qbo_refresh_token: string | null
+          qbo_token_expires_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          environment?: string
+          id?: string
+          is_active?: boolean | null
+          last_connected_at?: string | null
+          last_sync_at?: string | null
+          organization_id?: string | null
+          qbo_access_token?: string | null
+          qbo_company_id: string
+          qbo_realm_id: string
+          qbo_refresh_token?: string | null
+          qbo_token_expires_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          environment?: string
+          id?: string
+          is_active?: boolean | null
+          last_connected_at?: string | null
+          last_sync_at?: string | null
+          organization_id?: string | null
+          qbo_access_token?: string | null
+          qbo_company_id?: string
+          qbo_realm_id?: string
+          qbo_refresh_token?: string | null
+          qbo_token_expires_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qbo_connection_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qbo_entity_config: {
+        Row: {
+          batch_size: number | null
+          created_at: string | null
+          dependency_order: number | null
+          entity_type: string
+          id: string
+          is_enabled: boolean | null
+          organization_id: string | null
+          priority_level: number | null
+          sync_direction: string
+          sync_frequency_minutes: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          batch_size?: number | null
+          created_at?: string | null
+          dependency_order?: number | null
+          entity_type: string
+          id?: string
+          is_enabled?: boolean | null
+          organization_id?: string | null
+          priority_level?: number | null
+          sync_direction?: string
+          sync_frequency_minutes?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          batch_size?: number | null
+          created_at?: string | null
+          dependency_order?: number | null
+          entity_type?: string
+          id?: string
+          is_enabled?: boolean | null
+          organization_id?: string | null
+          priority_level?: number | null
+          sync_direction?: string
+          sync_frequency_minutes?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qbo_entity_config_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qbo_entity_dependencies: {
+        Row: {
+          created_at: string | null
+          depends_on_entity: string
+          entity_type: string
+          id: string
+          is_required: boolean | null
+          organization_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          depends_on_entity: string
+          entity_type: string
+          id?: string
+          is_required?: boolean | null
+          organization_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          depends_on_entity?: string
+          entity_type?: string
+          id?: string
+          is_required?: boolean | null
+          organization_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qbo_entity_dependencies_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qbo_entity_mapping: {
+        Row: {
+          batchly_id: string
+          created_at: string | null
+          entity_type: string
+          id: string
+          last_batchly_update: string | null
+          last_qbo_update: string | null
+          organization_id: string | null
+          qbo_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          batchly_id: string
+          created_at?: string | null
+          entity_type: string
+          id?: string
+          last_batchly_update?: string | null
+          last_qbo_update?: string | null
+          organization_id?: string | null
+          qbo_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          batchly_id?: string
+          created_at?: string | null
+          entity_type?: string
+          id?: string
+          last_batchly_update?: string | null
+          last_qbo_update?: string | null
+          organization_id?: string | null
+          qbo_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qbo_entity_mapping_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qbo_error_registry: {
+        Row: {
+          created_at: string | null
+          error_category: string
+          error_code: string | null
+          error_message: string
+          id: string
+          is_resolved: boolean | null
+          last_occurred_at: string | null
+          occurrence_count: number | null
+          organization_id: string | null
+          suggested_resolution: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_category: string
+          error_code?: string | null
+          error_message: string
+          id?: string
+          is_resolved?: boolean | null
+          last_occurred_at?: string | null
+          occurrence_count?: number | null
+          organization_id?: string | null
+          suggested_resolution?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_category?: string
+          error_code?: string | null
+          error_message?: string
+          id?: string
+          is_resolved?: boolean | null
+          last_occurred_at?: string | null
+          occurrence_count?: number | null
+          organization_id?: string | null
+          suggested_resolution?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qbo_error_registry_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qbo_field_mapping: {
+        Row: {
+          batchly_field: string
+          created_at: string | null
+          entity_type: string
+          id: string
+          is_enabled: boolean | null
+          organization_id: string | null
+          qbo_field: string
+          transformation_config: Json | null
+          transformation_type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          batchly_field: string
+          created_at?: string | null
+          entity_type: string
+          id?: string
+          is_enabled?: boolean | null
+          organization_id?: string | null
+          qbo_field: string
+          transformation_config?: Json | null
+          transformation_type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          batchly_field?: string
+          created_at?: string | null
+          entity_type?: string
+          id?: string
+          is_enabled?: boolean | null
+          organization_id?: string | null
+          qbo_field?: string
+          transformation_config?: Json | null
+          transformation_type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qbo_field_mapping_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qbo_sync_batch: {
+        Row: {
+          batch_id: string
+          completed_at: string | null
+          created_at: string | null
+          entity_type: string
+          failure_count: number | null
+          id: string
+          operation_count: number | null
+          organization_id: string | null
+          started_at: string | null
+          status: string
+          success_count: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          batch_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          entity_type: string
+          failure_count?: number | null
+          id?: string
+          operation_count?: number | null
+          organization_id?: string | null
+          started_at?: string | null
+          status?: string
+          success_count?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          batch_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          entity_type?: string
+          failure_count?: number | null
+          id?: string
+          operation_count?: number | null
+          organization_id?: string | null
+          started_at?: string | null
+          status?: string
+          success_count?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qbo_sync_batch_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qbo_sync_history: {
+        Row: {
+          completed_at: string | null
+          entity_count: number | null
+          entity_types: string[] | null
+          error_summary: string | null
+          failure_count: number | null
+          id: string
+          organization_id: string | null
+          started_at: string | null
+          started_by: string | null
+          status: string
+          success_count: number | null
+          summary: Json | null
+          sync_type: string
+        }
+        Insert: {
+          completed_at?: string | null
+          entity_count?: number | null
+          entity_types?: string[] | null
+          error_summary?: string | null
+          failure_count?: number | null
+          id?: string
+          organization_id?: string | null
+          started_at?: string | null
+          started_by?: string | null
+          status: string
+          success_count?: number | null
+          summary?: Json | null
+          sync_type: string
+        }
+        Update: {
+          completed_at?: string | null
+          entity_count?: number | null
+          entity_types?: string[] | null
+          error_summary?: string | null
+          failure_count?: number | null
+          id?: string
+          organization_id?: string | null
+          started_at?: string | null
+          started_by?: string | null
+          status?: string
+          success_count?: number | null
+          summary?: Json | null
+          sync_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qbo_sync_history_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qbo_sync_metrics: {
+        Row: {
+          avg_time_per_entity_ms: number | null
+          entity_type: string
+          failure_count: number | null
+          id: string
+          operation_count: number | null
+          organization_id: string | null
+          rate_limit_hits: number | null
+          recorded_at: string | null
+          success_count: number | null
+          sync_direction: string
+          total_time_ms: number | null
+        }
+        Insert: {
+          avg_time_per_entity_ms?: number | null
+          entity_type: string
+          failure_count?: number | null
+          id?: string
+          operation_count?: number | null
+          organization_id?: string | null
+          rate_limit_hits?: number | null
+          recorded_at?: string | null
+          success_count?: number | null
+          sync_direction: string
+          total_time_ms?: number | null
+        }
+        Update: {
+          avg_time_per_entity_ms?: number | null
+          entity_type?: string
+          failure_count?: number | null
+          id?: string
+          operation_count?: number | null
+          organization_id?: string | null
+          rate_limit_hits?: number | null
+          recorded_at?: string | null
+          success_count?: number | null
+          sync_direction?: string
+          total_time_ms?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qbo_sync_metrics_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qbo_sync_operation: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          entity_id: string
+          entity_type: string
+          error_message: string | null
+          id: string
+          operation_id: string
+          operation_type: string
+          organization_id: string | null
+          qbo_id: string | null
+          request_payload: Json | null
+          response_payload: Json | null
+          retry_count: number | null
+          scheduled_at: string | null
+          started_at: string | null
+          status: string
+          sync_direction: string
+          updated_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          entity_id: string
+          entity_type: string
+          error_message?: string | null
+          id?: string
+          operation_id: string
+          operation_type: string
+          organization_id?: string | null
+          qbo_id?: string | null
+          request_payload?: Json | null
+          response_payload?: Json | null
+          retry_count?: number | null
+          scheduled_at?: string | null
+          started_at?: string | null
+          status?: string
+          sync_direction: string
+          updated_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          entity_id?: string
+          entity_type?: string
+          error_message?: string | null
+          id?: string
+          operation_id?: string
+          operation_type?: string
+          organization_id?: string | null
+          qbo_id?: string | null
+          request_payload?: Json | null
+          response_payload?: Json | null
+          retry_count?: number | null
+          scheduled_at?: string | null
+          started_at?: string | null
+          status?: string
+          sync_direction?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qbo_sync_operation_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qbo_webhook_events: {
+        Row: {
+          created_at: string | null
+          entity_id: string
+          entity_type: string
+          event_data: Json | null
+          event_type: string
+          id: string
+          is_processed: boolean | null
+          organization_id: string | null
+          processed_at: string | null
+          webhook_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          entity_id: string
+          entity_type: string
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          is_processed?: boolean | null
+          organization_id?: string | null
+          processed_at?: string | null
+          webhook_id: string
+        }
+        Update: {
+          created_at?: string | null
+          entity_id?: string
+          entity_type?: string
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          is_processed?: boolean | null
+          organization_id?: string | null
+          processed_at?: string | null
+          webhook_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qbo_webhook_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -2807,6 +3384,7 @@ export type Database = {
           payment_terms: string | null
           phone: string | null
           qbo_id: string | null
+          qbo_sync_status: string | null
           sync_status: string | null
           tax_id: string | null
           updated_at: string | null
@@ -2841,6 +3419,7 @@ export type Database = {
           payment_terms?: string | null
           phone?: string | null
           qbo_id?: string | null
+          qbo_sync_status?: string | null
           sync_status?: string | null
           tax_id?: string | null
           updated_at?: string | null
@@ -2875,6 +3454,7 @@ export type Database = {
           payment_terms?: string | null
           phone?: string | null
           qbo_id?: string | null
+          qbo_sync_status?: string | null
           sync_status?: string | null
           tax_id?: string | null
           updated_at?: string | null
