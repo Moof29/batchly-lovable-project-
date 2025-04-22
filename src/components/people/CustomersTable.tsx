@@ -1,10 +1,10 @@
-
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowDownAZ, ArrowUpAZ } from "lucide-react";
 import { Link } from "react-router-dom";
 import { FilterDropdown } from "@/components/common/FilterDropdown";
+import { Switch } from "@/components/ui/switch";
 
 interface CustomersTableProps {
   customers: any[];
@@ -12,14 +12,20 @@ interface CustomersTableProps {
   filters: Record<string, string>;
   onSort: (column: string) => void;
   onFilter: (column: string, value: string) => void;
+  portalAccessMap?: Record<string, boolean>;
+  onTogglePortalAccess?: (customerId: string, enabled: boolean) => void;
+  loadingCustomerId?: string;
 }
 
-export const CustomersTable = ({ 
-  customers, 
-  sorting, 
-  filters, 
-  onSort, 
-  onFilter 
+export const CustomersTable = ({
+  customers,
+  sorting,
+  filters,
+  onSort,
+  onFilter,
+  portalAccessMap = {},
+  onTogglePortalAccess,
+  loadingCustomerId,
 }: CustomersTableProps) => {
   return (
     <div className="rounded-md border">
@@ -76,6 +82,9 @@ export const CustomersTable = ({
                 </button>
               </div>
             </TableHead>
+            <TableHead>
+              Portal Access
+            </TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -87,6 +96,16 @@ export const CustomersTable = ({
                 <TableCell>{customer.email}</TableCell>
                 <TableCell>{customer.phone}</TableCell>
                 <TableCell>${customer.balance?.toFixed(2) || '0.00'}</TableCell>
+                <TableCell>
+                  <Switch
+                    checked={portalAccessMap[customer.id] || false}
+                    disabled={loadingCustomerId === customer.id}
+                    onCheckedChange={(checked) =>
+                      onTogglePortalAccess && onTogglePortalAccess(customer.id, checked)
+                    }
+                    aria-label={`Toggle portal access for ${customer.display_name}`}
+                  />
+                </TableCell>
                 <TableCell className="text-right">
                   <Button variant="outline" size="sm" asChild>
                     <Link to={`/people/customers/${customer.id}`}>View</Link>
@@ -96,7 +115,7 @@ export const CustomersTable = ({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-4">
+              <TableCell colSpan={6} className="text-center py-4">
                 No customers found.
               </TableCell>
             </TableRow>

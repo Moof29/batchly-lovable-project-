@@ -1,13 +1,17 @@
-
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { useCustomerPortalAccess } from "@/hooks/people/useCustomerPortalAccess";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export const CustomerDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const { data: customer, isLoading } = useQuery({
     queryKey: ["customer", id],
@@ -23,18 +27,46 @@ export const CustomerDetail = () => {
     },
   });
 
+  const {
+    hasAccess: portalAccess,
+    isLoading: portalLoading,
+    setAccess: setPortalAccess,
+  } = useCustomerPortalAccess(id!);
+
   if (isLoading) return <div>Loading...</div>;
   if (!customer) return <div>Customer not found</div>;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {customer.display_name}
-        </h1>
-        <Badge variant={customer.is_active ? "default" : "secondary"}>
-          {customer.is_active ? "Active" : "Inactive"}
-        </Badge>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {customer.display_name}
+          </h1>
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={portalAccess}
+              disabled={portalLoading}
+              onCheckedChange={setPortalAccess}
+              aria-label="Toggle portal access"
+            />
+            <span className="text-sm">
+              Portal Access
+            </span>
+          </div>
+        </div>
+        {portalAccess && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              navigate(`/portal?asCustomer=${id}`);
+            }}
+            aria-label="View as Customer"
+          >
+            View as Customer
+          </Button>
+        )}
       </div>
 
       <Tabs defaultValue="details" className="space-y-4">
