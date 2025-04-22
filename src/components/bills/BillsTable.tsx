@@ -15,6 +15,11 @@ interface BillsTableProps {
 }
 
 export const BillsTable = ({ bills, sorting, filters, onSort, onFilter }: BillsTableProps) => {
+  const handleVendorSort = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onSort("vendor_profile.display_name");
+  };
+  
   return (
     <div className="rounded-md border">
       <Table>
@@ -41,7 +46,7 @@ export const BillsTable = ({ bills, sorting, filters, onSort, onFilter }: BillsT
             <TableHead>
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={() => onSort("vendor_profile.display_name")}
+                  onClick={handleVendorSort}
                   className="flex items-center hover:text-primary"
                 >
                   Vendor

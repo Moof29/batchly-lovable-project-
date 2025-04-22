@@ -28,6 +28,10 @@ export const BillList = () => {
     }));
   };
 
+  console.log("Current sorting:", sorting);
+  console.log("Current filters:", filters);
+  console.log("Bills data:", bills);
+
   return (
     <div className="space-y-6">
       <BillListHeader />

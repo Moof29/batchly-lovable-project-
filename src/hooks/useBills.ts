@@ -11,6 +11,8 @@ export const useBills = (sorting: SortConfig, filters: Record<string, string>) =
   return useQuery({
     queryKey: ["bills", sorting, filters],
     queryFn: async () => {
+      console.log("Sorting by:", sorting);
+      
       let query = supabase
         .from("bill_record")
         .select("*, vendor_profile(display_name), vendor_id")
@@ -27,7 +29,12 @@ export const useBills = (sorting: SortConfig, filters: Record<string, string>) =
       });
 
       const { data, error } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase query error:", error);
+        throw error;
+      }
+      
+      console.log("Query results:", data);
       return data;
     },
   });
