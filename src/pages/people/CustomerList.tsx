@@ -70,7 +70,10 @@ export const CustomerList = () => {
         toast.success("Portal access revoked successfully");
       }
       setPortalAccessMap((prev) => ({ ...prev, [customerId]: enabled }));
+      
+      // Invalidate both queries to ensure they are in sync
       queryClient.invalidateQueries({ queryKey: ["portalAccess", customerId] });
+      queryClient.invalidateQueries({ queryKey: ["portal_users"] });
     } catch (err) {
       console.error("Portal access change failed", err);
       toast.error(`Failed to ${enabled ? 'grant' : 'revoke'} portal access`);

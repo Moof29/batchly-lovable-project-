@@ -1,6 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { CustomerPortalAccessService } from "@/services/people/CustomerPortalAccessService";
 
 export type PortalUser = {
   id: string;
@@ -21,6 +22,45 @@ export function usePortalUsers(page: number, pageSize: number) {
   return useQuery({
     queryKey: ["portal_users", { page }],
     queryFn: async () => {
+      // In development with mock mode enabled, use local data
+      if (CustomerPortalAccessService.DEV_MOCK_CUSTOMER_PORTAL_ACCESS) {
+        // Get customers with portal access from mock storage
+        const customersWithAccess = await CustomerPortalAccessService.getAllCustomersWithAccess();
+        
+        // For each customer with access, create a portal user entry
+        const mockPortalUsers: PortalUser[] = await Promise.all(
+          customersWithAccess.map(async (customerId) => {
+            // Get customer details
+            const { data: customer } = await supabase
+              .from("customer_profile")
+              .select("id, display_name, email")
+              .eq("id", customerId)
+              .single();
+            
+            return {
+              id: customerId, // Using customer ID as portal user ID in mock mode
+              email: customer?.email || "customer@example.com",
+              invited_at: new Date().toISOString(),
+              accepted_at: new Date().toISOString(),
+              customer_id: customerId,
+              is_active: true,
+              invite_token: null,
+              created_at: new Date().toISOString(),
+              customer: customer ? {
+                id: customer.id,
+                display_name: customer.display_name
+              } : null
+            };
+          })
+        );
+        
+        // Apply pagination
+        const from = (page - 1) * pageSize;
+        const to = from + pageSize;
+        return mockPortalUsers.slice(from, to);
+      }
+      
+      // Normal database query when not in mock mode
       const from = (page - 1) * pageSize;
       const to = from + pageSize - 1;
       const { data, error } = await supabase
@@ -64,6 +104,7 @@ export function usePortalUsers(page: number, pageSize: number) {
 
       return enrichedUsers;
     },
-    placeholderData: (previousData) => previousData,
+    // Refetch when customers with portal access change
+    refetchOnWindowFocus: true,
   });
 }
