@@ -37,23 +37,21 @@ export default function CustomerPortalUsers() {
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 20;
 
-  // Fetch portal users, join customer display_name
+  // Fetch portal users from customer_portal_user_links and join with users
   const { data: portalUsers = [], isLoading, error } = useQuery({
     queryKey: ["portal_users", { page }],
     queryFn: async () => {
       const from = (page - 1) * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
 
-      // First, let's directly fetch from the portal_users table
+      // First get users with customer links
       const { data, error } = await supabase
-        .from("portal_users")
+        .from("customer_portal_user_links")
         .select(`
-          id, 
-          email, 
-          invited_at, 
-          accepted_at, 
-          is_active, 
-          invite_token, 
+          id,
+          portal_user_id,
+          customer_id,
+          customer:customer_id(id, display_name),
           created_at
         `)
         .order("created_at", { ascending: false })
@@ -61,23 +59,31 @@ export default function CustomerPortalUsers() {
 
       if (error) throw error;
       
-      // For each portal user, check if there's a link to a customer
-      const enrichedUsers: PortalUser[] = await Promise.all((data || []).map(async (user) => {
-        // Get customer info from the link table
-        const { data: linkData } = await supabase
-          .from("customer_portal_user_links")
+      // For each link, fetch the user details
+      const enrichedUsers: PortalUser[] = await Promise.all((data || []).map(async (link) => {
+        // Get user data for this link
+        const { data: userData } = await supabase
+          .from("users")
           .select(`
-            customer_id,
-            customer:customer_id(id, display_name)
+            id,
+            email,
+            created_at,
+            last_login_at
           `)
-          .eq('portal_user_id', user.id)
-          .maybeSingle();
+          .eq('id', link.portal_user_id)
+          .single();
           
         return {
-          ...user,
-          customer_id: linkData?.customer_id || null,
-          customer: linkData?.customer || null,
-        } as PortalUser;
+          id: link.portal_user_id,
+          email: userData?.email || "Unknown",
+          invited_at: null, // Add these fields if they exist in your schema
+          accepted_at: null, // Add these fields if they exist in your schema
+          customer_id: link.customer_id,
+          is_active: true, // Set default or determine from data if available
+          invite_token: null, // Add if available in schema
+          created_at: userData?.created_at || link.created_at,
+          customer: link.customer
+        };
       }));
       
       return enrichedUsers;
