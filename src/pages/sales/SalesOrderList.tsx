@@ -9,27 +9,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useSalesOrders } from "@/hooks/useSalesOrders";
 
 export const SalesOrderList = () => {
-  const { data: salesOrders, isLoading } = useQuery({
-    queryKey: ["salesOrders"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("sales_order")
-        .select(`
-          *,
-          customer_profile:customer_id(display_name)
-        `)
-        .order("order_date", { ascending: false });
+  const [sorting, setSorting] = useState({ column: "order_date", direction: "desc" as "asc" | "desc" });
+  const [filters, setFilters] = useState<Record<string, string>>({});
 
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: salesOrders, isLoading } = useSalesOrders(sorting, filters);
+
+  const handleSort = (column: string) => {
+    setSorting(prev => ({
+      column,
+      direction: prev.column === column && prev.direction === "asc" ? "desc" : "asc"
+    }));
+  };
 
   return (
     <div className="space-y-6">
@@ -49,16 +45,16 @@ export const SalesOrderList = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div>Loading...</div>
+            <div className="flex items-center justify-center h-32">Loading...</div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Order Number</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Total</TableHead>
+                  <TableHead onClick={() => handleSort("order_number")} className="cursor-pointer">Order Number</TableHead>
+                  <TableHead onClick={() => handleSort("order_date")} className="cursor-pointer">Date</TableHead>
+                  <TableHead onClick={() => handleSort("customer_profile.display_name")} className="cursor-pointer">Customer</TableHead>
+                  <TableHead onClick={() => handleSort("status")} className="cursor-pointer">Status</TableHead>
+                  <TableHead onClick={() => handleSort("total")} className="cursor-pointer">Total</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
