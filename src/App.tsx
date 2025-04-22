@@ -1,4 +1,3 @@
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -41,6 +40,7 @@ import { InvoiceList } from "./pages/sales/InvoiceList";
 import { BillDetail } from "./pages/purchases/BillDetail";
 import { InvoiceDetail } from "./pages/sales/InvoiceDetail";
 import { TimeEntryDetail } from "./pages/people/TimeEntryDetail";
+import { CustomerPortalUsers } from "./pages/people/CustomerPortalUsers";
 
 const queryClient = new QueryClient();
 
@@ -58,7 +58,6 @@ const App = () => (
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/auth" element={<AuthPage />} />
                 
-                {/* Dashboard is protected but maintains its own layout */}
                 <Route path="/dashboard" element={
                   <ProtectedRoute element={<DashboardPage />} />
                 } />
@@ -91,6 +90,7 @@ const App = () => (
                     <Route index element={<CustomerList />} />
                     <Route path="customers" element={<CustomerList />} />
                     <Route path="customers/:id" element={<CustomerDetail />} />
+                    <Route path="customers/portal-users" element={<CustomerPortalUsers />} />
                     <Route path="vendors" element={<VendorList />} />
                     <Route path="vendors/:id" element={<VendorDetail />} />
                     <Route path="employees" element={<EmployeeList />} />

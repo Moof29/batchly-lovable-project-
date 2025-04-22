@@ -94,6 +94,11 @@ export const menuItems: MenuItem[] = [
         permissions: ['customer_service']
       },
       {
+        title: 'Customer Portal Users', // New submenu item
+        path: '/people/customers/portal-users',
+        permissions: ['customer_service']
+      },
+      {
         title: 'Vendors',
         path: '/people/vendors',
         permissions: ['warehouse_staff']
