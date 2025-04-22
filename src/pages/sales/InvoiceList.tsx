@@ -9,10 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus } from "lucide-react";
+import { Plus, ArrowUpAZ, ArrowDownAZ } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useInvoices } from "@/hooks/useInvoices";
+import { FilterDropdown } from "@/components/common/FilterDropdown";
 
 export const InvoiceList = () => {
   const [sorting, setSorting] = useState({ column: "invoice_date", direction: "desc" as "asc" | "desc" });
@@ -24,6 +25,13 @@ export const InvoiceList = () => {
     setSorting(prev => ({
       column,
       direction: prev.column === column && prev.direction === "asc" ? "desc" : "asc"
+    }));
+  };
+
+  const handleFilter = (column: string, value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      [column]: value,
     }));
   };
 
@@ -58,12 +66,99 @@ export const InvoiceList = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead onClick={() => handleSort("invoice_number")} className="cursor-pointer">Invoice #</TableHead>
-                    <TableHead onClick={() => handleSort("invoice_date")} className="cursor-pointer">Date</TableHead>
-                    <TableHead onClick={() => handleSort("customer_profile.display_name")} className="cursor-pointer">Customer</TableHead>
-                    <TableHead onClick={() => handleSort("status")} className="cursor-pointer">Status</TableHead>
-                    <TableHead onClick={() => handleSort("total")} className="cursor-pointer text-right">Total</TableHead>
-                    <TableHead onClick={() => handleSort("balance_due")} className="cursor-pointer text-right">Balance Due</TableHead>
+                    <TableHead>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleSort("invoice_number")}
+                          className="flex items-center hover:text-primary"
+                        >
+                          Invoice #
+                          {sorting.column === "invoice_number" && (
+                            sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                          )}
+                        </button>
+                        <FilterDropdown
+                          value={filters.invoice_number || ""}
+                          onChange={(value) => handleFilter("invoice_number", value)}
+                          placeholder="Filter by number..."
+                        />
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleSort("invoice_date")}
+                          className="flex items-center hover:text-primary"
+                        >
+                          Date
+                          {sorting.column === "invoice_date" && (
+                            sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleSort("customer_profile.display_name")}
+                          className="flex items-center hover:text-primary"
+                        >
+                          Customer
+                          {sorting.column === "customer_profile.display_name" && (
+                            sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                          )}
+                        </button>
+                        <FilterDropdown
+                          value={filters["customer_profile.display_name"] || ""}
+                          onChange={(value) => handleFilter("customer_profile.display_name", value)}
+                          placeholder="Filter by customer..."
+                        />
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleSort("status")}
+                          className="flex items-center hover:text-primary"
+                        >
+                          Status
+                          {sorting.column === "status" && (
+                            sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                          )}
+                        </button>
+                        <FilterDropdown
+                          value={filters.status || ""}
+                          onChange={(value) => handleFilter("status", value)}
+                          placeholder="Filter by status..."
+                        />
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleSort("total")}
+                          className="flex items-center hover:text-primary text-right w-full"
+                        >
+                          Total
+                          {sorting.column === "total" && (
+                            sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleSort("balance_due")}
+                          className="flex items-center hover:text-primary text-right w-full"
+                        >
+                          Balance Due
+                          {sorting.column === "balance_due" && (
+                            sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                    </TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>

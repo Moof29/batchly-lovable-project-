@@ -9,27 +9,31 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Plus } from "lucide-react";
+import { Plus, ArrowUpAZ, ArrowDownAZ } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { usePurchaseOrders } from "@/hooks/usePurchaseOrders";
+import { FilterDropdown } from "@/components/common/FilterDropdown";
 
 export const PurchaseOrderList = () => {
-  const { data: purchaseOrders, isLoading } = useQuery({
-    queryKey: ["purchaseOrders"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("purchase_order")
-        .select(`
-          *,
-          vendor_profile:vendor_id(display_name)
-        `)
-        .order("po_date", { ascending: false });
+  const [sorting, setSorting] = useState({ column: "po_date", direction: "desc" as "asc" | "desc" });
+  const [filters, setFilters] = useState<Record<string, string>>({});
 
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: purchaseOrders, isLoading } = usePurchaseOrders(sorting, filters);
+
+  const handleSort = (column: string) => {
+    setSorting(prev => ({
+      column,
+      direction: prev.column === column && prev.direction === "asc" ? "desc" : "asc"
+    }));
+  };
+
+  const handleFilter = (column: string, value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      [column]: value,
+    }));
+  };
 
   return (
     <div className="space-y-6">
@@ -49,16 +53,91 @@ export const PurchaseOrderList = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div>Loading...</div>
+            <div className="flex items-center justify-center h-32">Loading...</div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>PO Number</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Vendor</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Total</TableHead>
+                  <TableHead>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleSort("purchase_order_number")}
+                        className="flex items-center hover:text-primary"
+                      >
+                        PO Number
+                        {sorting.column === "purchase_order_number" && (
+                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                        )}
+                      </button>
+                      <FilterDropdown
+                        value={filters.purchase_order_number || ""}
+                        onChange={(value) => handleFilter("purchase_order_number", value)}
+                        placeholder="Filter PO number..."
+                      />
+                    </div>
+                  </TableHead>
+                  <TableHead>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleSort("po_date")}
+                        className="flex items-center hover:text-primary"
+                      >
+                        Date
+                        {sorting.column === "po_date" && (
+                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </TableHead>
+                  <TableHead>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleSort("vendor_profile.display_name")}
+                        className="flex items-center hover:text-primary"
+                      >
+                        Vendor
+                        {sorting.column === "vendor_profile.display_name" && (
+                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                        )}
+                      </button>
+                      <FilterDropdown
+                        value={filters["vendor_profile.display_name"] || ""}
+                        onChange={(value) => handleFilter("vendor_profile.display_name", value)}
+                        placeholder="Filter vendors..."
+                      />
+                    </div>
+                  </TableHead>
+                  <TableHead>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleSort("status")}
+                        className="flex items-center hover:text-primary"
+                      >
+                        Status
+                        {sorting.column === "status" && (
+                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                        )}
+                      </button>
+                      <FilterDropdown
+                        value={filters.status || ""}
+                        onChange={(value) => handleFilter("status", value)}
+                        placeholder="Filter status..."
+                      />
+                    </div>
+                  </TableHead>
+                  <TableHead>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleSort("total")}
+                        className="flex items-center hover:text-primary"
+                      >
+                        Total
+                        {sorting.column === "total" && (
+                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>

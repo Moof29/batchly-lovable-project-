@@ -9,28 +9,31 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Plus } from "lucide-react";
+import { Plus, ArrowUpAZ, ArrowDownAZ } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useTimeTracking } from "@/hooks/useTimeTracking";
+import { FilterDropdown } from "@/components/common/FilterDropdown";
 
 export const TimeTrackingList = () => {
-  const { data: timeEntries, isLoading } = useQuery({
-    queryKey: ["timeEntries"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("employee_time_tracking")
-        .select(`
-          *,
-          employee_profile:employee_id(first_name, last_name),
-          customer_profile:customer_id(display_name)
-        `)
-        .order('date', { ascending: false });
+  const [sorting, setSorting] = useState({ column: "date", direction: "desc" as "asc" | "desc" });
+  const [filters, setFilters] = useState<Record<string, string>>({});
+  
+  const { data: timeEntries, isLoading } = useTimeTracking(sorting, filters);
 
-      if (error) throw error;
-      return data;
-    },
-  });
+  const handleSort = (column: string) => {
+    setSorting(prev => ({
+      column,
+      direction: prev.column === column && prev.direction === "asc" ? "desc" : "asc"
+    }));
+  };
+
+  const handleFilter = (column: string, value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      [column]: value,
+    }));
+  };
 
   return (
     <div className="space-y-6">
@@ -50,16 +53,91 @@ export const TimeTrackingList = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div>Loading...</div>
+            <div className="flex items-center justify-center h-32">Loading...</div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Employee</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Hours</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleSort("date")}
+                        className="flex items-center hover:text-primary"
+                      >
+                        Date
+                        {sorting.column === "date" && (
+                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </TableHead>
+                  <TableHead>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleSort("employee_profile.last_name")}
+                        className="flex items-center hover:text-primary"
+                      >
+                        Employee
+                        {sorting.column === "employee_profile.last_name" && (
+                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                        )}
+                      </button>
+                      <FilterDropdown
+                        value={filters["employee_profile.last_name"] || ""}
+                        onChange={(value) => handleFilter("employee_profile.last_name", value)}
+                        placeholder="Filter employees..."
+                      />
+                    </div>
+                  </TableHead>
+                  <TableHead>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleSort("customer_profile.display_name")}
+                        className="flex items-center hover:text-primary"
+                      >
+                        Customer
+                        {sorting.column === "customer_profile.display_name" && (
+                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                        )}
+                      </button>
+                      <FilterDropdown
+                        value={filters["customer_profile.display_name"] || ""}
+                        onChange={(value) => handleFilter("customer_profile.display_name", value)}
+                        placeholder="Filter customers..."
+                      />
+                    </div>
+                  </TableHead>
+                  <TableHead>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleSort("hours")}
+                        className="flex items-center hover:text-primary"
+                      >
+                        Hours
+                        {sorting.column === "hours" && (
+                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </TableHead>
+                  <TableHead>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleSort("billable")}
+                        className="flex items-center hover:text-primary"
+                      >
+                        Status
+                        {sorting.column === "billable" && (
+                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                        )}
+                      </button>
+                      <FilterDropdown
+                        value={filters.billable || ""}
+                        onChange={(value) => handleFilter("billable", value)}
+                        placeholder="Filter status..."
+                      />
+                    </div>
+                  </TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
