@@ -424,7 +424,9 @@ const QBOIntegrationReconciliation: React.FC = () => {
                       <div key={type} className="bg-white rounded-xl shadow p-4">
                         <div className="flex justify-between items-center mb-2">
                           <h4 className="font-medium">{displayNames[type]}</h4>
-                          <Badge variant={percent === 100 ? "success" : "outline"}>{percent}%</Badge>
+                          <Badge variant={percent === 100 ? "secondary" : "outline"} className={percent === 100 ? "bg-green-100 text-green-800 hover:bg-green-200" : ""}>
+                            {percent}%
+                          </Badge>
                         </div>
                         <Progress value={percent} className="h-1 mb-2" />
                         <div className="text-xs text-gray-500 flex justify-between">
