@@ -120,8 +120,18 @@ export const BillsTable = ({ bills, sorting, filters, onSort, onFilter }: BillsT
           {bills?.map((bill) => (
             <TableRow key={bill.id} className="hover:bg-muted/50">
               <TableCell className="font-medium">{bill.bill_number}</TableCell>
-              <TableCell>{bill.vendor_profile?.display_name}</TableCell>
-              <TableCell>{new Date(bill.bill_date).toLocaleDateString()}</TableCell>
+              <TableCell>
+                {bill.vendor_profile?.display_name ? (
+                  <Link 
+                    to={`/people/vendors/${bill.vendor_id}`}
+                    className="text-primary hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {bill.vendor_profile.display_name}
+                  </Link>
+                ) : '-'}
+              </TableCell>
+              <TableCell>{bill.bill_date ? new Date(bill.bill_date).toLocaleDateString() : '-'}</TableCell>
               <TableCell>{bill.due_date ? new Date(bill.due_date).toLocaleDateString() : '-'}</TableCell>
               <TableCell>${bill.total?.toFixed(2) || '0.00'}</TableCell>
               <TableCell>
