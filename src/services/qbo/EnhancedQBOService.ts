@@ -119,6 +119,9 @@ const validators = {
   bill_record: new DataValidator(billValidationSchema)
 };
 
+// Define the error category type to match QBOService
+type ErrorCategory = 'auth' | 'validation' | 'rate_limit' | 'connection' | 'data' | 'unknown';
+
 /**
  * Enhanced QBO Service with circuit breaker and data validation
  * Wraps the existing QBOService with resilience patterns
@@ -203,18 +206,21 @@ export class EnhancedQBOService {
   
   /**
    * Categorize error by type to enable better error handling
+   * Returns a specific error category that matches the types expected by logError
    */
-  private categorizeError(error: any): string {
-    if (error.status === 401 || error.status === 403) {
+  private categorizeError(error: any): ErrorCategory {
+    const errorMessage = String(error).toLowerCase();
+    
+    if (errorMessage.includes('token') || errorMessage.includes('auth') || errorMessage.includes('unauthorized')) {
       return 'auth';
-    } else if (error.status === 400) {
+    } else if (errorMessage.includes('validation') || errorMessage.includes('invalid')) {
       return 'validation';
-    } else if (error.status === 429) {
+    } else if (errorMessage.includes('rate limit') || errorMessage.includes('too many requests')) {
       return 'rate_limit';
-    } else if (error.status >= 500) {
-      return 'server';
-    } else if (error.message && error.message.includes('network')) {
+    } else if (errorMessage.includes('network') || errorMessage.includes('connection') || errorMessage.includes('timeout')) {
       return 'connection';
+    } else if (errorMessage.includes('not found') || errorMessage.includes('duplicate')) {
+      return 'data';
     } else {
       return 'unknown';
     }
