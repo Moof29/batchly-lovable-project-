@@ -26,6 +26,7 @@ import QBOIntegrationEntitiesAccordion from './components/QBOIntegrationEntities
 import QBOIntegrationErrorsList from './components/QBOIntegrationErrorsList';
 import QBOIntegrationSyncOverview from './components/QBOIntegrationSyncOverview';
 import QBOIntegrationSyncHistory from './components/QBOIntegrationSyncHistory';
+import QBOIntegrationReconciliation from './components/QBOIntegrationReconciliation';
 
 export const QBOIntegrationPage = () => {
   const { user } = useAuth();
@@ -115,6 +116,10 @@ export const QBOIntegrationPage = () => {
                 <Badge variant="destructive" className="ml-1">{errors.length}</Badge>
               )}
             </TabsTrigger>
+            <TabsTrigger value="reconciliation" className="flex gap-2 items-center">
+              <Settings className="h-4 w-4" />
+              Reconciliation
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="sync" className="space-y-4">
@@ -185,6 +190,10 @@ export const QBOIntegrationPage = () => {
               resolveError={resolveError}
               isLoading={isLoadingErrors}
             />
+          </TabsContent>
+          
+          <TabsContent value="reconciliation" className="space-y-4">
+            <QBOIntegrationReconciliation />
           </TabsContent>
         </Tabs>
       )}
