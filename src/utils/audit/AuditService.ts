@@ -1,9 +1,4 @@
 
-/**
- * Unified Audit Service
- * Tracks operations across QBO sync and customer portal
- */
-
 import { supabase } from '@/integrations/supabase/client';
 
 export type AuditEventType = 
@@ -18,6 +13,7 @@ export type AuditEventType =
   | 'portal.login'
   | 'portal.logout'
   | 'portal.profile.updated'
+  | 'portal.profile.viewed'
   | 'portal.order.created'
   | 'portal.order.viewed'
   | 'portal.invoice.viewed'
@@ -39,6 +35,7 @@ export interface AuditEventData {
   detail?: any;
   severity?: AuditEventSeverity;
   metadata?: Record<string, any>;
+  createdAt?: string;
 }
 
 export class AuditService {
@@ -77,7 +74,7 @@ export class AuditService {
     const finalEventData = {
       ...eventData,
       severity: eventData.severity || 'info',
-      timestamp: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
       metadata: {
         ...(eventData.metadata || {}),
         userAgent: navigator.userAgent,
@@ -117,7 +114,7 @@ export class AuditService {
         severity: event.severity,
         detail: event.detail || null,
         metadata: event.metadata || {},
-        created_at: event.timestamp
+        created_at: event.createdAt || new Date().toISOString()
       }));
       
       // Insert into database

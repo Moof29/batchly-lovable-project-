@@ -1,9 +1,4 @@
 
-/**
- * Customer Portal Hook
- * Provides access to customer portal functionality in components
- */
-
 import { useState, useEffect } from 'react';
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import { createCustomerPortalService } from '@/services/customerPortal/CustomerPortalService';

@@ -222,6 +222,48 @@ export type Database = {
           },
         ]
       }
+      audit_events: {
+        Row: {
+          created_at: string | null
+          detail: Json | null
+          entity_id: string | null
+          entity_type: string | null
+          event_type: string
+          id: string
+          metadata: Json | null
+          organization_id: string
+          portal_user_id: string | null
+          severity: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          detail?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          organization_id: string
+          portal_user_id?: string | null
+          severity?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          detail?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          organization_id?: string
+          portal_user_id?: string | null
+          severity?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       bill_line_item: {
         Row: {
           amount: number | null
@@ -528,6 +570,38 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      customer_portal_user_links: {
+        Row: {
+          created_at: string | null
+          customer_id: string
+          id: string
+          portal_user_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_id: string
+          id?: string
+          portal_user_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_id?: string
+          id?: string
+          portal_user_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_portal_user_links_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_profile"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       customer_profile: {
         Row: {

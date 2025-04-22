@@ -1,9 +1,4 @@
 
-/**
- * Transaction Manager
- * Manages data transactions across QBO sync and customer portal operations
- */
-
 import { supabase } from '@/integrations/supabase/client';
 import { auditService } from '../audit/AuditService';
 
@@ -73,20 +68,19 @@ export class TransactionManager {
       for (const op of operations) {
         let result;
         let query;
+        let beforeState = null;
+        
+        if (journal && op.match) {
+          const { data: before } = await supabase
+            .from(op.table)
+            .select('*')
+            .match(op.match)
+            .maybeSingle();
+          beforeState = before;
+        }
         
         switch (op.type) {
           case 'insert':
-            // Get before state if journaling
-            let beforeState = null;
-            if (journal && op.match) {
-              const { data: before } = await supabase
-                .from(op.table)
-                .select('*')
-                .match(op.match)
-                .maybeSingle();
-              beforeState = before;
-            }
-            
             query = supabase.from(op.table).insert(op.data);
             
             if (op.returning) {
@@ -111,17 +105,6 @@ export class TransactionManager {
             break;
             
           case 'update':
-            // Get before state if journaling
-            if (journal) {
-              const { data: before } = await supabase
-                .from(op.table)
-                .select('*')
-                .match(op.match)
-                .maybeSingle();
-                
-              beforeState = before;
-            }
-            
             query = supabase.from(op.table).update(op.data).match(op.match);
             
             if (op.returning) {
@@ -146,17 +129,6 @@ export class TransactionManager {
             break;
             
           case 'delete':
-            // Get before state if journaling
-            if (journal) {
-              const { data: before } = await supabase
-                .from(op.table)
-                .select('*')
-                .match(op.match)
-                .maybeSingle();
-                
-              beforeState = before;
-            }
-            
             query = supabase.from(op.table).delete();
             
             if (op.match) {

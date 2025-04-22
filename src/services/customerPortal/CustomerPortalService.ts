@@ -1,9 +1,4 @@
 
-/**
- * Customer Portal Service
- * Handles API operations for the customer portal
- */
-
 import { supabase } from '@/integrations/supabase/client';
 import { circuitBreakerManager } from '@/utils/circuitBreaker/CircuitBreakerManager';
 import { auditService } from '@/utils/audit/AuditService';
@@ -121,7 +116,7 @@ export class CustomerPortalService {
               type: 'update',
               match: { id: customerId, organization_id: this.organizationId },
               data: {
-                ...validationResult.sanitized,
+                ...validationResult,
                 updated_at: new Date().toISOString(),
                 qbo_sync_status: 'pending' // Mark for sync
               },
