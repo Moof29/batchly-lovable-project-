@@ -1,35 +1,14 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { AccountsReceivableTable } from "@/components/payments/AccountsReceivableTable";
+import { useAccountsReceivable } from "@/hooks/useAccountsReceivable";
 
 export const AccountsReceivable = () => {
   const [sorting, setSorting] = useState({ column: "due_date", direction: "asc" as "asc" | "desc" });
   const [filters, setFilters] = useState<Record<string, string>>({});
 
-  const { data: invoices, isLoading } = useQuery({
-    queryKey: ["accounts-receivable", sorting, filters],
-    queryFn: async () => {
-      let query = supabase
-        .from("invoice_record")
-        .select("*, customer_profile(*)")
-        .gt("balance_due", 0)
-        .order(sorting.column, { ascending: sorting.direction === "asc" });
-
-      // Apply filters
-      Object.entries(filters).forEach(([column, value]) => {
-        if (value) {
-          query = query.ilike(column, `%${value}%`);
-        }
-      });
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: invoices, isLoading } = useAccountsReceivable(sorting, filters);
 
   const handleSort = (column: string) => {
     setSorting(prev => ({
