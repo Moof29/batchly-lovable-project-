@@ -1,19 +1,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Plus, ArrowUpAZ, ArrowDownAZ } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { usePurchaseOrders } from "@/hooks/usePurchaseOrders";
-import { FilterDropdown } from "@/components/common/FilterDropdown";
+import { PurchaseOrdersTable } from "@/components/purchases/PurchaseOrdersTable";
 
 export const PurchaseOrderList = () => {
   const [sorting, setSorting] = useState({ column: "po_date", direction: "desc" as "asc" | "desc" });
@@ -38,7 +30,10 @@ export const PurchaseOrderList = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">Purchase Orders</h1>
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Purchase Orders</h1>
+          <p className="text-sm text-muted-foreground">Manage and track your purchase orders</p>
+        </div>
         <Button asChild>
           <Link to="/purchases/orders/new">
             <Plus className="mr-2 h-4 w-4" />
@@ -47,117 +42,23 @@ export const PurchaseOrderList = () => {
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
+      <Card className="shadow-md">
+        <CardHeader className="py-4">
           <CardTitle>All Purchase Orders</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="flex items-center justify-center h-32">Loading...</div>
+            <div className="flex items-center justify-center py-8">
+              <div className="text-sm text-muted-foreground">Loading purchase orders...</div>
+            </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleSort("purchase_order_number")}
-                        className="flex items-center hover:text-primary"
-                      >
-                        PO Number
-                        {sorting.column === "purchase_order_number" && (
-                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                        )}
-                      </button>
-                      <FilterDropdown
-                        value={filters.purchase_order_number || ""}
-                        onChange={(value) => handleFilter("purchase_order_number", value)}
-                        placeholder="Filter PO number..."
-                      />
-                    </div>
-                  </TableHead>
-                  <TableHead>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleSort("po_date")}
-                        className="flex items-center hover:text-primary"
-                      >
-                        Date
-                        {sorting.column === "po_date" && (
-                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                  </TableHead>
-                  <TableHead>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleSort("vendor_profile.display_name")}
-                        className="flex items-center hover:text-primary"
-                      >
-                        Vendor
-                        {sorting.column === "vendor_profile.display_name" && (
-                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                        )}
-                      </button>
-                      <FilterDropdown
-                        value={filters["vendor_profile.display_name"] || ""}
-                        onChange={(value) => handleFilter("vendor_profile.display_name", value)}
-                        placeholder="Filter vendors..."
-                      />
-                    </div>
-                  </TableHead>
-                  <TableHead>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleSort("status")}
-                        className="flex items-center hover:text-primary"
-                      >
-                        Status
-                        {sorting.column === "status" && (
-                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                        )}
-                      </button>
-                      <FilterDropdown
-                        value={filters.status || ""}
-                        onChange={(value) => handleFilter("status", value)}
-                        placeholder="Filter status..."
-                      />
-                    </div>
-                  </TableHead>
-                  <TableHead>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleSort("total")}
-                        className="flex items-center hover:text-primary"
-                      >
-                        Total
-                        {sorting.column === "total" && (
-                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {purchaseOrders?.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell>{order.purchase_order_number}</TableCell>
-                    <TableCell>{new Date(order.po_date).toLocaleDateString()}</TableCell>
-                    <TableCell>{order.vendor_profile?.display_name}</TableCell>
-                    <TableCell className="capitalize">{order.status}</TableCell>
-                    <TableCell>${order.total.toFixed(2)}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="outline" asChild>
-                        <Link to={`/purchases/orders/${order.id}`}>View</Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <PurchaseOrdersTable
+              purchaseOrders={purchaseOrders || []}
+              sorting={sorting}
+              filters={filters}
+              onSort={handleSort}
+              onFilter={handleFilter}
+            />
           )}
         </CardContent>
       </Card>
