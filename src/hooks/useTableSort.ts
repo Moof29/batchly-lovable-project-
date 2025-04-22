@@ -24,53 +24,44 @@ export const useTableSort = <T>(
       .from(tableName)
       .select(extraSelects);
 
-    // Check if we're sorting by a nested field (contains a dot)
+    // Handle sorting
     if (sortConfig.column.includes('.')) {
-      // First get all records
-      const { data: allData, error: fetchError } = await query;
+      // For nested field sorting, we need to handle it differently
+      const [relationTable, relationField] = sortConfig.column.split('.');
       
-      if (fetchError) {
-        console.error(`Supabase fetch error for ${tableName}:`, fetchError);
-        throw fetchError;
-      }
-
-      // Then sort them manually in JavaScript
-      const sortedData = allData?.sort((a, b) => {
-        const aValue = sortConfig.column.split('.').reduce((obj, key) => obj?.[key], a) || '';
-        const bValue = sortConfig.column.split('.').reduce((obj, key) => obj?.[key], b) || '';
-        
-        if (sortConfig.direction === "asc") {
-          return String(aValue).localeCompare(String(bValue));
-        } else {
-          return String(bValue).localeCompare(String(aValue));
-        }
+      // Use the orderBy method for related fields, which is more efficient
+      query = query.order(`${relationTable}(${relationField})`, { 
+        ascending: sortConfig.direction === "asc" 
       });
-
-      console.log(`Manually sorted ${tableName} results:`, sortedData);
-      return sortedData;
     } else {
-      // For other columns, use Supabase's sorting
-      query = query.order(sortConfig.column, { ascending: sortConfig.direction === "asc" });
-      
-      // Apply filters
-      Object.entries(filters).forEach(([column, value]) => {
-        if (value) {
-          if (column.includes('.')) {
-            query = query.ilike(column, `%${value}%`);
-          } else {
-            query = query.ilike(column, `%${value}%`);
-          }
-        }
+      // For regular fields, use standard ordering
+      query = query.order(sortConfig.column, { 
+        ascending: sortConfig.direction === "asc" 
       });
-
-      const { data, error } = await query;
-      if (error) {
-        console.error(`Supabase query error for ${tableName}:`, error);
-        throw error;
-      }
-      
-      console.log(`Query results for ${tableName}:`, data);
-      return data as T[];
     }
+    
+    // Apply filters
+    Object.entries(filters).forEach(([column, value]) => {
+      if (value) {
+        if (column.includes('.')) {
+          // For nested field filtering, we need a different approach
+          const [relationTable, relationField] = column.split('.');
+          
+          // Use the proper filter syntax for nested fields
+          query = query.filter(`${relationTable}.${relationField}`, 'ilike', `%${value}%`);
+        } else {
+          query = query.ilike(column, `%${value}%`);
+        }
+      }
+    });
+
+    const { data, error } = await query;
+    if (error) {
+      console.error(`Supabase query error for ${tableName}:`, error);
+      throw error;
+    }
+    
+    console.log(`Query results for ${tableName}:`, data);
+    return data as T[];
   };
 };

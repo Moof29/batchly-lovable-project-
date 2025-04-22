@@ -1,35 +1,14 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { AccountsPayableTable } from "@/components/payments/AccountsPayableTable";
+import { useBills } from "@/hooks/useBills";
 
 export const AccountsPayable = () => {
   const [sorting, setSorting] = useState({ column: "due_date", direction: "asc" as "asc" | "desc" });
   const [filters, setFilters] = useState<Record<string, string>>({});
 
-  const { data: bills, isLoading } = useQuery({
-    queryKey: ["accounts-payable", sorting, filters],
-    queryFn: async () => {
-      let query = supabase
-        .from("bill_record")
-        .select("*, vendor_profile(*)")
-        .gt("balance_due", 0)
-        .order(sorting.column, { ascending: sorting.direction === "asc" });
-
-      // Apply filters
-      Object.entries(filters).forEach(([column, value]) => {
-        if (value) {
-          query = query.ilike(column, `%${value}%`);
-        }
-      });
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: bills, isLoading } = useBills(sorting, filters);
 
   const handleSort = (column: string) => {
     setSorting(prev => ({

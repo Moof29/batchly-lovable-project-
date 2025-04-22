@@ -8,11 +8,12 @@ type SortConfig = {
 };
 
 export const useBills = (sorting: SortConfig, filters: Record<string, string> = {}) => {
+  // Make sure we're including all necessary related tables in the query
   const sortTable = useTableSort(
     "bill_record",
     sorting,
     filters,
-    "*, vendor_profile(display_name), vendor_id"
+    "*, vendor_profile(*)"
   );
 
   return useQuery({
