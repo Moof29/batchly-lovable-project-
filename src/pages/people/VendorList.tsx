@@ -1,19 +1,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Plus, ArrowUpAZ, ArrowDownAZ } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useVendors } from "@/hooks/useVendors";
-import { FilterDropdown } from "@/components/common/FilterDropdown";
+import { VendorsTable } from "@/components/people/VendorsTable";
 
 export const VendorList = () => {
   const [sorting, setSorting] = useState({ column: "display_name", direction: "asc" as "asc" | "desc" });
@@ -47,103 +39,23 @@ export const VendorList = () => {
         </Button>
       </div>
 
-      <Card>
+      <Card className="shadow-md">
         <CardHeader>
           <CardTitle>All Vendors</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="flex items-center justify-center h-32">Loading...</div>
+            <div className="flex items-center justify-center py-8">
+              <div className="text-sm text-muted-foreground">Loading vendors...</div>
+            </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleSort("display_name")}
-                        className="flex items-center hover:text-primary"
-                      >
-                        Name
-                        {sorting.column === "display_name" && (
-                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                        )}
-                      </button>
-                      <FilterDropdown
-                        value={filters.display_name || ""}
-                        onChange={(value) => handleFilter("display_name", value)}
-                        placeholder="Filter by name..."
-                      />
-                    </div>
-                  </TableHead>
-                  <TableHead>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleSort("email")}
-                        className="flex items-center hover:text-primary"
-                      >
-                        Email
-                        {sorting.column === "email" && (
-                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                        )}
-                      </button>
-                      <FilterDropdown
-                        value={filters.email || ""}
-                        onChange={(value) => handleFilter("email", value)}
-                        placeholder="Filter by email..."
-                      />
-                    </div>
-                  </TableHead>
-                  <TableHead>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleSort("phone")}
-                        className="flex items-center hover:text-primary"
-                      >
-                        Phone
-                        {sorting.column === "phone" && (
-                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                  </TableHead>
-                  <TableHead>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleSort("account_number")}
-                        className="flex items-center hover:text-primary"
-                      >
-                        Account Number
-                        {sorting.column === "account_number" && (
-                          sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                        )}
-                      </button>
-                      <FilterDropdown
-                        value={filters.account_number || ""}
-                        onChange={(value) => handleFilter("account_number", value)}
-                        placeholder="Filter by account..."
-                      />
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {vendors?.map((vendor) => (
-                  <TableRow key={vendor.id}>
-                    <TableCell>{vendor.display_name}</TableCell>
-                    <TableCell>{vendor.email}</TableCell>
-                    <TableCell>{vendor.phone}</TableCell>
-                    <TableCell>{vendor.account_number}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="outline" asChild>
-                        <Link to={`/people/vendors/${vendor.id}`}>View</Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <VendorsTable
+              vendors={vendors || []}
+              sorting={sorting}
+              filters={filters}
+              onSort={handleSort}
+              onFilter={handleFilter}
+            />
           )}
         </CardContent>
       </Card>
