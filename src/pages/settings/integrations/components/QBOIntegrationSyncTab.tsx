@@ -1,6 +1,6 @@
 
 import React from "react";
-import { QBOIntegrationSyncOverview } from "./QBOIntegrationSyncOverview";
+import QBOIntegrationSyncOverview from "./QBOIntegrationSyncOverview";
 import QBOIntegrationSyncHistory from "./QBOIntegrationSyncHistory";
 import { QBOSyncStatus } from "@/components/integrations/QBOSyncStatus";
 import { toast } from "@/hooks/use-toast";
