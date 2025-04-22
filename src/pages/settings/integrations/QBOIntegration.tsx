@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { QBOConnectionStatus } from '@/components/integrations/QBOConnectionStatus';
 import { useQBOIntegration } from '@/hooks/useQBOIntegration';
@@ -12,7 +11,7 @@ import { QBOTabs } from './components/QBOTabs';
 export const QBOIntegrationPage = () => {
   const { user } = useAuth();
   const { isDevMode } = useDevMode();
-  const { isConnected, connectionDetails, syncSettings, beginOAuthFlow, disconnectQBO, updateSyncSettings } = useQBOIntegration();
+  const { isConnected, connectionDetails, syncSettings, beginOAuthFlow, disconnectQBO, updateSyncSettings, refreshQBOToken, tokenExpiresAt, isRefreshingToken } = useQBOIntegration();
 
   const [isMockModalOpen, setIsMockModalOpen] = useState(false);
 
@@ -68,6 +67,9 @@ export const QBOIntegrationPage = () => {
         connectionDetails={connectionDetails}
         onConnect={handleConnect}
         onDisconnect={disconnectQBO}
+        onRefreshToken={refreshQBOToken}
+        tokenExpiresAt={tokenExpiresAt}
+        isRefreshingToken={isRefreshingToken}
       />
       {isConnected && (
         <QBOTabs

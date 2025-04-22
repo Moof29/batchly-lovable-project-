@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDevMode } from '@/contexts/DevModeContext';
@@ -27,12 +26,11 @@ export const useQBOIntegration = () => {
 
   const connectionQuery = useQBOConnectionQuery();
   const errorsQuery = useQBOErrorsQuery(organizationId, !!organizationId && (connectionQuery.data?.is_active || isDevMode));
-  const { oauthMutation, disconnectMutation } = useQBOConnectionMutations(organizationId);
+  const { oauthMutation, disconnectMutation, refreshTokenMutation } = useQBOConnectionMutations(organizationId);
 
   const connectionDetails = useQBOConnectionDetails(connectionQuery.data, isDevMode);
   const syncErrors = useQBOErrorsList(errorsQuery.data);
 
-  // Default sync settings and updateSyncSettings
   const { syncSettings, updateSyncSettings } = useSyncSettingsState({
     entities: {
       customers: true,
@@ -47,38 +45,28 @@ export const useQBOIntegration = () => {
     conflictResolutionStrategy: 'newest_wins'
   });
 
-  // Sync mutation
   const syncMutation = useMutation({
     mutationFn: async (entityTypes?: string[]) => {
       if (!organizationId) {
         throw new Error('Organization ID is required');
       }
       
-      // In dev mode, just simulate success
       if (isDevMode) {
         return { success: true };
       }
       
-      // In a real implementation, you would:
-      // 1. Queue sync operations for the specified entity types
-      // 2. Or start a full sync if no entity types are specified
-      
-      // For now, we'll just return success
       return { success: true };
     }
   });
 
-  // Function to begin OAuth flow
   const beginOAuthFlow = useCallback(() => {
     if (isDevMode) {
-      // In dev mode, simulate connection
       localStorage.setItem('batchly-mock-qbo', JSON.stringify({
         enabled: true,
         companyName: 'Acme Test Company',
         companyId: '1234567890'
       }));
       
-      // Refresh connection data
       connectionQuery.refetch();
       
       toast({
@@ -86,11 +74,9 @@ export const useQBOIntegration = () => {
         description: 'Successfully connected to mock QuickBooks Online account',
       });
     } else {
-      // In production, initiate real OAuth flow
       oauthMutation.mutate(undefined, {
         onSuccess: (data) => {
           if (data.authUrl) {
-            // Redirect to QBO authorization page
             window.location.href = data.authUrl;
           } else {
             toast({
@@ -111,14 +97,11 @@ export const useQBOIntegration = () => {
     }
   }, [isDevMode, connectionQuery, oauthMutation, organizationId]);
 
-  // Function to disconnect QBO
   const disconnectQBO = useCallback(() => {
     if (window.confirm('Are you sure you want to disconnect from QuickBooks Online? This will stop all data synchronization.')) {
       if (isDevMode) {
-        // In dev mode, just clear local storage
         localStorage.removeItem('batchly-mock-qbo');
         
-        // Refresh connection data
         connectionQuery.refetch();
         
         toast({
@@ -127,10 +110,8 @@ export const useQBOIntegration = () => {
           variant: 'destructive'
         });
       } else {
-        // In production, call disconnect mutation
         disconnectMutation.mutate(undefined, {
           onSuccess: () => {
-            // Refresh connection data
             connectionQuery.refetch();
             
             toast({
@@ -151,7 +132,6 @@ export const useQBOIntegration = () => {
     }
   }, [isDevMode, connectionQuery, disconnectMutation, organizationId]);
 
-  // Function to trigger sync
   const triggerSync = useCallback((entityTypes?: string[]) => {
     if (syncMutation.isPending) {
       toast({
@@ -183,6 +163,39 @@ export const useQBOIntegration = () => {
     });
   }, [syncMutation, organizationId]);
 
+  const refreshToken = useCallback(() => {
+    if (refreshTokenMutation.isPending) {
+      toast({ title: "Token refresh in progress", description: "Please wait…" });
+      return;
+    }
+    refreshTokenMutation.mutate(undefined, {
+      onSuccess: (data) => {
+        connectionQuery.refetch();
+        if (data.success) {
+          toast({
+            title: "Token refreshed",
+            description: data.expires_at
+              ? `New expiry: ${new Date(data.expires_at).toLocaleString()}`
+              : "QuickBooks token has been refreshed.",
+          });
+        } else {
+          toast({
+            title: "Token refresh failed",
+            description: "Could not refresh the QuickBooks connection.",
+            variant: "destructive"
+          });
+        }
+      },
+      onError: (error) => {
+        toast({
+          title: "Token refresh failed",
+          description: error?.message || "Failed to refresh QuickBooks connection.",
+          variant: "destructive"
+        });
+      }
+    });
+  }, [refreshTokenMutation, connectionQuery]);
+
   return {
     isConnected: (isDevMode && connectionQuery.data?.enabled) || 
                  (!isDevMode && !!connectionQuery.data?.is_active),
@@ -197,5 +210,9 @@ export const useQBOIntegration = () => {
     disconnectQBO,
     updateSyncSettings,
     triggerSync,
+    tokenExpiresAt: connectionDetails?.expiresAt || null,
+    refreshQBOToken: refreshToken,
+    isRefreshingToken: refreshTokenMutation.isPending,
+    tokenRefUpdatedAt: connectionQuery.data?.qbo_token_expires_at || null,
   };
 };

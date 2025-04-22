@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, CheckCircle2, ExternalLink, Link2, Unlink } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ExternalLink, Link2, Unlink, RefreshCw } from 'lucide-react';
 
 interface ConnectionDetails {
   companyName: string;
@@ -17,14 +17,31 @@ interface QBOConnectionStatusProps {
   connectionDetails: ConnectionDetails | null;
   onConnect: () => void;
   onDisconnect: () => void;
+  onRefreshToken?: () => void; // NEW
+  tokenExpiresAt?: Date | null;
+  isRefreshingToken?: boolean;
+}
+
+function getExpiryStatus(expiresAt?: Date | null) {
+  if (!expiresAt) return null;
+  const ms = expiresAt.getTime() - Date.now();
+  const hoursLeft = ms / (1000 * 60 * 60);
+  if (ms <= 0) return { msg: "Token expired", color: "text-red-600", urgent: true };
+  if (hoursLeft < 48) return { msg: `Expires soon (${Math.round(hoursLeft)}h left)`, color: "text-amber-600", urgent: true };
+  return { msg: `Expires in ${Math.round(hoursLeft)}h`, color: "text-green-700", urgent: false };
 }
 
 export const QBOConnectionStatus: React.FC<QBOConnectionStatusProps> = ({ 
   isConnected, 
   connectionDetails, 
   onConnect, 
-  onDisconnect 
+  onDisconnect,
+  onRefreshToken,
+  tokenExpiresAt,
+  isRefreshingToken,
 }) => {
+  const expiryStatus = getExpiryStatus(tokenExpiresAt);
+
   return (
     <Card>
       <CardContent className="pt-6">
@@ -56,12 +73,19 @@ export const QBOConnectionStatus: React.FC<QBOConnectionStatusProps> = ({
               
               {isConnected && connectionDetails ? (
                 <div className="text-sm text-muted-foreground">
-                  <p>Connected to <span className="font-medium">{connectionDetails.companyName}</span></p>
+                  <p>
+                    Connected to <span className="font-medium">{connectionDetails.companyName}</span>
+                  </p>
                   <p className="text-xs mt-1">
-                    Connected {new Date(connectionDetails.connectedAt).toLocaleDateString()}
-                    {" · "}
+                    Connected {new Date(connectionDetails.connectedAt).toLocaleDateString()} {" · "}
                     Token expires {new Date(connectionDetails.expiresAt).toLocaleDateString()}
                   </p>
+                  {tokenExpiresAt && expiryStatus?.msg && (
+                    <div className={`mt-1 text-xs font-medium flex items-center gap-1 ${expiryStatus.color}`}>
+                      <RefreshCw className="inline h-4 w-4" />
+                      {expiryStatus.msg}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">
@@ -71,20 +95,40 @@ export const QBOConnectionStatus: React.FC<QBOConnectionStatusProps> = ({
             </div>
           </div>
           
-          <div>
+          <div className="flex gap-2">
             {isConnected ? (
-              <div className="flex gap-2">
-                <Button variant="outline" className="flex items-center gap-2" onClick={onDisconnect}>
+              <>
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2"
+                  onClick={onDisconnect}
+                >
                   <Unlink className="h-4 w-4" />
                   Disconnect
                 </Button>
-                <Button className="flex items-center gap-2" onClick={onConnect}>
+                <Button
+                  className="flex items-center gap-2"
+                  onClick={onConnect}
+                >
                   <ExternalLink className="h-4 w-4" />
                   Reconnect
                 </Button>
-              </div>
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2"
+                  aria-label="Refresh QBO token"
+                  onClick={() => onRefreshToken && onRefreshToken()}
+                  disabled={isRefreshingToken}
+                >
+                  <RefreshCw className={`h-4 w-4 ${isRefreshingToken ? 'animate-spin' : ''}`} />
+                  {isRefreshingToken ? "Refreshing..." : "Refresh Token"}
+                </Button>
+              </>
             ) : (
-              <Button className="flex items-center gap-2" onClick={onConnect}>
+              <Button
+                className="flex items-center gap-2"
+                onClick={onConnect}
+              >
                 <Link2 className="h-4 w-4" />
                 Connect to QuickBooks
               </Button>

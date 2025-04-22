@@ -40,5 +40,23 @@ export const useQBOConnectionMutations = (organizationId?: string) => {
     }
   });
 
-  return { oauthMutation, disconnectMutation };
+  // NEW: Refresh QBO Token
+  const refreshTokenMutation = useMutation({
+    mutationFn: async () => {
+      if (!organizationId) throw new Error('Organization ID required');
+      if (isDevMode) {
+        // Simulate refresh delay
+        await new Promise(r => setTimeout(r, 1000));
+        return { success: true, expires_at: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString() };
+      }
+      const { data, error } = await supabase.functions.invoke('qbo-oauth', {
+        body: { organizationId, action: 'refresh' },
+        method: 'POST'
+      });
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  return { oauthMutation, disconnectMutation, refreshTokenMutation };
 };
