@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,6 +11,9 @@ import { DownloadIcon, FilterIcon, RefreshCw, AlertCircle, CheckCircle, Clock } 
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
+import QBOReconciliationFilters from './QBOReconciliationFilters';
+import QBOReconciliationTable from './QBOReconciliationTable';
+import QBOReconciliationSummary from './QBOReconciliationSummary';
 
 interface ReconciliationRow {
   entityId: string;
@@ -179,7 +181,6 @@ const QBOIntegrationReconciliation: React.FC = () => {
     setFilteredData(result);
   };
 
-  // Export data to CSV
   const exportToCSV = () => {
     if (!filteredData.length) return;
 
@@ -253,7 +254,6 @@ const QBOIntegrationReconciliation: React.FC = () => {
         <TabsTrigger value="data">Reconciliation Data</TabsTrigger>
         <TabsTrigger value="summary">Sync Summary</TabsTrigger>
       </TabsList>
-
       <TabsContent value="data" className="space-y-4">
         <Card className="shadow-md">
           <CardHeader className="flex flex-row items-center">
@@ -270,46 +270,16 @@ const QBOIntegrationReconciliation: React.FC = () => {
             </Button>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col md:flex-row gap-4 mb-4">
-              <div className="flex-1">
-                <Input
-                  placeholder="Search by ID..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full"
-                />
-              </div>
-              <div className="flex flex-1 gap-2">
-                <div className="w-1/2">
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Statuses</SelectItem>
-                      <SelectItem value="synced">Synced</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="error">Error</SelectItem>
-                      <SelectItem value="mismatch">Mismatched</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="w-1/2">
-                  <Select value={entityFilter} onValueChange={setEntityFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Filter by entity" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Entities</SelectItem>
-                      {entityTypes.map((type) => (
-                        <SelectItem key={type} value={type}>{displayNames[type]}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-
+            <QBOReconciliationFilters
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+              entityFilter={entityFilter}
+              setEntityFilter={setEntityFilter}
+              entityTypes={entityTypes}
+              displayNames={displayNames}
+            />
             {filteredData.length === 0 && !loading ? (
               <div className="text-center py-8 bg-gray-50 rounded-md">
                 <p className="text-muted-foreground">No data matches your criteria</p>
@@ -318,129 +288,23 @@ const QBOIntegrationReconciliation: React.FC = () => {
                 </Button>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Entity Type</TableHead>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Batchly Status</TableHead>
-                      <TableHead>QBO Status</TableHead>
-                      <TableHead>Last Updated (Batchly)</TableHead>
-                      <TableHead>Last Updated (QBO)</TableHead>
-                      <TableHead>Remarks</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {loading ? (
-                      <TableRow>
-                        <TableCell colSpan={7} className="text-center p-8">
-                          <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2" />
-                          <p>Loading reconciliation data...</p>
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredData.map((row) => (
-                        <TableRow key={row.entityId} className={
-                          row.batchlyStatus === 'error' || row.qboStatus === 'error' 
-                            ? 'bg-red-50 hover:bg-red-100' 
-                            : row.batchlyStatus !== row.qboStatus 
-                              ? 'bg-amber-50 hover:bg-amber-100'
-                              : ''
-                        }>
-                          <TableCell className="font-medium">{displayNames[row.entityType as EntityTableName]}</TableCell>
-                          <TableCell className="font-mono text-sm">{row.entityId.substring(0, 8)}...</TableCell>
-                          <TableCell>{getStatusBadge(row.batchlyStatus)}</TableCell>
-                          <TableCell>{getStatusBadge(row.qboStatus)}</TableCell>
-                          <TableCell>{row.lastUpdatedBatchly?.toLocaleString() || 'N/A'}</TableCell>
-                          <TableCell>{row.lastUpdatedQBO?.toLocaleString() || 'N/A'}</TableCell>
-                          <TableCell>
-                            {row.remarks && (
-                              <span className="text-red-600 font-medium">{row.remarks}</span>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
+              <QBOReconciliationTable
+                filteredData={filteredData}
+                loading={loading}
+                displayNames={displayNames}
+                fetchReconciliationData={fetchReconciliationData}
+              />
             )}
           </CardContent>
         </Card>
       </TabsContent>
-
       <TabsContent value="summary">
-        <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle>Synchronization Summary</CardTitle>
-            <CardDescription>Overview of data reconciliation status between Batchly and QBO</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Overall Sync Progress</span>
-                  <span className="text-sm font-medium">{summaryStats.syncPercentage}%</span>
-                </div>
-                <Progress value={summaryStats.syncPercentage} className="h-2" />
-              </div>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white rounded-xl shadow p-4 text-center">
-                  <p className="text-sm text-gray-500 mb-1">Total Records</p>
-                  <p className="text-2xl font-bold">{summaryStats.total}</p>
-                </div>
-                
-                <div className="bg-green-50 rounded-xl shadow p-4 text-center">
-                  <p className="text-sm text-green-700 mb-1">Synced</p>
-                  <p className="text-2xl font-bold text-green-700">{summaryStats.synced}</p>
-                </div>
-                
-                <div className="bg-yellow-50 rounded-xl shadow p-4 text-center">
-                  <p className="text-sm text-yellow-700 mb-1">Pending</p>
-                  <p className="text-2xl font-bold text-yellow-700">{summaryStats.pending}</p>
-                </div>
-                
-                <div className="bg-red-50 rounded-xl shadow p-4 text-center">
-                  <p className="text-sm text-red-700 mb-1">Errors</p>
-                  <p className="text-2xl font-bold text-red-700">{summaryStats.error}</p>
-                </div>
-              </div>
-
-              <Separator className="my-4" />
-              
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Entity Breakdown</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {entityTypes.map(type => {
-                    const entityData = data.filter(row => row.entityType === type);
-                    if (entityData.length === 0) return null;
-                    
-                    const synced = entityData.filter(row => row.batchlyStatus === 'synced' && row.qboStatus === 'synced').length;
-                    const percent = Math.round((synced / entityData.length) * 100);
-                    
-                    return (
-                      <div key={type} className="bg-white rounded-xl shadow p-4">
-                        <div className="flex justify-between items-center mb-2">
-                          <h4 className="font-medium">{displayNames[type]}</h4>
-                          <Badge variant={percent === 100 ? "secondary" : "outline"} className={percent === 100 ? "bg-green-100 text-green-800 hover:bg-green-200" : ""}>
-                            {percent}%
-                          </Badge>
-                        </div>
-                        <Progress value={percent} className="h-1 mb-2" />
-                        <div className="text-xs text-gray-500 flex justify-between">
-                          <span>Total: {entityData.length}</span>
-                          <span>Synced: {synced}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <QBOReconciliationSummary
+          summaryStats={summaryStats}
+          data={data}
+          entityTypes={entityTypes}
+          displayNames={displayNames}
+        />
       </TabsContent>
     </Tabs>
   );
