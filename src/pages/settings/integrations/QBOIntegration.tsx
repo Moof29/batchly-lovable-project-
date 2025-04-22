@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { QBOConnectionStatus } from '@/components/integrations/QBOConnectionStatus';
 import { QBOSyncStatus } from '@/components/integrations/QBOSyncStatus';
@@ -27,6 +28,21 @@ import QBOIntegrationErrorsList from './components/QBOIntegrationErrorsList';
 import QBOIntegrationSyncOverview from './components/QBOIntegrationSyncOverview';
 import QBOIntegrationSyncHistory from './components/QBOIntegrationSyncHistory';
 import QBOIntegrationReconciliation from './components/QBOIntegrationReconciliation';
+
+// Define EntityConfig type with the correct union type for sync_direction
+interface EntityConfig {
+  batch_size: number;
+  created_at: string;
+  dependency_order: number;
+  entity_type: string;
+  id: string;
+  is_enabled: boolean;
+  organization_id: string;
+  priority_level: number;
+  sync_direction: 'to_qbo' | 'from_qbo' | 'bidirectional';
+  sync_frequency_minutes: number;
+  updated_at: string;
+}
 
 export const QBOIntegrationPage = () => {
   const { user } = useAuth();
@@ -178,7 +194,7 @@ export const QBOIntegrationPage = () => {
           <TabsContent value="entities">
             <QBOIntegrationEntitiesAccordion
               entityTypes={entityTypes}
-              entityConfigs={entityConfigs}
+              entityConfigs={entityConfigs as EntityConfig[]}
               updateEntityConfig={updateEntityConfig}
               isLoading={isLoadingEntityConfigs}
             />

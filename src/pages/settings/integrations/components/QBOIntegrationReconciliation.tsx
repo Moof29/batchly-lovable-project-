@@ -16,7 +16,10 @@ interface ReconciliationRow {
   remarks?: string;
 }
 
-const entityTypes = ['customer_profile', 'vendor_profile', 'item_record', 'invoice_record', 'bill_record', 'payment_receipt'];
+// Define the allowed entity types as a literal union type for type safety
+type EntityTableName = 'customer_profile' | 'vendor_profile' | 'item_record' | 'invoice_record' | 'bill_record' | 'payment_receipt';
+
+const entityTypes: EntityTableName[] = ['customer_profile', 'vendor_profile', 'item_record', 'invoice_record', 'bill_record', 'payment_receipt'];
 
 const QBOIntegrationReconciliation: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -27,35 +30,45 @@ const QBOIntegrationReconciliation: React.FC = () => {
     try {
       setLoading(true);
 
-      // For demonstration, we will load a simple aggregated reconciliation data comparing last sync status timestamps
-      // We'll query Batchly tables and QBO mappings to compare sync status and last update times for entities
-
       // Generate reconciliation data for each entity type
       const results: ReconciliationRow[] = [];
 
       for (const entity of entityTypes) {
         // Batchly side query (simplified)
-        const batchlyData = await supabase
+        const { data: batchlyData, error: batchlyError } = await supabase
           .from(entity)
           .select('id, qbo_sync_status, last_sync_at, updated_at')
           .limit(5);
 
-        if (!batchlyData.data) continue;
+        if (batchlyError) {
+          console.error(`Error fetching ${entity} data:`, batchlyError);
+          continue;
+        }
 
-        for (const item of batchlyData.data) {
+        if (!batchlyData || batchlyData.length === 0) continue;
+
+        for (const item of batchlyData) {
           // For QBO, check qbo_entity_mapping for matching qbo_id and entity_type
-          const qboMapping = await supabase
+          const { data: qboMapping, error: mappingError } = await supabase
             .from('qbo_entity_mapping')
             .select('last_qbo_update')
             .eq('batchly_id', item.id)
             .eq('entity_type', entity)
             .single();
 
-          const batchlyStatus = item.qbo_sync_status || 'pending';
+          if (mappingError && mappingError.code !== 'PGRST116') { // Ignore not found errors
+            console.error(`Error fetching QBO mapping for ${entity} ${item.id}:`, mappingError);
+          }
+
+          const batchlyStatus: 'synced' | 'pending' | 'error' = 
+            item.qbo_sync_status === 'error' ? 'error' : 
+            item.qbo_sync_status === 'synced' ? 'synced' : 'pending';
+
           // Determine QBO Status from last_qbo_update (if recent enough consider synced)
           let qboStatus: 'synced' | 'pending' | 'error' = 'pending';
-          if (qboMapping.data?.last_qbo_update) {
-            const lastQbo = new Date(qboMapping.data.last_qbo_update);
+          
+          if (qboMapping?.last_qbo_update) {
+            const lastQbo = new Date(qboMapping.last_qbo_update);
             const lastBatchly = item.last_sync_at ? new Date(item.last_sync_at) : new Date(item.updated_at);
             // Within 1 hour difference synced, else pending
             if (Math.abs(lastQbo.getTime() - lastBatchly.getTime()) < 3600000) {
@@ -63,8 +76,6 @@ const QBOIntegrationReconciliation: React.FC = () => {
             } else {
               qboStatus = 'pending';
             }
-          } else {
-            qboStatus = 'pending';
           }
 
           results.push({
@@ -73,8 +84,8 @@ const QBOIntegrationReconciliation: React.FC = () => {
             batchlyStatus,
             qboStatus,
             lastUpdatedBatchly: item.last_sync_at ? new Date(item.last_sync_at) : new Date(item.updated_at),
-            lastUpdatedQBO: qboMapping.data?.last_qbo_update ? new Date(qboMapping.data.last_qbo_update) : null,
-            remarks: batchlyStatus === 'error' || qboStatus === 'error' ? 'Check errors' : ''
+            lastUpdatedQBO: qboMapping?.last_qbo_update ? new Date(qboMapping.last_qbo_update) : null,
+            remarks: (batchlyStatus === 'error' || qboStatus === 'error') ? 'Check errors' : ''
           });
         }
       }
