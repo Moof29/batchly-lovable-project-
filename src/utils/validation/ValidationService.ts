@@ -26,7 +26,7 @@ export class ValidationService<T extends Record<string, any>> {
     };
   }
   
-  validate(data: T): ValidationResult {
+  validate(data: T): ValidationResult & { sanitized?: T } {
     const errors: { field: string; message: string }[] = [];
     
     // Validate required fields and defined rules
@@ -60,12 +60,18 @@ export class ValidationService<T extends Record<string, any>> {
       }
     }
     
-    return {
+    // Create result object
+    const result: ValidationResult & { sanitized?: T } = {
       isValid: errors.length === 0,
-      errors,
-      // Return sanitized data if configured to strip extra fields
-      sanitized: this.config.stripExtraFields ? this.stripExtraFields(data) : data
+      errors
     };
+    
+    // Add sanitized data if configured to strip extra fields
+    if (this.config.stripExtraFields) {
+      result.sanitized = this.stripExtraFields(data);
+    }
+    
+    return result;
   }
   
   stripExtraFields(data: T): T {
@@ -100,7 +106,7 @@ export class ValidationService<T extends Record<string, any>> {
   
   // Create a validation pipeline for more complex validations
   static createPipeline<T extends Record<string, any>>(validators: ValidationService<T>[]) {
-    return (data: T): ValidationResult => {
+    return (data: T): ValidationResult & { sanitized?: T } => {
       for (const validator of validators) {
         const result = validator.validate(data);
         if (!result.isValid) {

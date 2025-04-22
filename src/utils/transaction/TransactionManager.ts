@@ -71,8 +71,9 @@ export class TransactionManager {
         let beforeState = null;
         
         if (journal && op.match) {
+          // Use type assertion to handle dynamic table names
           const { data: before } = await supabase
-            .from(op.table)
+            .from(op.table as any)
             .select('*')
             .match(op.match)
             .maybeSingle();
@@ -81,7 +82,8 @@ export class TransactionManager {
         
         switch (op.type) {
           case 'insert':
-            query = supabase.from(op.table).insert(op.data);
+            // Use type assertion for dynamic table names
+            query = supabase.from(op.table as any).insert(op.data);
             
             if (op.returning) {
               query = query.select(op.returning);
@@ -105,7 +107,8 @@ export class TransactionManager {
             break;
             
           case 'update':
-            query = supabase.from(op.table).update(op.data).match(op.match);
+            // Use type assertion for dynamic table names
+            query = supabase.from(op.table as any).update(op.data).match(op.match);
             
             if (op.returning) {
               query = query.select(op.returning);
@@ -129,7 +132,8 @@ export class TransactionManager {
             break;
             
           case 'delete':
-            query = supabase.from(op.table).delete();
+            // Use type assertion for dynamic table names
+            query = supabase.from(op.table as any).delete();
             
             if (op.match) {
               query = query.match(op.match);
@@ -157,7 +161,8 @@ export class TransactionManager {
             break;
             
           case 'upsert':
-            query = supabase.from(op.table).upsert(op.data);
+            // Use type assertion for dynamic table names
+            query = supabase.from(op.table as any).upsert(op.data);
             
             if (op.returning) {
               query = query.select(op.returning);
@@ -228,18 +233,19 @@ export class TransactionManager {
       // Convert journal entries to database format
       const recordsToInsert = entries.map(entry => ({
         organization_id: entry.organizationId,
-        entity_type: entry.entityType,
-        entity_id: entry.entityId,
+        table_name: entry.entityType,
+        record_id: entry.entityId,
         operation_type: entry.operation,
         user_id: entry.userId || null,
-        portal_user_id: entry.portalUserId || null,
         before_data: entry.before || null,
         after_data: entry.after || null,
-        source: entry.source,
         timestamp: new Date().toISOString()
       }));
       
-      const { error } = await supabase.from('change_log').insert(recordsToInsert);
+      // Insert records into change_log table
+      const { error } = await supabase
+        .from('change_log')
+        .insert(recordsToInsert);
       
       if (error) {
         console.error('Failed to flush journal entries:', error);

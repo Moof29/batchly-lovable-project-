@@ -76,6 +76,7 @@ export class CustomerPortalService {
     try {
       // Validate the profile data
       const validationResult = customerPortalValidator.validate(profileData);
+      const sanitizedData = validationResult.sanitized || profileData;
       
       if (!validationResult.isValid) {
         return {
@@ -116,7 +117,7 @@ export class CustomerPortalService {
               type: 'update',
               match: { id: customerId, organization_id: this.organizationId },
               data: {
-                ...validationResult,
+                ...sanitizedData,
                 updated_at: new Date().toISOString(),
                 qbo_sync_status: 'pending' // Mark for sync
               },
