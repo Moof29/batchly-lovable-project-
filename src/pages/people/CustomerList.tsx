@@ -1,13 +1,14 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCustomers } from "@/hooks/useCustomers";
 import { CustomersTable } from "@/components/people/CustomersTable";
-import { useCustomerPortalAccess } from "@/hooks/people/useCustomerPortalAccess";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { CustomerPortalAccessService } from "@/services/people/CustomerPortalAccessService";
+import { toast } from "sonner";
 
 export const CustomerList = () => {
   const [sorting, setSorting] = useState({ column: "display_name", direction: "asc" as "asc" | "desc" });
@@ -21,21 +22,23 @@ export const CustomerList = () => {
     let mounted = true;
     async function loadPortalAccess() {
       if (!customers) return;
+      
       const map: Record<string, boolean> = {};
       await Promise.all(
         customers.map(async (customer) => {
           try {
-            const hasAccess = await import("@/services/people/CustomerPortalAccessService").then(mod =>
-              mod.CustomerPortalAccessService.hasPortalAccess(customer.id)
-            );
+            const hasAccess = await CustomerPortalAccessService.hasPortalAccess(customer.id);
             map[customer.id] = hasAccess;
-          } catch {
+          } catch (error) {
+            console.error(`Error loading portal access for ${customer.id}:`, error);
             map[customer.id] = false;
           }
         })
       );
+      
       if (mounted) setPortalAccessMap(map);
     }
+    
     loadPortalAccess();
     return () => {
       mounted = false;
@@ -59,18 +62,20 @@ export const CustomerList = () => {
   const handleTogglePortalAccess = async (customerId: string, enabled: boolean) => {
     setLoadingCustomerId(customerId);
     try {
-      const svc = (await import("@/services/people/CustomerPortalAccessService")).CustomerPortalAccessService;
       if (enabled) {
-        await svc.grantPortalAccess(customerId);
+        await CustomerPortalAccessService.grantPortalAccess(customerId);
+        toast.success("Portal access granted successfully");
       } else {
-        await svc.revokePortalAccess(customerId);
+        await CustomerPortalAccessService.revokePortalAccess(customerId);
+        toast.success("Portal access revoked successfully");
       }
       setPortalAccessMap((prev) => ({ ...prev, [customerId]: enabled }));
+      queryClient.invalidateQueries({ queryKey: ["portalAccess", customerId] });
     } catch (err) {
       console.error("Portal access change failed", err);
+      toast.error(`Failed to ${enabled ? 'grant' : 'revoke'} portal access`);
     } finally {
       setLoadingCustomerId(null);
-      queryClient.invalidateQueries({ queryKey: ["customers"] });
     }
   };
 

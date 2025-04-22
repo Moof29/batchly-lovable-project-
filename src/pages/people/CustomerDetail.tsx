@@ -1,4 +1,5 @@
-import { useParams } from "react-router-dom";
+
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { useCustomerPortalAccess } from "@/hooks/people/useCustomerPortalAccess";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { Eye } from "lucide-react";
 
 export const CustomerDetail = () => {
   const { id } = useParams();
@@ -62,8 +63,9 @@ export const CustomerDetail = () => {
             onClick={() => {
               navigate(`/portal?asCustomer=${id}`);
             }}
-            aria-label="View as Customer"
+            className="flex items-center gap-2"
           >
+            <Eye className="h-4 w-4" />
             View as Customer
           </Button>
         )}
