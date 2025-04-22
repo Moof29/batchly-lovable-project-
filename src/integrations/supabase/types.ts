@@ -571,6 +571,100 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_messages: {
+        Row: {
+          created_at: string
+          customer_id: string
+          id: string
+          message: string
+          organization_id: string
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          id?: string
+          message: string
+          organization_id: string
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          id?: string
+          message?: string
+          organization_id?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_messages_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_payment_methods: {
+        Row: {
+          billing_name: string | null
+          card_brand: string | null
+          created_at: string
+          customer_id: string
+          expiry_month: number | null
+          expiry_year: number | null
+          id: string
+          is_default: boolean | null
+          last_four: string | null
+          payment_type: string
+          provider_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          billing_name?: string | null
+          card_brand?: string | null
+          created_at?: string
+          customer_id: string
+          expiry_month?: number | null
+          expiry_year?: number | null
+          id?: string
+          is_default?: boolean | null
+          last_four?: string | null
+          payment_type: string
+          provider_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          billing_name?: string | null
+          card_brand?: string | null
+          created_at?: string
+          customer_id?: string
+          expiry_month?: number | null
+          expiry_year?: number | null
+          id?: string
+          is_default?: boolean | null
+          last_four?: string | null
+          payment_type?: string
+          provider_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_payment_methods_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_portal_user_links: {
         Row: {
           created_at: string | null

@@ -9,6 +9,8 @@ import { CustomerContactCard } from "@/components/people/CustomerContactCard";
 import { CustomerFinancialCard } from "@/components/people/CustomerFinancialCard";
 import { CustomerBillingCard } from "@/components/people/CustomerBillingCard";
 import { CustomerShippingCard } from "@/components/people/CustomerShippingCard";
+import { CustomerMessagesCard } from "@/components/people/CustomerMessagesCard";
+import { CustomerPaymentMethodsCard } from "@/components/people/CustomerPaymentMethodsCard";
 
 export const CustomerDetail = () => {
   const { id } = useParams();
@@ -50,6 +52,8 @@ export const CustomerDetail = () => {
         <TabsList>
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="billing">Billing & Shipping</TabsTrigger>
+          <TabsTrigger value="messages">Messages</TabsTrigger>
+          <TabsTrigger value="payments">Payment Methods</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details" className="space-y-4">
@@ -61,8 +65,20 @@ export const CustomerDetail = () => {
           <CustomerBillingCard customer={customer} />
           <CustomerShippingCard customer={customer} />
         </TabsContent>
+
+        <TabsContent value="messages" className="space-y-4">
+          <CustomerMessagesCard
+            customerId={id!}
+            organizationId={customer.organization_id}
+          />
+        </TabsContent>
+
+        <TabsContent value="payments" className="space-y-4">
+          <CustomerPaymentMethodsCard
+            customerId={id!}
+          />
+        </TabsContent>
       </Tabs>
     </div>
   );
 };
-
