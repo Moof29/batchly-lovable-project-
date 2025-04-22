@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { DownloadIcon, FilterIcon, RefreshCw, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { DownloadIcon, FilterIcon, RefreshCw } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
-import QBOReconciliationFilters from './QBOReconciliationFilters';
-import QBOReconciliationTable from './QBOReconciliationTable';
-import QBOReconciliationSummary from './QBOReconciliationSummary';
+import { QBOReconciliationFilters } from './QBOReconciliationFilters';
+import { QBOReconciliationTable } from './QBOReconciliationTable';
+import { QBOReconciliationSummary } from './QBOReconciliationSummary';
 
 interface ReconciliationRow {
   entityId: string;
@@ -151,7 +147,6 @@ const QBOIntegrationReconciliation: React.FC = () => {
   ) => {
     let result = [...dataToFilter];
     
-    // Apply search filter
     if (search) {
       const searchLower = search.toLowerCase();
       result = result.filter(row => 
@@ -160,7 +155,6 @@ const QBOIntegrationReconciliation: React.FC = () => {
       );
     }
     
-    // Apply status filter
     if (status !== 'all') {
       if (status === 'synced') {
         result = result.filter(row => row.batchlyStatus === 'synced' && row.qboStatus === 'synced');
@@ -173,7 +167,6 @@ const QBOIntegrationReconciliation: React.FC = () => {
       }
     }
     
-    // Apply entity filter
     if (entity !== 'all') {
       result = result.filter(row => row.entityType === entity);
     }
@@ -206,38 +199,6 @@ const QBOIntegrationReconciliation: React.FC = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  };
-
-  const getStatusBadge = (status: 'synced' | 'pending' | 'error') => {
-    switch (status) {
-      case 'synced':
-        return (
-          <div className="flex items-center gap-1">
-            <CheckCircle className="h-4 w-4 text-green-700" />
-            <span className="px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-700">
-              Synced
-            </span>
-          </div>
-        );
-      case 'pending':
-        return (
-          <div className="flex items-center gap-1">
-            <Clock className="h-4 w-4 text-yellow-700" />
-            <span className="px-2 py-1 rounded text-xs font-semibold bg-yellow-100 text-yellow-700">
-              Pending
-            </span>
-          </div>
-        );
-      case 'error':
-        return (
-          <div className="flex items-center gap-1">
-            <AlertCircle className="h-4 w-4 text-red-700" />
-            <span className="px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-700">
-              Error
-            </span>
-          </div>
-        );
-    }
   };
 
   useEffect(() => {
