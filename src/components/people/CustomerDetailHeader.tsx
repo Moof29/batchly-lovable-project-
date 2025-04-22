@@ -33,19 +33,20 @@ export const CustomerDetailHeader = ({
             aria-label="Toggle portal access"
           />
           <span className="text-sm">Portal Access</span>
+          {portalAccess && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate(`/portal?asCustomer=${customerId}`)}
+              className="flex items-center gap-2 ml-2"
+              aria-label="View customer portal"
+            >
+              <Eye className="h-4 w-4" />
+              View as Customer
+            </Button>
+          )}
         </div>
       </div>
-      {portalAccess && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate(`/portal?asCustomer=${customerId}`)}
-          className="flex items-center gap-2"
-        >
-          <Eye className="h-4 w-4" />
-          View as Customer
-        </Button>
-      )}
     </div>
   );
 };
