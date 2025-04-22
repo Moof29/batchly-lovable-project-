@@ -8,7 +8,8 @@ import { usePortalUsers } from "@/hooks/people/usePortalUsers";
 import { PortalUsersTable } from "@/components/people/PortalUsersTable";
 import { TablePagination } from "@/components/people/TablePagination";
 
-export default function CustomerPortalUsers() {
+// Changed from default export to named export
+export function CustomerPortalUsers() {
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 20;
 
@@ -52,3 +53,5 @@ export default function CustomerPortalUsers() {
     </div>
   );
 }
+
+export default CustomerPortalUsers; // Keep default export for backwards compatibility
