@@ -2,6 +2,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowDownAZ, ArrowUpAZ } from "lucide-react";
 import { FilterDropdown } from "@/components/common/FilterDropdown";
+import { Button } from "@/components/ui/button";
 
 interface AccountsReceivableTableProps {
   invoices: any[];
@@ -98,20 +99,35 @@ export const AccountsReceivableTable = ({
                 </button>
               </div>
             </TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {invoices?.map((invoice) => (
-            <TableRow key={invoice.id} className="hover:bg-muted/50">
-              <TableCell>{invoice.invoice_number}</TableCell>
-              <TableCell>{invoice.customer_profile?.display_name}</TableCell>
-              <TableCell>{new Date(invoice.due_date).toLocaleDateString()}</TableCell>
-              <TableCell>${invoice.total?.toFixed(2)}</TableCell>
-              <TableCell>${invoice.balance_due?.toFixed(2)}</TableCell>
+          {invoices?.length > 0 ? (
+            invoices.map((invoice) => (
+              <TableRow key={invoice.id} className="hover:bg-muted/50">
+                <TableCell>{invoice.invoice_number}</TableCell>
+                <TableCell>{invoice.customer_profile?.display_name}</TableCell>
+                <TableCell>{new Date(invoice.due_date).toLocaleDateString()}</TableCell>
+                <TableCell>${invoice.total?.toFixed(2)}</TableCell>
+                <TableCell>${invoice.balance_due?.toFixed(2)}</TableCell>
+                <TableCell className="text-right">
+                  <Button variant="outline" size="sm">
+                    View Details
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center py-4 text-muted-foreground">
+                No invoices found
+              </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
     </div>
   );
 };
+
