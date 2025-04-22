@@ -12,22 +12,59 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Download } from "lucide-react";
+import { Plus, Download, ArrowDownAZ, ArrowUpAZ, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useState } from "react";
 
 export const BillList = () => {
+  const [sorting, setSorting] = useState<{ column: string; direction: "asc" | "desc" }>({
+    column: "bill_date",
+    direction: "desc",
+  });
+  const [filters, setFilters] = useState<Record<string, string>>({});
+
   const { data: bills, isLoading } = useQuery({
-    queryKey: ["bills"],
+    queryKey: ["bills", sorting, filters],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("bill_record")
         .select("*, vendor_profile(display_name)")
-        .order('bill_date', { ascending: false });
+        .order(sorting.column, { ascending: sorting.direction === "asc" });
+
+      // Apply filters
+      Object.entries(filters).forEach(([column, value]) => {
+        if (value) {
+          query = query.ilike(column, `%${value}%`);
+        }
+      });
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return data;
     },
   });
+
+  const handleSort = (column: string) => {
+    setSorting(prev => ({
+      column,
+      direction: prev.column === column && prev.direction === "asc" ? "desc" : "asc"
+    }));
+  };
+
+  const handleFilter = (column: string, value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      [column]: value,
+    }));
+  };
 
   return (
     <div className="space-y-6">
@@ -64,13 +101,136 @@ export const BillList = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/50">
-                    <TableHead className="font-medium">Bill #</TableHead>
-                    <TableHead className="font-medium">Vendor</TableHead>
-                    <TableHead className="font-medium">Date</TableHead>
-                    <TableHead className="font-medium">Due Date</TableHead>
-                    <TableHead className="font-medium">Total</TableHead>
-                    <TableHead className="font-medium">Status</TableHead>
-                    <TableHead className="text-right font-medium">Actions</TableHead>
+                    <TableHead>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleSort("bill_number")}
+                          className="flex items-center hover:text-primary"
+                        >
+                          Bill #
+                          {sorting.column === "bill_number" && (
+                            sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                          )}
+                        </button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <Filter className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start">
+                            <div className="p-2">
+                              <Input
+                                placeholder="Filter bills..."
+                                value={filters.bill_number || ""}
+                                onChange={(e) => handleFilter("bill_number", e.target.value)}
+                                className="h-8"
+                              />
+                            </div>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleSort("vendor_profile.display_name")}
+                          className="flex items-center hover:text-primary"
+                        >
+                          Vendor
+                          {sorting.column === "vendor_profile.display_name" && (
+                            sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                          )}
+                        </button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <Filter className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start">
+                            <div className="p-2">
+                              <Input
+                                placeholder="Filter vendors..."
+                                value={filters["vendor_profile.display_name"] || ""}
+                                onChange={(e) => handleFilter("vendor_profile.display_name", e.target.value)}
+                                className="h-8"
+                              />
+                            </div>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleSort("bill_date")}
+                          className="flex items-center hover:text-primary"
+                        >
+                          Date
+                          {sorting.column === "bill_date" && (
+                            sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleSort("due_date")}
+                          className="flex items-center hover:text-primary"
+                        >
+                          Due Date
+                          {sorting.column === "due_date" && (
+                            sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleSort("total")}
+                          className="flex items-center hover:text-primary"
+                        >
+                          Total
+                          {sorting.column === "total" && (
+                            sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleSort("status")}
+                          className="flex items-center hover:text-primary"
+                        >
+                          Status
+                          {sorting.column === "status" && (
+                            sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                          )}
+                        </button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <Filter className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start">
+                            <div className="p-2">
+                              <Input
+                                placeholder="Filter status..."
+                                value={filters.status || ""}
+                                onChange={(e) => handleFilter("status", e.target.value)}
+                                className="h-8"
+                              />
+                            </div>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
