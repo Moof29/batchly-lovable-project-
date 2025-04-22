@@ -1,7 +1,8 @@
-
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CustomerPortalAccessService } from "@/services/people/CustomerPortalAccessService";
 import { toast } from "sonner";
+
+const DEV_MOCK_CUSTOMER_PORTAL_ACCESS = true;
 
 export function useCustomerPortalAccess(customerId: string) {
   const queryClient = useQueryClient();
@@ -37,6 +38,15 @@ export function useCustomerPortalAccess(customerId: string) {
   });
 
   const setAccess = (allowed: boolean) => {
+    if (DEV_MOCK_CUSTOMER_PORTAL_ACCESS) {
+      if (allowed) {
+        grantMutation.mutate();
+      } else {
+        revokeMutation.mutate();
+      }
+      refetch();
+      return;
+    }
     if (allowed) {
       grantMutation.mutate();
     } else {

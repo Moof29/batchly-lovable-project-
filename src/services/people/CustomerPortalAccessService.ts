@@ -1,16 +1,23 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
+// Toggle this to true to enable mock mode for portal access in development.
+const DEV_MOCK_CUSTOMER_PORTAL_ACCESS = true;
+
+// In-memory mock storage for testing toggles per-customer.
+const mockPortalAccess: Record<string, boolean> = {};
+
 export const CustomerPortalAccessService = {
-  // Checks if this customer has portal access by finding any portal user link
   async hasPortalAccess(customerId: string): Promise<boolean> {
+    if (DEV_MOCK_CUSTOMER_PORTAL_ACCESS) {
+      // If no value is set, default to false
+      return !!mockPortalAccess[customerId];
+    }
     try {
       const { data, error } = await supabase
         .from("customer_portal_user_links")
         .select("id")
         .eq("customer_id", customerId)
         .maybeSingle();
-      
       if (error) throw error;
       return !!data;
     } catch (error) {
@@ -18,33 +25,34 @@ export const CustomerPortalAccessService = {
       return false;
     }
   },
-  
-  // Enable access: create a link (for demo, assign a dummy user; real deployment should use invite flow)
+
   async grantPortalAccess(customerId: string): Promise<void> {
+    if (DEV_MOCK_CUSTOMER_PORTAL_ACCESS) {
+      mockPortalAccess[customerId] = true;
+      return;
+    }
     try {
-      // Here you would implement choosing a user to assign; for demo, assign a dummy portal_user_id
-      // (You might want to create a UI to invite/set, for now assign customerId as portal_user_id for testing)
-      const portal_user_id = customerId; // NOT REAL LOGIC! Only for simple PoC
-      
+      const portal_user_id = customerId;
       const { error } = await supabase
         .from("customer_portal_user_links")
         .insert([{ portal_user_id, customer_id: customerId }]);
-        
       if (error) throw error;
     } catch (error) {
       console.error("Error granting portal access:", error);
       throw error;
     }
   },
-  
-  // Remove any portal access links for this customer
+
   async revokePortalAccess(customerId: string): Promise<void> {
+    if (DEV_MOCK_CUSTOMER_PORTAL_ACCESS) {
+      mockPortalAccess[customerId] = false;
+      return;
+    }
     try {
       const { error } = await supabase
         .from("customer_portal_user_links")
         .delete()
         .eq("customer_id", customerId);
-        
       if (error) throw error;
     } catch (error) {
       console.error("Error revoking portal access:", error);
