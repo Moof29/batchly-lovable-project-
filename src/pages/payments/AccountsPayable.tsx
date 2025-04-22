@@ -1,65 +1,71 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { AccountsPayableTable } from "@/components/payments/AccountsPayableTable";
 
 export const AccountsPayable = () => {
+  const [sorting, setSorting] = useState({ column: "due_date", direction: "asc" as "asc" | "desc" });
+  const [filters, setFilters] = useState<Record<string, string>>({});
+
   const { data: bills, isLoading } = useQuery({
-    queryKey: ["accounts-payable"],
+    queryKey: ["accounts-payable", sorting, filters],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("bill_record")
         .select("*, vendor_profile(*)")
         .gt("balance_due", 0)
-        .order("due_date", { ascending: true });
+        .order(sorting.column, { ascending: sorting.direction === "asc" });
 
+      // Apply filters
+      Object.entries(filters).forEach(([column, value]) => {
+        if (value) {
+          query = query.ilike(column, `%${value}%`);
+        }
+      });
+
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
   });
 
+  const handleSort = (column: string) => {
+    setSorting(prev => ({
+      column,
+      direction: prev.column === column && prev.direction === "asc" ? "desc" : "asc"
+    }));
+  };
+
+  const handleFilter = (column: string, value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      [column]: value,
+    }));
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold tracking-tight">Accounts Payable</h1>
       
-      <Card>
+      <Card className="shadow-md">
         <CardHeader>
           <CardTitle>Outstanding Bills</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div>Loading...</div>
+            <div className="flex items-center justify-center py-8">
+              <div className="text-sm text-muted-foreground">Loading bills...</div>
+            </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Bill #</TableHead>
-                  <TableHead>Vendor</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Balance Due</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {bills?.map((bill) => (
-                  <TableRow key={bill.id}>
-                    <TableCell>{bill.bill_number}</TableCell>
-                    <TableCell>{bill.vendor_profile?.display_name}</TableCell>
-                    <TableCell>{new Date(bill.due_date).toLocaleDateString()}</TableCell>
-                    <TableCell>${bill.total?.toFixed(2)}</TableCell>
-                    <TableCell>${bill.balance_due?.toFixed(2)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <AccountsPayableTable
+              bills={bills || []}
+              sorting={sorting}
+              filters={filters}
+              onSort={handleSort}
+              onFilter={handleFilter}
+            />
           )}
         </CardContent>
       </Card>
