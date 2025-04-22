@@ -33,12 +33,12 @@ export const DevModeToggle: React.FC = () => {
 
   const handleGoToDashboard = () => {
     console.log("Navigating to dashboard");
-    navigate('/');
+    navigate('/dashboard');
   };
 
-  // Position the toggle in the top right corner with some spacing
+  // Position the toggle in the top right corner with high z-index and some spacing
   return (
-    <Card className={`fixed top-4 right-4 z-50 shadow-xl border-2 ${isDevMode ? 'border-purple-500' : 'border-gray-200'}`} style={{ maxWidth: '300px' }}>
+    <Card className={`fixed top-4 right-4 z-[9999] shadow-xl border-2 ${isDevMode ? 'border-purple-500' : 'border-gray-200'}`} style={{ maxWidth: '300px' }}>
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
