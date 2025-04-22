@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,6 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
-// Update the type definition to include 'error' as a possible status
 interface ReconciliationRow {
   entityId: string;
   entityType: string;
@@ -17,7 +15,6 @@ interface ReconciliationRow {
   remarks?: string;
 }
 
-// Define the allowed entity types as a literal union type for type safety
 type EntityTableName = 'customer_profile' | 'vendor_profile' | 'item_record' | 'invoice_record' | 'bill_record' | 'payment_receipt';
 
 const entityTypes: EntityTableName[] = ['customer_profile', 'vendor_profile', 'item_record', 'invoice_record', 'bill_record', 'payment_receipt'];
@@ -31,11 +28,9 @@ const QBOIntegrationReconciliation: React.FC = () => {
     try {
       setLoading(true);
 
-      // Generate reconciliation data for each entity type
       const results: ReconciliationRow[] = [];
 
       for (const entity of entityTypes) {
-        // Batchly side query (simplified)
         const { data: batchlyData, error: batchlyError } = await supabase
           .from(entity)
           .select('id, qbo_sync_status, last_sync_at, updated_at')
@@ -49,7 +44,6 @@ const QBOIntegrationReconciliation: React.FC = () => {
         if (!batchlyData || batchlyData.length === 0) continue;
 
         for (const item of batchlyData) {
-          // For QBO, check qbo_entity_mapping for matching qbo_id and entity_type
           const { data: qboMapping, error: mappingError } = await supabase
             .from('qbo_entity_mapping')
             .select('last_qbo_update')
@@ -57,23 +51,20 @@ const QBOIntegrationReconciliation: React.FC = () => {
             .eq('entity_type', entity)
             .single();
 
-          if (mappingError && mappingError.code !== 'PGRST116') { // Ignore not found errors
+          if (mappingError && mappingError.code !== 'PGRST116') {
             console.error(`Error fetching QBO mapping for ${entity} ${item.id}:`, mappingError);
           }
 
-          // Determine Batchly Status explicitly including 'error'
           const batchlyStatus: 'synced' | 'pending' | 'error' = 
             item.qbo_sync_status === 'error' ? 'error' : 
             item.qbo_sync_status === 'synced' ? 'synced' : 'pending';
 
-          // Determine QBO Status explicitly including 'error'
           let qboStatus: 'synced' | 'pending' | 'error' = 'pending';
           
           if (qboMapping?.last_qbo_update) {
             const lastQbo = new Date(qboMapping.last_qbo_update);
             const lastBatchly = item.last_sync_at ? new Date(item.last_sync_at) : new Date(item.updated_at);
             
-            // Within 1 hour difference synced, else pending
             if (Math.abs(lastQbo.getTime() - lastBatchly.getTime()) < 3600000) {
               qboStatus = 'synced';
             } else {
