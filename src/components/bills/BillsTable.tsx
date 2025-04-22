@@ -15,8 +15,11 @@ interface BillsTableProps {
 }
 
 export const BillsTable = ({ bills, sorting, filters, onSort, onFilter }: BillsTableProps) => {
+  // Safe handler for vendor sort to prevent any event propagation issues
   const handleVendorSort = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    console.log("Vendor sort clicked");
     onSort("vendor_profile.display_name");
   };
   
@@ -122,38 +125,46 @@ export const BillsTable = ({ bills, sorting, filters, onSort, onFilter }: BillsT
           </TableRow>
         </TableHeader>
         <TableBody>
-          {bills?.map((bill) => (
-            <TableRow key={bill.id} className="hover:bg-muted/50">
-              <TableCell className="font-medium">{bill.bill_number}</TableCell>
-              <TableCell>
-                {bill.vendor_profile?.display_name ? (
-                  <Link 
-                    to={`/people/vendors/${bill.vendor_id}`}
-                    className="text-primary hover:underline"
-                    onClick={(e) => e.stopPropagation()}
+          {bills && bills.length > 0 ? (
+            bills.map((bill) => (
+              <TableRow key={bill.id} className="hover:bg-muted/50">
+                <TableCell className="font-medium">{bill.bill_number}</TableCell>
+                <TableCell>
+                  {bill.vendor_profile?.display_name ? (
+                    <Link 
+                      to={`/people/vendors/${bill.vendor_id}`}
+                      className="text-primary hover:underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {bill.vendor_profile.display_name}
+                    </Link>
+                  ) : '-'}
+                </TableCell>
+                <TableCell>{bill.bill_date ? new Date(bill.bill_date).toLocaleDateString() : '-'}</TableCell>
+                <TableCell>{bill.due_date ? new Date(bill.due_date).toLocaleDateString() : '-'}</TableCell>
+                <TableCell>${bill.total?.toFixed(2) || '0.00'}</TableCell>
+                <TableCell>
+                  <Badge 
+                    variant={bill.status === 'paid' ? 'default' : 'secondary'}
+                    className="capitalize"
                   >
-                    {bill.vendor_profile.display_name}
-                  </Link>
-                ) : '-'}
-              </TableCell>
-              <TableCell>{bill.bill_date ? new Date(bill.bill_date).toLocaleDateString() : '-'}</TableCell>
-              <TableCell>{bill.due_date ? new Date(bill.due_date).toLocaleDateString() : '-'}</TableCell>
-              <TableCell>${bill.total?.toFixed(2) || '0.00'}</TableCell>
-              <TableCell>
-                <Badge 
-                  variant={bill.status === 'paid' ? 'default' : 'secondary'}
-                  className="capitalize"
-                >
-                  {bill.status}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-right">
-                <Button variant="outline" size="sm" asChild>
-                  <Link to={`/purchases/bills/${bill.id}`}>View</Link>
-                </Button>
+                    {bill.status}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to={`/purchases/bills/${bill.id}`}>View</Link>
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-4">
+                No bills found.
               </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
     </div>
