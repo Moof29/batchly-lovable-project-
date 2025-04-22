@@ -61,12 +61,12 @@ const QBOIntegrationReconciliation: React.FC = () => {
             console.error(`Error fetching QBO mapping for ${entity} ${item.id}:`, mappingError);
           }
 
-          // Determine Batchly Status with 'error' included
+          // Determine Batchly Status explicitly including 'error'
           const batchlyStatus: 'synced' | 'pending' | 'error' = 
             item.qbo_sync_status === 'error' ? 'error' : 
             item.qbo_sync_status === 'synced' ? 'synced' : 'pending';
 
-          // Determine QBO Status with 'error' included
+          // Determine QBO Status explicitly including 'error'
           let qboStatus: 'synced' | 'pending' | 'error' = 'pending';
           
           if (qboMapping?.last_qbo_update) {
