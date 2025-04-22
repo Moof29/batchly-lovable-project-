@@ -7,16 +7,16 @@ interface CustomerPortalMessagesListProps {
 }
 
 export const CustomerPortalMessagesList = ({ isLoading, messages }: CustomerPortalMessagesListProps) => (
-  <Card className="bg-white shadow-lg rounded-xl">
+  <Card className="bg-white shadow-lg rounded-xl w-full">
     <CardHeader className="pb-2">
       <CardTitle className="text-lg">Your Messages</CardTitle>
     </CardHeader>
     <CardContent>
-      <div className="space-y-4">
+      <div className="space-y-4 max-h-[280px] overflow-auto">
         {isLoading ? (
           <p>Loading messages...</p>
         ) : messages && messages.length > 0 ? (
-          <div className="space-y-4 max-h-60 overflow-auto">
+          <div className="space-y-4">
             {messages.map((msg: any) => (
               <div key={msg.id} className="rounded border p-2 bg-gray-50">
                 <div className="font-semibold">{msg.subject}</div>

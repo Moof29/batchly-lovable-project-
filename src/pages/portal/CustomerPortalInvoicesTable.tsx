@@ -8,7 +8,7 @@ interface CustomerPortalInvoicesTableProps {
 }
 
 export const CustomerPortalInvoicesTable = ({ isLoading, invoices }: CustomerPortalInvoicesTableProps) => (
-  <Card className="bg-white shadow-lg rounded-xl">
+  <Card className="bg-white shadow-lg rounded-xl w-full">
     <CardHeader className="pb-2">
       <CardTitle className="text-lg">Your Invoices</CardTitle>
     </CardHeader>
@@ -16,7 +16,7 @@ export const CustomerPortalInvoicesTable = ({ isLoading, invoices }: CustomerPor
       {isLoading ? (
         <p>Loading invoices...</p>
       ) : invoices && invoices.length > 0 ? (
-        <div className="w-full overflow-x-auto">
+        <div className="w-full max-h-[340px] overflow-auto">
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b">

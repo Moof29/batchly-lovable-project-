@@ -95,91 +95,116 @@ export const CustomerPortal = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-gray-50">
-      {/* Full-width, no inner px-0, for flush look */}
       <CustomerPortalHeader onBack={handleBack} />
-      {/* Use px-0 and responsive gap/padding for full-bleed content */}
-      <main className="flex-1 flex flex-col w-full max-w-full mx-auto bg-gray-50 pb-8">
-        <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto p-4 md:p-6">
-          {/* Welcome Card (Full width) */}
+      <main className="flex-1 flex flex-col w-full max-w-6xl mx-auto bg-gray-50 pb-8 px-2 sm:px-4 md:px-8">
+        <div className="flex flex-col gap-6 w-full mx-auto">
           <CustomerPortalWelcomeCard displayName={customer.display_name} />
-          {/* Portal Tabs */}
           <div className="w-full">
             <div className="w-full flex flex-col">
-              {/* Tabs navigation */}
-              <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6 md:mb-8 rounded-md overflow-x-auto bg-gray-100 p-1">
+              {/* Tabs navigation with prominent active indicator */}
+              <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6 md:mb-8 rounded-xl overflow-x-auto bg-gray-100 p-1">
                 <button
                   aria-label="Profile Tab"
                   onClick={() => setActiveTab("profile")}
-                  className={`flex items-center justify-center py-2 rounded-md font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
-                    activeTab === "profile"
-                      ? "bg-white shadow text-brand-500"
+                  className={`flex items-center justify-center py-2 rounded-md font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 relative 
+                    ${activeTab === "profile"
+                      ? "bg-white shadow text-brand-500 ring-2 ring-brand-500"
                       : "text-gray-700 hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   <User className="h-4 w-4 mr-2" aria-hidden />
                   Profile
+                  {activeTab === "profile" && (
+                    <span
+                      className="absolute bottom-0 left-4 right-4 h-1 rounded-xl"
+                      style={{ background: "hsl(var(--brand-500))" }}
+                    />
+                  )}
                 </button>
                 <button
                   aria-label="Invoices Tab"
                   onClick={() => setActiveTab("invoices")}
-                  className={`flex items-center justify-center py-2 rounded-md font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
-                    activeTab === "invoices"
-                      ? "bg-white shadow text-brand-500"
+                  className={`flex items-center justify-center py-2 rounded-md font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 relative 
+                    ${activeTab === "invoices"
+                      ? "bg-white shadow text-brand-500 ring-2 ring-brand-500"
                       : "text-gray-700 hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   <FileText className="h-4 w-4 mr-2" aria-hidden />
                   Invoices
+                  {activeTab === "invoices" && (
+                    <span
+                      className="absolute bottom-0 left-4 right-4 h-1 rounded-xl"
+                      style={{ background: "hsl(var(--brand-500))" }}
+                    />
+                  )}
                 </button>
                 <button
                   aria-label="Payments Tab"
                   onClick={() => setActiveTab("payments")}
-                  className={`flex items-center justify-center py-2 rounded-md font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
-                    activeTab === "payments"
-                      ? "bg-white shadow text-brand-500"
+                  className={`flex items-center justify-center py-2 rounded-md font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 relative 
+                    ${activeTab === "payments"
+                      ? "bg-white shadow text-brand-500 ring-2 ring-brand-500"
                       : "text-gray-700 hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   <CreditCard className="h-4 w-4 mr-2" aria-hidden />
                   Payments
+                  {activeTab === "payments" && (
+                    <span
+                      className="absolute bottom-0 left-4 right-4 h-1 rounded-xl"
+                      style={{ background: "hsl(var(--brand-500))" }}
+                    />
+                  )}
                 </button>
                 <button
                   aria-label="Messages Tab"
                   onClick={() => setActiveTab("messages")}
-                  className={`flex items-center justify-center py-2 rounded-md font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
-                    activeTab === "messages"
-                      ? "bg-white shadow text-brand-500"
+                  className={`flex items-center justify-center py-2 rounded-md font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 relative 
+                    ${activeTab === "messages"
+                      ? "bg-white shadow text-brand-500 ring-2 ring-brand-500"
                       : "text-gray-700 hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   <MessageSquare className="h-4 w-4 mr-2" aria-hidden />
                   Messages
+                  {activeTab === "messages" && (
+                    <span
+                      className="absolute bottom-0 left-4 right-4 h-1 rounded-xl"
+                      style={{ background: "hsl(var(--brand-500))" }}
+                    />
+                  )}
                 </button>
               </div>
               <div className="w-full">
-                {/* All tabs render all content, governed by activeTab */}
                 <div className={activeTab !== "profile" ? "hidden" : "block"}>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-fade-in">
+                  <div className="grid">
                     <CustomerPortalProfileCard customer={customer} />
                   </div>
                 </div>
                 <div className={activeTab !== "invoices" ? "hidden" : "block"}>
-                  <CustomerPortalInvoicesTable
-                    isLoading={isLoadingInvoices}
-                    invoices={invoicesData?.invoices || []}
-                  />
+                  <div className="grid">
+                    <CustomerPortalInvoicesTable
+                      isLoading={isLoadingInvoices}
+                      invoices={invoicesData?.invoices || []}
+                    />
+                  </div>
                 </div>
                 <div className={activeTab !== "payments" ? "hidden" : "block"}>
-                  <CustomerPortalPaymentsCard
-                    isLoading={isLoadingPayments}
-                    paymentMethods={paymentMethods || []}
-                  />
+                  <div className="grid">
+                    <CustomerPortalPaymentsCard
+                      isLoading={isLoadingPayments}
+                      paymentMethods={paymentMethods || []}
+                    />
+                  </div>
                 </div>
                 <div className={activeTab !== "messages" ? "hidden" : "block"}>
-                  <CustomerPortalMessagesList
-                    isLoading={isLoadingMessages}
-                    messages={messages || []}
-                  />
+                  <div className="grid">
+                    <CustomerPortalMessagesList
+                      isLoading={isLoadingMessages}
+                      messages={messages || []}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

@@ -6,7 +6,7 @@ interface CustomerPortalProfileCardProps {
 }
 
 export const CustomerPortalProfileCard = ({ customer }: CustomerPortalProfileCardProps) => (
-  <Card className="bg-white shadow-lg rounded-xl">
+  <Card className="bg-white shadow-lg rounded-xl w-full">
     <CardHeader className="pb-2">
       <CardTitle className="text-lg">Your Profile</CardTitle>
     </CardHeader>

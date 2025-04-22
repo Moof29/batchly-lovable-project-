@@ -7,12 +7,12 @@ interface CustomerPortalPaymentsCardProps {
 }
 
 export const CustomerPortalPaymentsCard = ({ isLoading, paymentMethods }: CustomerPortalPaymentsCardProps) => (
-  <Card className="bg-white shadow-lg rounded-xl">
+  <Card className="bg-white shadow-lg rounded-xl w-full">
     <CardHeader className="pb-2">
       <CardTitle className="text-lg">Your Payment Methods</CardTitle>
     </CardHeader>
     <CardContent>
-      <div className="space-y-4">
+      <div className="space-y-4 max-h-[280px] overflow-auto">
         {isLoading ? (
           <p>Loading payment methods...</p>
         ) : paymentMethods && paymentMethods.length > 0 ? (
