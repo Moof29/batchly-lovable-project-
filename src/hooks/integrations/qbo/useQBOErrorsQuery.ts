@@ -3,7 +3,7 @@ import { useDevMode } from '@/contexts/DevModeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { SyncError } from '@/components/integrations/QBOSyncStatus';
+import { SyncError } from '@/types/qbo';
 
 export const useQBOErrorsQuery = (organizationId?: string, enabled?: boolean) => {
   const { isDevMode } = useDevMode();
