@@ -1,3 +1,4 @@
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -41,6 +42,8 @@ import { BillDetail } from "./pages/purchases/BillDetail";
 import { InvoiceDetail } from "./pages/sales/InvoiceDetail";
 import { TimeEntryDetail } from "./pages/people/TimeEntryDetail";
 import { CustomerPortalUsers } from "./pages/people/CustomerPortalUsers";
+import { PortalLayout } from "./pages/portal/PortalLayout";
+import { CustomerPortal } from "./pages/portal/CustomerPortal";
 
 const queryClient = new QueryClient();
 
@@ -109,6 +112,11 @@ const App = () => (
                     <Route index element={<ProtectedRoute requiredRole="admin" element={<GeneralSettings />} />} />
                     <Route path="integrations" element={<ProtectedRoute requiredRole="admin" element={<IntegrationsSettingsPage />} />} />
                   </Route>
+                </Route>
+                
+                {/* Customer Portal Routes */}
+                <Route path="/portal" element={<PortalLayout />}>
+                  <Route index element={<CustomerPortal />} />
                 </Route>
                 
                 <Route path="*" element={<NotFound />} />
