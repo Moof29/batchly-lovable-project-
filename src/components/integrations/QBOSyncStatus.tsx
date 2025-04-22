@@ -1,7 +1,7 @@
 import React from 'react';
-import { SyncError } from "@/components/integrations/QBOSyncStatus";
+import { SyncError, SyncStatus } from "@/types/qbo";
 import { SyncStatusOverview } from "./SyncStatusOverview";
-import { EntitySyncProgress, SyncStatus } from "./EntitySyncProgress";
+import { EntitySyncProgress } from "./EntitySyncProgress";
 import { SyncErrorsList } from "./SyncErrorsList";
 
 interface QBOSyncStatusProps {
@@ -71,5 +71,3 @@ export const QBOSyncStatus: React.FC<QBOSyncStatusProps> = ({
     </div>
   );
 };
-
-export type { SyncError };

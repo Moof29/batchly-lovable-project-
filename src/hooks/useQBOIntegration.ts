@@ -1,9 +1,9 @@
+
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDevMode } from '@/contexts/DevModeContext';
 import { toast } from '@/hooks/use-toast';
-import { SyncError, SyncStatus } from '@/components/integrations/QBOSyncStatus';
-import { SyncSettings } from '@/components/integrations/QBOSyncSettings';
+import { SyncError, SyncStatus } from '@/types/qbo';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useQBOConnectionDetails } from "./qbo/useQBOConnectionDetails";

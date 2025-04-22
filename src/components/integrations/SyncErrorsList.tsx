@@ -3,7 +3,7 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, XCircle } from "lucide-react";
-import { SyncError } from "./QBOSyncStatus";
+import { SyncError } from "@/types/qbo";
 
 interface SyncErrorsListProps {
   syncErrors: SyncError[];

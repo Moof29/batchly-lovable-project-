@@ -1,15 +1,10 @@
-
 import { useEffect, useState } from "react";
 import { categorizeError } from "@/services/qbo/entities/categorizeError";
+import { SyncError } from "@/types/qbo";
 
 // Define types for better error handling
-export interface QBOSyncError {
-  id: string;
-  entityType: string;
-  message: string;
+export interface QBOSyncError extends SyncError {
   category: string;
-  timestamp: Date;
-  resolved: boolean;
   occurrenceCount?: number;
   code?: string;
   affectedRecords?: number;

@@ -1,17 +1,9 @@
-
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Users, Package, FileText, Wallet, RefreshCw } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-
-export interface SyncStatus {
-  entityType: string;
-  totalItems: number;
-  syncedItems: number;
-  lastSynced: Date | null;
-  status: 'success' | 'error' | 'in_progress' | 'pending';
-}
+import { SyncStatus } from "@/types/qbo";
 
 interface EntitySyncProgressProps {
   syncStatuses: SyncStatus[];
