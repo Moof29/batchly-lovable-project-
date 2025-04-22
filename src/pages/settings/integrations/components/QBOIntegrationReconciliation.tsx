@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -55,10 +56,12 @@ const QBOIntegrationReconciliation: React.FC = () => {
             console.error(`Error fetching QBO mapping for ${entity} ${item.id}:`, mappingError);
           }
 
+          // Determine Batchly Status with explicit typing
           const batchlyStatus: 'synced' | 'pending' | 'error' = 
             item.qbo_sync_status === 'error' ? 'error' : 
             item.qbo_sync_status === 'synced' ? 'synced' : 'pending';
 
+          // Initialize QBO status with explicit typing
           let qboStatus: 'synced' | 'pending' | 'error' = 'pending';
           
           if (qboMapping?.last_qbo_update) {
