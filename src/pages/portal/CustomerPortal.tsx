@@ -1,7 +1,6 @@
+
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, User, FileText, CreditCard, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -95,60 +94,95 @@ export const CustomerPortal = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen w-full flex flex-col bg-gray-50">
+      {/* Full-width, no inner px-0, for flush look */}
       <CustomerPortalHeader onBack={handleBack} />
-
-      <main className="flex-1 w-full px-0 sm:px-4 py-4 md:py-8">
-        <div className="w-full h-full flex flex-col gap-6">
-          {/* Welcome Card */}
+      {/* Use px-0 and responsive gap/padding for full-bleed content */}
+      <main className="flex-1 flex flex-col w-full max-w-full mx-auto bg-gray-50 pb-8">
+        <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto p-4 md:p-6">
+          {/* Welcome Card (Full width) */}
           <CustomerPortalWelcomeCard displayName={customer.display_name} />
           {/* Portal Tabs */}
           <div className="w-full">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col">
-              <TabsList className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4 rounded-md overflow-x-auto bg-gray-100">
-                <TabsTrigger value="profile" className="flex items-center justify-center py-2">
+            <div className="w-full flex flex-col">
+              {/* Tabs navigation */}
+              <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6 md:mb-8 rounded-md overflow-x-auto bg-gray-100 p-1">
+                <button
+                  aria-label="Profile Tab"
+                  onClick={() => setActiveTab("profile")}
+                  className={`flex items-center justify-center py-2 rounded-md font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
+                    activeTab === "profile"
+                      ? "bg-white shadow text-brand-500"
+                      : "text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
                   <User className="h-4 w-4 mr-2" aria-hidden />
                   Profile
-                </TabsTrigger>
-                <TabsTrigger value="invoices" className="flex items-center justify-center py-2">
+                </button>
+                <button
+                  aria-label="Invoices Tab"
+                  onClick={() => setActiveTab("invoices")}
+                  className={`flex items-center justify-center py-2 rounded-md font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
+                    activeTab === "invoices"
+                      ? "bg-white shadow text-brand-500"
+                      : "text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
                   <FileText className="h-4 w-4 mr-2" aria-hidden />
                   Invoices
-                </TabsTrigger>
-                <TabsTrigger value="payments" className="flex items-center justify-center py-2">
+                </button>
+                <button
+                  aria-label="Payments Tab"
+                  onClick={() => setActiveTab("payments")}
+                  className={`flex items-center justify-center py-2 rounded-md font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
+                    activeTab === "payments"
+                      ? "bg-white shadow text-brand-500"
+                      : "text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
                   <CreditCard className="h-4 w-4 mr-2" aria-hidden />
                   Payments
-                </TabsTrigger>
-                <TabsTrigger value="messages" className="flex items-center justify-center py-2">
+                </button>
+                <button
+                  aria-label="Messages Tab"
+                  onClick={() => setActiveTab("messages")}
+                  className={`flex items-center justify-center py-2 rounded-md font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
+                    activeTab === "messages"
+                      ? "bg-white shadow text-brand-500"
+                      : "text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
                   <MessageSquare className="h-4 w-4 mr-2" aria-hidden />
                   Messages
-                </TabsTrigger>
-              </TabsList>
+                </button>
+              </div>
               <div className="w-full">
-                <TabsContent value="profile" className="w-full">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* All tabs render all content, governed by activeTab */}
+                <div className={activeTab !== "profile" ? "hidden" : "block"}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-fade-in">
                     <CustomerPortalProfileCard customer={customer} />
                   </div>
-                </TabsContent>
-                <TabsContent value="invoices" className="w-full">
+                </div>
+                <div className={activeTab !== "invoices" ? "hidden" : "block"}>
                   <CustomerPortalInvoicesTable
                     isLoading={isLoadingInvoices}
                     invoices={invoicesData?.invoices || []}
                   />
-                </TabsContent>
-                <TabsContent value="payments" className="w-full">
+                </div>
+                <div className={activeTab !== "payments" ? "hidden" : "block"}>
                   <CustomerPortalPaymentsCard
                     isLoading={isLoadingPayments}
                     paymentMethods={paymentMethods || []}
                   />
-                </TabsContent>
-                <TabsContent value="messages" className="w-full">
+                </div>
+                <div className={activeTab !== "messages" ? "hidden" : "block"}>
                   <CustomerPortalMessagesList
                     isLoading={isLoadingMessages}
                     messages={messages || []}
                   />
-                </TabsContent>
+                </div>
               </div>
-            </Tabs>
+            </div>
           </div>
         </div>
       </main>
