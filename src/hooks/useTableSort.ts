@@ -1,13 +1,17 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { Database } from "@/integrations/supabase/types";
 
 type SortConfig = {
   column: string;
   direction: "asc" | "desc";
 };
 
+// Create a type that represents all table names in the database
+type TableNames = keyof Database["public"]["Tables"];
+
 export const useTableSort = <T>(
-  tableName: string,
+  tableName: TableNames,
   sortConfig: SortConfig,
   filters: Record<string, string> = {},
   extraSelects: string = "*"
