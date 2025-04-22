@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDevMode } from '@/contexts/DevModeContext';
 import { toast } from '@/hooks/use-toast';
@@ -6,6 +6,9 @@ import { SyncError, SyncStatus } from '@/components/integrations/QBOSyncStatus';
 import { SyncSettings } from '@/components/integrations/QBOSyncSettings';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQBOConnectionDetails } from "./qbo/useQBOConnectionDetails";
+import { useQBOErrorsList } from "./qbo/useQBOErrorsList";
+import { useSyncSettingsState } from "./qbo/useSyncSettingsState";
 
 interface ConnectionDetails {
   companyName: string;
@@ -17,27 +20,6 @@ interface ConnectionDetails {
 export const useQBOIntegration = () => {
   const { user } = useAuth();
   const { isDevMode } = useDevMode();
-  
-  // State for QBO integration
-  const [connectionDetails, setConnectionDetails] = useState<ConnectionDetails | null>(null);
-  const [syncErrors, setSyncErrors] = useState<SyncError[]>([]);
-  
-  // Default sync settings
-  const [syncSettings, setSyncSettings] = useState<SyncSettings>({
-    entities: {
-      customers: true,
-      items: true,
-      invoices: true,
-      payments: true,
-      bills: true
-    },
-    frequency: 'daily',
-    scheduleTime: '02:00',
-    autoSyncNewRecords: true,
-    conflictResolutionStrategy: 'newest_wins'
-  });
-
-  // Get organization ID
   const organizationId = user?.organization_id || (isDevMode ? "00000000-0000-0000-0000-000000000000" : undefined);
 
   // Query to fetch QBO connection status
@@ -139,42 +121,24 @@ export const useQBOIntegration = () => {
     enabled: !!organizationId && (connectionQuery.data?.is_active || isDevMode),
     refetchInterval: 30000 // Refetch every 30 seconds
   });
-  
-  // Update connection details when the query data changes
-  useEffect(() => {
-    if (connectionQuery.data) {
-      if (isDevMode && typeof connectionQuery.data === 'object' && connectionQuery.data.enabled) {
-        // Format mock connection data
-        setConnectionDetails({
-          companyName: connectionQuery.data.companyName || 'Mock Company',
-          companyId: connectionQuery.data.companyId || '123456789',
-          connectedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-        });
-      } else if (!isDevMode && connectionQuery.data.is_active) {
-        // Format real connection data
-        setConnectionDetails({
-          companyName: connectionQuery.data.qbo_company_id || 'QBO Company',
-          companyId: connectionQuery.data.qbo_realm_id,
-          connectedAt: new Date(connectionQuery.data.last_connected_at),
-          expiresAt: new Date(connectionQuery.data.qbo_token_expires_at),
-        });
-      } else {
-        setConnectionDetails(null);
-      }
-    } else {
-      setConnectionDetails(null);
-    }
-  }, [connectionQuery.data, isDevMode]);
-  
-  // Update sync errors when the query data changes
-  useEffect(() => {
-    if (errorsQuery.data) {
-      setSyncErrors(errorsQuery.data);
-    } else {
-      setSyncErrors([]);
-    }
-  }, [errorsQuery.data]);
+
+  const connectionDetails = useQBOConnectionDetails(connectionQuery.data, isDevMode);
+  const syncErrors = useQBOErrorsList(errorsQuery.data);
+
+  // Default sync settings and updateSyncSettings
+  const { syncSettings, updateSyncSettings } = useSyncSettingsState({
+    entities: {
+      customers: true,
+      items: true,
+      invoices: true,
+      payments: true,
+      bills: true
+    },
+    frequency: 'daily',
+    scheduleTime: '02:00',
+    autoSyncNewRecords: true,
+    conflictResolutionStrategy: 'newest_wins'
+  });
 
   // OAuth flow mutation
   const oauthMutation = useMutation({
@@ -312,17 +276,6 @@ export const useQBOIntegration = () => {
     }
   }, [isDevMode, connectionQuery, disconnectMutation, organizationId]);
 
-  // Function to update sync settings
-  const updateSyncSettings = useCallback((newSettings: SyncSettings) => {
-    setSyncSettings(newSettings);
-    
-    // In a real implementation, you'd save these settings to the database
-    toast({
-      title: 'Sync Settings Updated',
-      description: 'Your QuickBooks sync settings have been saved',
-    });
-  }, []);
-  
   // Sync mutation
   const syncMutation = useMutation({
     mutationFn: async (entityTypes?: string[]) => {
