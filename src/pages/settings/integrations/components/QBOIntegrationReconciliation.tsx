@@ -6,6 +6,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
+// Update the type definition to include 'error' as a possible status
 interface ReconciliationRow {
   entityId: string;
   entityType: string;
@@ -60,16 +61,18 @@ const QBOIntegrationReconciliation: React.FC = () => {
             console.error(`Error fetching QBO mapping for ${entity} ${item.id}:`, mappingError);
           }
 
+          // Determine Batchly Status with 'error' included
           const batchlyStatus: 'synced' | 'pending' | 'error' = 
             item.qbo_sync_status === 'error' ? 'error' : 
             item.qbo_sync_status === 'synced' ? 'synced' : 'pending';
 
-          // Determine QBO Status from last_qbo_update (if recent enough consider synced)
+          // Determine QBO Status with 'error' included
           let qboStatus: 'synced' | 'pending' | 'error' = 'pending';
           
           if (qboMapping?.last_qbo_update) {
             const lastQbo = new Date(qboMapping.last_qbo_update);
             const lastBatchly = item.last_sync_at ? new Date(item.last_sync_at) : new Date(item.updated_at);
+            
             // Within 1 hour difference synced, else pending
             if (Math.abs(lastQbo.getTime() - lastBatchly.getTime()) < 3600000) {
               qboStatus = 'synced';
