@@ -5,9 +5,9 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHead, TableBody, TableRow, TableCell, TableHeader } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Plus, Mail, Link as LinkIcon } from "lucide-react";
+import { Plus, Mail, Link as LinkIcon, User as UserIcon } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 // Types for portal user and joined customer info
 type PortalUser = {
@@ -26,37 +26,39 @@ type PortalUser = {
 };
 
 export default function CustomerPortalUsers() {
-  // Simple pagination—can be improved, but follows minimal request
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 20;
 
-  // Fetch portal users, join display_name of associated customer 
-  const { data, isLoading, error } = useQuery({
+  // Fetch portal users, join customer display_name
+  const { data: portalUsers = [], isLoading, error } = useQuery({
     queryKey: ["portal_users", { page }],
     queryFn: async () => {
       const from = (page - 1) * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
 
-      // Join customer display_name (assuming FK exists and is called customer_id)
+      // Use correct table name as in the DB schema: customer_portal_user_links, customer_profile, users, etc.
+      // For this example, let's fetch from "users" with a left join on customer_profile by customer_id (if exists).
+      // NOTE: You must adjust these fields if your schema has a separate link table or organizes differently.
+
       const { data, error } = await supabase
-        .from("customer_portal_user")
-        .select("id,email,invited_at,accepted_at,customer_id,is_active,invite_token,created_at,customer:customer_id(display_name,id)")
-        .range(from, to)
-        .order("created_at", { ascending: false });
+        .from("users")
+        .select(`
+          id, email, invited_at, accepted_at, customer_id, is_active, invite_token, created_at,
+          customer:customer_id(id, display_name)
+        `)
+        .order("created_at", { ascending: false })
+        .range(from, to);
 
       if (error) throw error;
-      return data as PortalUser[];
+      return (data ?? []) as PortalUser[];
     },
     keepPreviousData: true,
   });
-
-  const portalUsers = data || [];
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Customer Portal Users</h1>
-        {/* Placeholder: button for inviting users */}
         <Button asChild>
           <Link to="/people/customers/portal/invite">
             <Plus className="mr-2 h-4 w-4" />
@@ -86,7 +88,7 @@ export default function CustomerPortalUsers() {
                     <TableHead>Status</TableHead>
                     <TableHead>Invited</TableHead>
                     <TableHead>Accepted</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead className="w-56">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -134,13 +136,29 @@ export default function CustomerPortalUsers() {
                         )}
                       </TableCell>
                       <TableCell>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          asChild
-                        >
-                          <Link to={`/people/customers/portal/${user.id}`}>View</Link>
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            asChild
+                          >
+                            <Link to={`/people/customers/portal/${user.id}`}>View</Link>
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            asChild
+                            aria-label="View as customer"
+                          >
+                            <Link
+                              to={`/people/customers/portal/impersonate/${user.id}`}
+                              title="View this portal as the customer"
+                            >
+                              <UserIcon className="w-4 h-4 mr-1" />
+                              View as Customer
+                            </Link>
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
