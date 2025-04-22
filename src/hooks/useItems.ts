@@ -8,7 +8,7 @@ type SortConfig = {
 };
 
 export const useItems = (sorting: SortConfig, filters: Record<string, string> = {}) => {
-  const sortTable = useTableSort(
+  const sortTable = useTableSort<any>(
     "item_record",
     sorting,
     filters,
