@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import {
   Pagination, 
   PaginationContent, 
   PaginationItem, 
+  PaginationLink,
   PaginationNext, 
   PaginationPrevious 
 } from "@/components/ui/pagination";
@@ -42,38 +44,44 @@ export default function CustomerPortalUsers() {
       const from = (page - 1) * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
 
-      // Get the correct table name from the database schema
-      // For this example, we'll use customer_portal_user_links which has the columns we need
+      // First, let's directly fetch from the portal_users table
       const { data, error } = await supabase
-        .from("customer_portal_user_links")
+        .from("portal_users")
         .select(`
           id, 
-          portal_user_id,
-          customer_id,
-          created_at,
-          updated_at,
-          portal_user:portal_user_id(id, email, invited_at, accepted_at, is_active, invite_token, created_at),
-          customer:customer_id(id, display_name)
+          email, 
+          invited_at, 
+          accepted_at, 
+          is_active, 
+          invite_token, 
+          created_at
         `)
         .order("created_at", { ascending: false })
         .range(from, to);
 
       if (error) throw error;
       
-      // Transform the data to match our PortalUser type
-      return (data ?? []).map(item => ({
-        id: item.portal_user?.id || item.portal_user_id,
-        email: item.portal_user?.email || '',
-        invited_at: item.portal_user?.invited_at,
-        accepted_at: item.portal_user?.accepted_at,
-        customer_id: item.customer_id,
-        is_active: item.portal_user?.is_active || false,
-        invite_token: item.portal_user?.invite_token,
-        created_at: item.portal_user?.created_at || item.created_at,
-        customer: item.customer
-      })) as PortalUser[];
+      // For each portal user, check if there's a link to a customer
+      const enrichedUsers: PortalUser[] = await Promise.all((data || []).map(async (user) => {
+        // Get customer info from the link table
+        const { data: linkData } = await supabase
+          .from("customer_portal_user_links")
+          .select(`
+            customer_id,
+            customer:customer_id(id, display_name)
+          `)
+          .eq('portal_user_id', user.id)
+          .maybeSingle();
+          
+        return {
+          ...user,
+          customer_id: linkData?.customer_id || null,
+          customer: linkData?.customer || null,
+        } as PortalUser;
+      }));
+      
+      return enrichedUsers;
     },
-    // Replace keepPreviousData with placeholderData in v5
     placeholderData: (previousData) => previousData,
   });
 
@@ -97,7 +105,7 @@ export default function CustomerPortalUsers() {
           {isLoading ? (
             <div className="py-12 flex justify-center text-muted-foreground">Loading portal users...</div>
           ) : error ? (
-            <div className="text-destructive">Error: {error.message}</div>
+            <div className="text-destructive">Error: {(error as Error).message}</div>
           ) : portalUsers.length === 0 ? (
             <div className="py-8 text-center text-gray-500">No portal users found.</div>
           ) : (
@@ -190,8 +198,7 @@ export default function CustomerPortalUsers() {
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious 
-                      onClick={() => setPage(p => Math.max(p - 1, 1))}
-                      disabled={page <= 1}
+                      onClick={() => page > 1 && setPage(p => p - 1)}
                       aria-label="Previous page"
                       className={page <= 1 ? "pointer-events-none opacity-50" : ""}
                     />
@@ -201,8 +208,7 @@ export default function CustomerPortalUsers() {
                   </PaginationItem>
                   <PaginationItem>
                     <PaginationNext
-                      onClick={() => setPage(p => p + 1)}
-                      disabled={portalUsers.length < PAGE_SIZE}
+                      onClick={() => portalUsers.length >= PAGE_SIZE && setPage(p => p + 1)}
                       aria-label="Next page"
                       className={portalUsers.length < PAGE_SIZE ? "pointer-events-none opacity-50" : ""}
                     />
