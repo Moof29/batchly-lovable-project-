@@ -177,7 +177,12 @@ export const CustomerPaymentMethodsCard = ({ customerId }: CustomerPaymentMethod
                   Exp: {pm.expiry_month}/{pm.expiry_year} &mdash; {pm.billing_name}
                 </div>
               </div>
-              <Button variant="outline" size="xs" onClick={() => handleRemove(pm.id)} aria-label="Remove">
+              <Button 
+                variant="outline" 
+                size="sm"  // Changed from "xs" to "sm"
+                onClick={() => handleRemove(pm.id)} 
+                aria-label="Remove"
+              >
                 Remove
               </Button>
             </div>
