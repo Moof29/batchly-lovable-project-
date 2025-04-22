@@ -18,7 +18,7 @@ import { Progress } from "@/components/ui/progress";
 
 export interface SyncError {
   id: string;
-  entityType: 'customers' | 'items' | 'invoices' | 'payments' | 'bills';
+  entityType: 'customers' | 'items' | 'invoices' | 'payments' | 'bills' | string;
   message: string;
   timestamp: Date;
   resolved: boolean;

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -11,13 +10,18 @@ import { toast } from '@/hooks/use-toast';
 
 interface QBOMockConnectionModalProps {
   open: boolean;
+  isOpen?: boolean; // Added for backward compatibility
   onClose: () => void;
 }
 
 export const QBOMockConnectionModal: React.FC<QBOMockConnectionModalProps> = ({
   open,
+  isOpen,
   onClose
 }) => {
+  // Use either open or isOpen prop
+  const isDialogOpen = open || isOpen || false;
+
   const [mockSettings, setMockSettings] = useState({
     enabled: true,
     companyName: "Acme Test Company",
@@ -52,7 +56,7 @@ export const QBOMockConnectionModal: React.FC<QBOMockConnectionModalProps> = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={isDialogOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Mock QBO Integration</DialogTitle>

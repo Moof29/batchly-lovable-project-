@@ -307,14 +307,8 @@ export const useQBOSync = (organizationId?: string) => {
     if (!tableName) return { pending: 0, syncing: 0, synced: 0, error: 0, total: 0 };
     
     try {
-      const { data, error } = await supabase
-        .from(tableName)
-        .select('qbo_sync_status, count')
-        .eq('organization_id', organizationId)
-        .group('qbo_sync_status');
-        
-      if (error) throw error;
-      
+      // Need to manually count since the group function isn't available
+      const statuses = ['pending', 'syncing', 'synced', 'error'];
       const counts = {
         pending: 0,
         syncing: 0,
@@ -323,11 +317,24 @@ export const useQBOSync = (organizationId?: string) => {
         total: 0
       };
       
-      data.forEach((row: any) => {
-        const status = row.qbo_sync_status || 'pending';
-        counts[status] = row.count;
-        counts.total += row.count;
-      });
+      // Get total count
+      const { count: totalCount } = await supabase
+        .from(tableName as any) // Type cast to work around the typing issue
+        .select('*', { count: 'exact', head: true })
+        .eq('organization_id', organizationId);
+      
+      counts.total = totalCount || 0;
+      
+      // Get individual status counts
+      for (const status of statuses) {
+        const { count } = await supabase
+          .from(tableName as any) // Type cast to work around the typing issue
+          .select('*', { count: 'exact', head: true })
+          .eq('organization_id', organizationId)
+          .eq('qbo_sync_status', status);
+        
+        counts[status as keyof typeof counts] = count || 0;
+      }
       
       return counts;
     } catch (error) {
@@ -359,27 +366,27 @@ export const useQBOSync = (organizationId?: string) => {
     isInitialized,
     connection: connectionQuery.data,
     isConnected: !!connectionQuery.data?.is_active,
-    isLoadingConnection: connectionQuery.isLoading,
+    isLoadingConnection: connectionQuery.isPending,
     
     // Entity configurations
     entityConfigs: entityConfigsQuery.data || [],
-    isLoadingEntityConfigs: entityConfigsQuery.isLoading,
+    isLoadingEntityConfigs: entityConfigsQuery.isPending,
     
     // Pending operations
     pendingOperations: pendingOperationsQuery.data || [],
-    isLoadingPendingOperations: pendingOperationsQuery.isLoading,
+    isLoadingPendingOperations: pendingOperationsQuery.isPending,
     
     // Sync history
     syncHistory: syncHistoryQuery.data || [],
-    isLoadingSyncHistory: syncHistoryQuery.isLoading,
+    isLoadingSyncHistory: syncHistoryQuery.isPending,
     
     // Errors
     errors: errorRegistryQuery.data || [],
-    isLoadingErrors: errorRegistryQuery.isLoading,
+    isLoadingErrors: errorRegistryQuery.isPending,
     
     // Metrics
     syncMetrics: syncMetricsQuery.data || [],
-    isLoadingMetrics: syncMetricsQuery.isLoading,
+    isLoadingMetrics: syncMetricsQuery.isPending,
     
     // Actions
     syncEntities: syncEntitiesMutation.mutate,

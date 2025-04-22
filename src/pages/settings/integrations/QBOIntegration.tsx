@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { QBOConnectionStatus } from '@/components/integrations/QBOConnectionStatus';
 import { QBOSyncStatus } from '@/components/integrations/QBOSyncStatus';
@@ -8,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQBOIntegration } from '@/hooks/useQBOIntegration';
 import { useQBOSync } from '@/hooks/useQBOSync';
 import { useAuth } from '@/contexts/AuthContext';
-import { Loader2, Settings, List, Activity, AlertTriangle } from 'lucide-react';
+import { Loader2, Settings, List, Activity, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { QBOSyncLogs } from '@/components/integrations/QBOSyncLogs';
 import { QBOSyncSettings } from '@/components/integrations/QBOSyncSettings';
@@ -27,15 +26,12 @@ import { useDevMode } from '@/contexts/DevModeContext';
 export const QBOIntegrationPage = () => {
   const { user } = useAuth();
   const { isDevMode } = useDevMode();
-  const { isConnected, connectionDetails, syncSettings, beginOAuthFlow, disconnectQBO } = useQBOIntegration();
+  const { isConnected, connectionDetails, syncSettings, beginOAuthFlow, disconnectQBO, updateSyncSettings } = useQBOIntegration();
   
-  // State for the mock connection modal
   const [isMockModalOpen, setIsMockModalOpen] = useState(false);
   
-  // Get organization ID (in a real app, this would come from the user's profile)
   const organizationId = user?.organization_id || (isDevMode ? "00000000-0000-0000-0000-000000000000" : undefined);
   
-  // Use our enhanced QBO sync hook
   const {
     connection,
     isLoadingConnection,
@@ -55,25 +51,20 @@ export const QBOIntegrationPage = () => {
     updateEntityConfig
   } = useQBOSync(organizationId);
 
-  // Process pending operations automatically
   useEffect(() => {
     if (pendingOperations.length > 0 && !isProcessing) {
       processOperations();
     }
   }, [pendingOperations, isProcessing, processOperations]);
   
-  // Function to handle the QBO connection
   const handleConnect = () => {
     if (isDevMode) {
-      // In dev mode, show the mock connection modal
       setIsMockModalOpen(true);
     } else {
-      // In production, initiate real OAuth flow
       beginOAuthFlow();
     }
   };
-  
-  // Entity types for the integration
+
   const entityTypes = [
     { type: 'customer_profile', label: 'Customers', priority: 1 },
     { type: 'vendor_profile', label: 'Vendors', priority: 1 },
@@ -92,7 +83,6 @@ export const QBOIntegrationPage = () => {
         </div>
       </div>
       
-      {/* Connection Status Card */}
       <QBOConnectionStatus 
         isConnected={isConnected} 
         connectionDetails={connectionDetails} 
@@ -100,7 +90,6 @@ export const QBOIntegrationPage = () => {
         onDisconnect={disconnectQBO}
       />
       
-      {/* If connected, show more integration options */}
       {isConnected && (
         <Tabs defaultValue="sync" className="space-y-4">
           <TabsList>
@@ -117,14 +106,13 @@ export const QBOIntegrationPage = () => {
               Entities
             </TabsTrigger>
             <TabsTrigger value="errors" className="flex gap-2 items-center">
-              <AlertTriangle className="h-4 w-4" />
+              <AlertCircle className="h-4 w-4" />
               Errors {errors.length > 0 && (
                 <Badge variant="destructive" className="ml-1">{errors.length}</Badge>
               )}
             </TabsTrigger>
           </TabsList>
           
-          {/* Sync Status Tab */}
           <TabsContent value="sync" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
@@ -178,7 +166,6 @@ export const QBOIntegrationPage = () => {
                   </Button>
                   <Button 
                     onClick={() => {
-                      // In a real app, you'd implement full sync logic here
                       toast({
                         title: "Full sync initiated",
                         description: "Starting full synchronization with QuickBooks Online",
@@ -252,7 +239,6 @@ export const QBOIntegrationPage = () => {
               </Card>
             </div>
             
-            {/* Sync Status Component with our enhanced data */}
             <QBOSyncStatus
               lastSync={connection?.last_sync_at ? new Date(connection.last_sync_at) : null}
               syncErrors={errors.map(err => ({
@@ -265,15 +251,11 @@ export const QBOIntegrationPage = () => {
               syncInProgress={isProcessing || isSyncing}
               onTriggerSync={async (entityTypes) => {
                 if (!entityTypes || entityTypes.length === 0) {
-                  // Trigger full sync of all entities
-                  // In a real implementation, you'd have proper logic here
                   toast({
                     title: "Full sync initiated",
                     description: "Starting sync for all entities",
                   });
                 } else {
-                  // Sync specific entity type
-                  // In a real implementation, you'd fetch IDs and sync
                   toast({
                     title: "Entity sync initiated",
                     description: `Starting sync for ${entityTypes.join(', ')}`,
@@ -283,7 +265,6 @@ export const QBOIntegrationPage = () => {
             />
           </TabsContent>
           
-          {/* Settings Tab */}
           <TabsContent value="settings">
             <Card>
               <CardHeader>
@@ -293,19 +274,12 @@ export const QBOIntegrationPage = () => {
               <CardContent className="space-y-6">
                 <QBOSyncSettings
                   settings={syncSettings}
-                  onChange={(newSettings) => {
-                    // In a real implementation, you'd save these settings
-                    toast({
-                      title: "Settings updated",
-                      description: "Your QuickBooks sync settings have been updated",
-                    });
-                  }}
+                  updateSettings={updateSyncSettings}
                 />
               </CardContent>
             </Card>
           </TabsContent>
           
-          {/* Entities Tab */}
           <TabsContent value="entities">
             <Card>
               <CardHeader>
@@ -436,7 +410,6 @@ export const QBOIntegrationPage = () => {
                                   size="sm"
                                   className="ml-auto"
                                   onClick={() => {
-                                    // In a real implementation, trigger entity sync
                                     toast({
                                       title: `Syncing ${entity.label}`,
                                       description: "Starting synchronization for this entity type",
@@ -457,7 +430,6 @@ export const QBOIntegrationPage = () => {
             </Card>
           </TabsContent>
           
-          {/* Errors Tab */}
           <TabsContent value="errors">
             <Card>
               <CardHeader>
@@ -512,7 +484,6 @@ export const QBOIntegrationPage = () => {
                             <Button 
                               size="sm"
                               onClick={() => {
-                                // In a real implementation, retry the operation
                                 toast({
                                   title: "Retrying operation",
                                   description: "Attempting to retry the failed operation",
@@ -537,13 +508,10 @@ export const QBOIntegrationPage = () => {
         </Tabs>
       )}
       
-      {/* Mock QBO Connection Modal for dev mode */}
-      {isDevMode && (
-        <QBOMockConnectionModal 
-          isOpen={isMockModalOpen}
-          onClose={() => setIsMockModalOpen(false)}
-        />
-      )}
+      <QBOMockConnectionModal
+        open={isMockModalOpen}
+        onClose={() => setIsMockModalOpen(false)}
+      />
     </div>
   );
 };

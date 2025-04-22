@@ -33,11 +33,13 @@ export interface SyncSettings {
 interface QBOSyncSettingsProps {
   settings: SyncSettings;
   updateSettings: (settings: SyncSettings) => void;
+  onChange?: (settings: SyncSettings) => void; // Added for backward compatibility
 }
 
 export const QBOSyncSettings: React.FC<QBOSyncSettingsProps> = ({
   settings,
   updateSettings,
+  onChange,
 }) => {
   const [localSettings, setLocalSettings] = React.useState<SyncSettings>(settings);
 
@@ -88,6 +90,7 @@ export const QBOSyncSettings: React.FC<QBOSyncSettingsProps> = ({
 
   const saveSettings = () => {
     updateSettings(localSettings);
+    if (onChange) onChange(localSettings); // Support both callback patterns
     toast({
       title: "Settings saved",
       description: "Your synchronization settings have been updated.",

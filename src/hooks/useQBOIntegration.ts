@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDevMode } from '@/contexts/DevModeContext';
@@ -88,19 +87,19 @@ export const useQBOIntegration = () => {
         return [
           {
             id: 'err-1',
-            entityType: 'invoices',
+            entityType: 'invoices' as 'invoices',
             message: 'Invoice #INV-2023-0547 failed: Invalid customer reference',
             timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000),
             resolved: false
           },
           {
             id: 'err-2',
-            entityType: 'items',
+            entityType: 'items' as 'items',
             message: 'Item SKU-7744 failed to sync: Duplicate SKU in QuickBooks',
             timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000),
             resolved: false
           }
-        ];
+        ] as SyncError[];
       }
       
       const { data, error } = await supabase
@@ -116,13 +115,26 @@ export const useQBOIntegration = () => {
         return [];
       }
       
-      return data.map(err => ({
-        id: err.id,
-        entityType: err.error_category === 'data' ? 'items' : 'customers',
-        message: err.error_message,
-        timestamp: new Date(err.last_occurred_at),
-        resolved: err.is_resolved
-      }));
+      return data.map(err => {
+        let entityType: 'customers' | 'items' | 'invoices' | 'payments' | 'bills' | string = 'items';
+        if (err.error_category === 'data') {
+          entityType = 'items';
+        } else if (err.error_category === 'validation') {
+          entityType = 'customers';
+        } else if (err.error_category === 'auth') {
+          entityType = 'invoices';
+        } else {
+          entityType = 'bills';
+        }
+        
+        return {
+          id: err.id,
+          entityType,
+          message: err.error_message,
+          timestamp: new Date(err.last_occurred_at),
+          resolved: err.is_resolved
+        };
+      });
     },
     enabled: !!organizationId && (connectionQuery.data?.is_active || isDevMode),
     refetchInterval: 30000 // Refetch every 30 seconds

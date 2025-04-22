@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from 'uuid';
@@ -11,11 +10,11 @@ export interface QBOConnection {
   qbo_company_id: string;
   qbo_access_token?: string;
   qbo_refresh_token?: string;
-  qbo_token_expires_at?: Date;
+  qbo_token_expires_at?: string;
   environment: 'production' | 'sandbox';
   is_active: boolean;
-  last_connected_at: Date;
-  last_sync_at?: Date;
+  last_connected_at: string;
+  last_sync_at?: string;
 }
 
 export interface SyncOperation {
@@ -31,9 +30,9 @@ export interface SyncOperation {
   response_payload?: any;
   retry_count: number;
   error_message?: string;
-  started_at?: Date;
-  completed_at?: Date;
-  scheduled_at: Date;
+  started_at?: string;
+  completed_at?: string;
+  scheduled_at: string;
 }
 
 export interface EntityConfig {
@@ -51,8 +50,8 @@ export interface EntityMapping {
   entity_type: string;
   batchly_id: string;
   qbo_id: string;
-  last_batchly_update?: Date;
-  last_qbo_update?: Date;
+  last_batchly_update?: string;
+  last_qbo_update?: string;
 }
 
 export interface FieldMapping {
@@ -73,7 +72,7 @@ export interface SyncError {
   suggested_resolution?: string;
   occurrence_count: number;
   is_resolved: boolean;
-  last_occurred_at: Date;
+  last_occurred_at: string;
 }
 
 export interface SyncMetrics {
@@ -86,7 +85,7 @@ export interface SyncMetrics {
   total_time_ms?: number;
   avg_time_per_entity_ms?: number;
   rate_limit_hits: number;
-  recorded_at: Date;
+  recorded_at: string;
 }
 
 export interface SyncHistory {
@@ -98,8 +97,8 @@ export interface SyncHistory {
   entity_count: number;
   success_count: number;
   failure_count: number;
-  started_at: Date;
-  completed_at?: Date;
+  started_at: string;
+  completed_at?: string;
   summary?: any;
   error_summary?: string;
 }
@@ -120,14 +119,12 @@ class QBOService {
   private lastRequestReset = Date.now();
 
   constructor() {
-    // Reset request counter every minute
     setInterval(() => {
       this.requestCounter = 0;
       this.lastRequestReset = Date.now();
     }, 60000);
   }
 
-  // Initialize with organization ID
   async initialize(organizationId: string): Promise<boolean> {
     this.organizationId = organizationId;
     try {
@@ -139,7 +136,6 @@ class QBOService {
     }
   }
 
-  // Get QBO connection details
   async getConnection(): Promise<QBOConnection | null> {
     if (!this.organizationId) {
       throw new Error("QBO service not initialized with organization ID");
@@ -156,22 +152,19 @@ class QBOService {
       return null;
     }
 
-    this.connection = data as QBOConnection;
+    this.connection = data as unknown as QBOConnection;
     return this.connection;
   }
 
-  // Check if token needs refresh
   private needsTokenRefresh(): boolean {
     if (!this.connection?.qbo_token_expires_at) return true;
     
     const expiresAt = new Date(this.connection.qbo_token_expires_at);
     const now = new Date();
     
-    // Refresh token if it expires in less than 10 minutes
     return expiresAt.getTime() - now.getTime() < 10 * 60 * 1000;
   }
 
-  // Refresh OAuth token
   async refreshToken(): Promise<boolean> {
     if (!this.connection?.qbo_refresh_token) {
       console.error("No refresh token available");
@@ -179,10 +172,6 @@ class QBOService {
     }
 
     try {
-      // In a real implementation, this would call a secure edge function
-      // that handles the token refresh with QuickBooks OAuth API
-      
-      // For now, we'll simulate a successful refresh
       const mockNewToken = {
         access_token: `mock_refreshed_token_${Date.now()}`,
         refresh_token: this.connection.qbo_refresh_token,
@@ -201,7 +190,6 @@ class QBOService {
     }
   }
 
-  // Update stored tokens
   private async updateTokens(
     accessToken: string,
     refreshToken: string,
@@ -224,23 +212,20 @@ class QBOService {
       return false;
     }
 
-    // Update local connection object
     if (this.connection) {
       this.connection.qbo_access_token = accessToken;
       this.connection.qbo_refresh_token = refreshToken;
-      this.connection.qbo_token_expires_at = expiresAt;
+      this.connection.qbo_token_expires_at = expiresAt.toISOString();
     }
 
     return true;
   }
 
-  // Make authenticated request to QBO API
   async makeRequest(endpoint: string, method = 'GET', data?: any): Promise<any> {
     if (!this.connection?.qbo_access_token) {
       throw new Error("No QBO access token available");
     }
 
-    // Check rate limits
     if (this.requestCounter >= QBO_RATE_LIMITS.MAX_REQUESTS_PER_MINUTE) {
       const timeToWait = 60000 - (Date.now() - this.lastRequestReset);
       if (timeToWait > 0) {
@@ -248,7 +233,6 @@ class QBOService {
       }
     }
 
-    // Check if token needs refreshing
     if (this.needsTokenRefresh()) {
       const refreshed = await this.refreshToken();
       if (!refreshed) {
@@ -256,20 +240,13 @@ class QBOService {
       }
     }
 
-    // In a real implementation, this would make actual API calls to QuickBooks
-    // For now, we'll simulate the API responses
-
-    // Increment request counter
     this.requestCounter++;
 
-    // Simulate API request delay
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    // Return mock response based on endpoint
     return this.getMockResponse(endpoint, method, data);
   }
 
-  // Create sync operation record
   async createSyncOperation(
     entityType: string,
     entityId: string,
@@ -309,7 +286,6 @@ class QBOService {
     return data.id;
   }
 
-  // Get pending sync operations
   async getPendingOperations(
     entityType?: string,
     limit = 50
@@ -337,10 +313,9 @@ class QBOService {
       return [];
     }
 
-    return data as SyncOperation[];
+    return data as unknown as SyncOperation[];
   }
 
-  // Update sync operation status
   async updateOperationStatus(
     operationId: string,
     status: 'in_progress' | 'success' | 'failed' | 'rollback' | 'conflict',
@@ -384,39 +359,30 @@ class QBOService {
     return true;
   }
 
-  // Process a single sync operation
   async processSyncOperation(operation: SyncOperation): Promise<boolean> {
     try {
-      // Mark operation as in progress
       await this.updateOperationStatus(operation.id, 'in_progress');
 
-      // Determine API endpoint based on entity type and operation
       const endpoint = this.getApiEndpoint(operation.entity_type, operation.operation_type, operation.qbo_id);
       
-      // Determine HTTP method
       const method = this.getHttpMethod(operation.operation_type);
 
-      // Execute the API call
       const response = await this.makeRequest(endpoint, method, operation.request_payload);
 
-      // Update operation as successful
       await this.updateOperationStatus(operation.id, 'success', response);
 
-      // If this was a create or update operation, update entity mapping
       if ((operation.operation_type === 'create' || operation.operation_type === 'update') && 
           operation.sync_direction === 'to_qbo' &&
           response.Id) {
         await this.updateEntityMapping(operation.entity_type, operation.entity_id, response.Id);
       }
 
-      // If successful, update entity's sync status
       await this.updateEntitySyncStatus(operation.entity_type, operation.entity_id, 'synced');
 
       return true;
     } catch (error) {
       console.error(`Error processing operation ${operation.id}:`, error);
       
-      // Log error and update operation status
       await this.logError(
         this.categorizeError(error),
         `Failed to sync ${operation.entity_type}`,
@@ -425,14 +391,12 @@ class QBOService {
       
       await this.updateOperationStatus(operation.id, 'failed', null, String(error));
       
-      // Update entity's sync status
       await this.updateEntitySyncStatus(operation.entity_type, operation.entity_id, 'error');
       
       return false;
     }
   }
 
-  // Update entity mapping
   private async updateEntityMapping(
     entityType: string,
     batchlyId: string,
@@ -456,7 +420,6 @@ class QBOService {
     const now = new Date().toISOString();
 
     if (data) {
-      // Update existing mapping
       const { error } = await supabase
         .from('qbo_entity_mapping')
         .update({
@@ -468,7 +431,6 @@ class QBOService {
 
       return !error;
     } else {
-      // Create new mapping
       const { error } = await supabase
         .from('qbo_entity_mapping')
         .insert({
@@ -483,15 +445,13 @@ class QBOService {
     }
   }
 
-  // Update entity sync status in its respective table
-  private async updateEntitySyncStatus(
+  public async updateEntitySyncStatus(
     entityType: string,
     entityId: string,
     status: 'pending' | 'syncing' | 'synced' | 'error'
   ): Promise<boolean> {
     if (!this.organizationId) return false;
 
-    // Map entity type to table name
     const tableMap: Record<string, string> = {
       'customer_profile': 'customer_profile',
       'vendor_profile': 'vendor_profile',
@@ -504,17 +464,21 @@ class QBOService {
     const tableName = tableMap[entityType];
     if (!tableName) return false;
 
-    const { error } = await supabase
-      .from(tableName)
-      .update({
-        qbo_sync_status: status
-      })
-      .eq('id', entityId);
+    try {
+      const { error } = await supabase
+        .from(tableName as any)
+        .update({
+          qbo_sync_status: status
+        })
+        .eq('id', entityId);
 
-    return !error;
+      return !error;
+    } catch (error) {
+      console.error(`Error updating entity sync status for ${entityType}:${entityId}:`, error);
+      return false;
+    }
   }
 
-  // Log sync error for monitoring
   async logError(
     category: 'auth' | 'validation' | 'rate_limit' | 'connection' | 'data' | 'unknown',
     message: string,
@@ -533,17 +497,15 @@ class QBOService {
         .maybeSingle();
 
       if (data) {
-        // Update existing error count
         await supabase
           .from('qbo_error_registry')
           .update({
             occurrence_count: data.occurrence_count + 1,
             last_occurred_at: new Date().toISOString(),
-            error_details: details || data.error_details
+            error_message: details || message
           })
           .eq('id', data.id);
       } else {
-        // Create new error record
         await supabase
           .from('qbo_error_registry')
           .insert({
@@ -551,7 +513,7 @@ class QBOService {
             error_category: category,
             error_code: errorCode,
             error_message: message,
-            error_details: details,
+            suggested_resolution: details,
             occurrence_count: 1,
             last_occurred_at: new Date().toISOString(),
             is_resolved: false
@@ -562,7 +524,6 @@ class QBOService {
     }
   }
 
-  // Start a sync batch for multiple entities
   async startSyncBatch(
     entityType: string,
     entityIds: string[],
@@ -574,7 +535,6 @@ class QBOService {
 
     const batchId = uuidv4();
 
-    // Create batch record
     const { data, error } = await supabase
       .from('qbo_sync_batch')
       .insert({
@@ -592,13 +552,10 @@ class QBOService {
       throw error;
     }
 
-    // Create individual operations for each entity
     for (const entityId of entityIds) {
       try {
-        // Determine if entity exists in QBO
         const mapping = await this.getEntityMapping(entityType, entityId);
         
-        // Create appropriate operation
         const operationType = mapping ? 'update' : 'create';
         const payload = await this.buildPayload(entityType, entityId, operationType);
         
@@ -618,7 +575,6 @@ class QBOService {
     return data.id;
   }
 
-  // Get entity mapping
   async getEntityMapping(
     entityType: string,
     batchlyId: string
@@ -634,10 +590,9 @@ class QBOService {
       .maybeSingle();
 
     if (error || !data) return null;
-    return data as EntityMapping;
+    return data as unknown as EntityMapping;
   }
 
-  // Get sync configuration for entity
   async getEntityConfig(entityType: string): Promise<EntityConfig | null> {
     if (!this.organizationId) return null;
 
@@ -649,22 +604,14 @@ class QBOService {
       .maybeSingle();
 
     if (error || !data) return null;
-    return data as EntityConfig;
+    return data as unknown as EntityConfig;
   }
 
-  // Helper method to build API payload based on entity type and field mappings
   private async buildPayload(
     entityType: string,
     entityId: string,
     operationType: 'create' | 'update' | 'delete'
   ): Promise<any> {
-    // In a real implementation, this would:
-    // 1. Fetch the entity from its table
-    // 2. Get field mappings from qbo_field_mapping
-    // 3. Apply transformations
-    // 4. Build QBO-compatible payload
-
-    // For now, return mock payload
     return {
       Id: operationType === 'update' ? entityId : undefined,
       Name: `Mock ${entityType} ${entityId.substring(0, 8)}`,
@@ -672,7 +619,6 @@ class QBOService {
     };
   }
 
-  // Helper to get QBO API endpoint
   private getApiEndpoint(
     entityType: string,
     operationType: 'create' | 'update' | 'delete',
@@ -698,21 +644,19 @@ class QBOService {
     }
   }
 
-  // Helper to get HTTP method
   private getHttpMethod(operationType: 'create' | 'update' | 'delete'): string {
     switch (operationType) {
       case 'create':
         return 'POST';
       case 'update':
-        return 'POST'; // QBO uses POST with operation=update query param
+        return 'POST';
       case 'delete':
-        return 'POST'; // QBO uses POST with operation=delete query param
+        return 'POST';
       default:
         return 'GET';
     }
   }
 
-  // Helper to categorize errors
   private categorizeError(error: any): 'auth' | 'validation' | 'rate_limit' | 'connection' | 'data' | 'unknown' {
     const errorMessage = String(error).toLowerCase();
     
@@ -731,13 +675,10 @@ class QBOService {
     }
   }
 
-  // Get mock response (for development/testing)
   private getMockResponse(endpoint: string, method: string, data?: any): any {
-    // Extract entity type from endpoint
     const entityMatch = endpoint.match(/\/v3\/company\/[\w\d]+\/(\w+)/);
     const entityType = entityMatch ? entityMatch[1] : 'unknown';
     
-    // Generate mock ID if creating
     const mockId = data?.Id || `mockQBO_${Date.now()}`;
     
     const mockResponses: Record<string, any> = {
@@ -788,7 +729,6 @@ class QBOService {
       }
     };
     
-    // Small chance of error for testing error handling
     if (Math.random() > 0.95) {
       throw new Error("Mock API error for testing");
     }
@@ -797,17 +737,4 @@ class QBOService {
   }
 }
 
-// Export a singleton instance
 export const qboService = new QBOService();
-
-// Export types for use in other components
-export type {
-  QBOConnection,
-  SyncOperation,
-  EntityConfig,
-  EntityMapping,
-  FieldMapping,
-  SyncError,
-  SyncMetrics,
-  SyncHistory
-};
