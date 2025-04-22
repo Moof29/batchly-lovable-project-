@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { qboService } from '@/services/qbo/QBOService';
@@ -72,7 +73,7 @@ export const useEnhancedQBOSync = (organizationId?: string) => {
   const syncHistoryQuery = useQuery({
     queryKey: ['qbo', 'syncHistory', organizationId],
     queryFn: async () => {
-      if (!organizationId return [];
+      if (!organizationId) return [];
       const { data, error } = await supabase
         .from('qbo_sync_history')
         .select('*')
