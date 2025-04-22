@@ -57,7 +57,7 @@ export const Bills = () => {
         </div>
         
         {(isUnavailable || isDegraded) && (
-          <Alert variant={isUnavailable ? "destructive" : "warning"} className="max-w-md">
+          <Alert variant={isUnavailable ? "destructive" : "default"} className="max-w-md">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>
               {isUnavailable ? "QBO Service Unavailable" : "QBO Service Degraded"}
@@ -103,7 +103,7 @@ export const Bills = () => {
         <CardContent>
           {health.status !== 'healthy' && (
             <div className="mb-4">
-              <Alert variant={health.status === 'degraded' ? "warning" : "destructive"}>
+              <Alert variant={health.status === 'degraded' ? "default" : "destructive"}>
                 <div className="flex items-center gap-2">
                   {health.status === 'degraded' ? (
                     <AlertTriangle className="h-4 w-4" />

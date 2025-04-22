@@ -17,20 +17,20 @@ import { qboService,
 
 // Entity validation schemas
 const customerValidationSchema = {
-  display_name: DataValidator.rules.required('Display name'),
-  email: DataValidator.rules.email('Email')
+  display_name: [DataValidator.rules.required('Display name')],
+  email: [DataValidator.rules.email('Email')]
 };
 
 const invoiceValidationSchema = {
-  customer_id: DataValidator.rules.required('Customer ID'),
-  invoice_date: DataValidator.rules.required('Invoice date'),
-  total: DataValidator.rules.positiveNumber('Total amount')
+  customer_id: [DataValidator.rules.required('Customer ID')],
+  invoice_date: [DataValidator.rules.required('Invoice date')],
+  total: [DataValidator.rules.positiveNumber('Total amount')]
 };
 
 const billValidationSchema = {
-  vendor_id: DataValidator.rules.required('Vendor ID'),
-  bill_date: DataValidator.rules.required('Bill date'),
-  total: DataValidator.rules.positiveNumber('Total amount')
+  vendor_id: [DataValidator.rules.required('Vendor ID')],
+  bill_date: [DataValidator.rules.required('Bill date')],
+  total: [DataValidator.rules.positiveNumber('Total amount')]
 };
 
 // Create circuit breakers for different QBO API endpoints
@@ -189,7 +189,7 @@ export class EnhancedQBOService {
       
       // Log the error using original service
       await qboService.logError(
-        qboService.categorizeError(error),
+        this.categorizeError(error),
         `Failed to sync ${operation.entity_type} with enhanced service`,
         String(error)
       );
@@ -198,6 +198,25 @@ export class EnhancedQBOService {
       await qboService.updateOperationStatus(operation.id, 'failed', null, String(error));
       
       return false;
+    }
+  }
+  
+  /**
+   * Categorize error by type to enable better error handling
+   */
+  private categorizeError(error: any): string {
+    if (error.status === 401 || error.status === 403) {
+      return 'auth';
+    } else if (error.status === 400) {
+      return 'validation';
+    } else if (error.status === 429) {
+      return 'rate_limit';
+    } else if (error.status >= 500) {
+      return 'server';
+    } else if (error.message && error.message.includes('network')) {
+      return 'connection';
+    } else {
+      return 'unknown';
     }
   }
   

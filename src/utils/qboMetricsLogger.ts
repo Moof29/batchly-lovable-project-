@@ -11,6 +11,17 @@ interface PerformanceMetric {
   errorType?: string;
 }
 
+interface MetricsRecord {
+  organization_id: string;
+  entity_type: string;
+  operation_type: string;
+  success: boolean;
+  duration_ms: number;
+  record_size_bytes?: number;
+  error_type?: string;
+  created_at: string;
+}
+
 /**
  * QBO Metrics Logger for tracking performance and reliability metrics
  */
@@ -88,7 +99,16 @@ export class QBOMetricsLogger {
         created_at: now
       }));
       
-      // Insert metrics to the qbo_performance_metrics table
+      // Insert metrics
+      // Note: We don't use a specific table since it may not exist yet
+      // Instead, we log to console for now and can implement proper storage later
+      console.log('QBO Metrics to store:', metricsToInsert);
+      
+      // Clear the processed metrics
+      this.metrics = [];
+      
+      /* 
+      // Code to use when the qbo_performance_metrics table is created:
       const { error } = await supabase
         .from('qbo_performance_metrics')
         .insert(metricsToInsert);
@@ -99,6 +119,7 @@ export class QBOMetricsLogger {
         // Clear the processed metrics
         this.metrics = [];
       }
+      */
     } catch (e) {
       console.error('Error flushing QBO metrics:', e);
     }
@@ -111,6 +132,22 @@ export class QBOMetricsLogger {
     if (!this.organizationId) return null;
     
     try {
+      // For now, return mock data since we haven't created the specific table yet
+      return {
+        totalOperations: this.metrics.length,
+        successfulOperations: this.metrics.filter(m => m.success).length,
+        successRate: this.metrics.length > 0 ? 
+          (this.metrics.filter(m => m.success).length / this.metrics.length) * 100 : 
+          100,
+        averageDurationMs: this.metrics.length > 0 ? 
+          this.metrics.reduce((acc, curr) => acc + curr.durationMs, 0) / this.metrics.length : 
+          0,
+        durationByOperationType: this.getDurationByOperationType(),
+        errorDistribution: this.getErrorDistribution()
+      };
+      
+      /* 
+      // Code to use when table is created:
       // Calculate time boundary
       const timeBoundary = new Date();
       timeBoundary.setHours(timeBoundary.getHours() - lookbackHours);
@@ -159,10 +196,42 @@ export class QBOMetricsLogger {
         durationByOperationType: durationByOp,
         errorDistribution: errorCounts
       };
+      */
     } catch (e) {
       console.error('Error calculating aggregate metrics:', e);
       return null;
     }
+  }
+
+  /**
+   * Helper method to calculate duration by operation type
+   */
+  private getDurationByOperationType(): Record<string, number> {
+    const operations = [...new Set(this.metrics.map(m => m.operation))];
+    const result: Record<string, number> = {};
+
+    operations.forEach(op => {
+      const metricsForOp = this.metrics.filter(m => m.operation === op);
+      const avgDuration = metricsForOp.reduce((acc, curr) => acc + curr.durationMs, 0) / metricsForOp.length;
+      result[op] = Math.round(avgDuration);
+    });
+
+    return result;
+  }
+
+  /**
+   * Helper method to calculate error distribution
+   */
+  private getErrorDistribution(): Record<string, number> {
+    const errors = this.metrics.filter(m => !m.success);
+    const errorTypes = [...new Set(errors.map(m => m.errorType || 'unknown'))];
+    const result: Record<string, number> = {};
+
+    errorTypes.forEach(type => {
+      result[type] = errors.filter(m => m.errorType === type).length;
+    });
+
+    return result;
   }
 }
 
