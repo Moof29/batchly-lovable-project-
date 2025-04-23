@@ -40,20 +40,20 @@ export const CustomerList = () => {
           <h1 className="text-2xl font-semibold tracking-tight">Customers</h1>
           <p className="text-sm text-muted-foreground">View and manage your customer accounts</p>
         </div>
-        <div className="flex items-center gap-4">
-          <ColumnSelector columns={columns} onToggle={toggleColumn} />
-          <Button asChild>
-            <Link to="/people/customers/new">
-              <Plus className="mr-2 h-4 w-4" />
-              New Customer
-            </Link>
-          </Button>
-        </div>
+        <Button asChild>
+          <Link to="/people/customers/new">
+            <Plus className="mr-2 h-4 w-4" />
+            New Customer
+          </Link>
+        </Button>
       </div>
 
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle>All Customers</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>All Customers</CardTitle>
+            <ColumnSelector columns={columns} onToggle={toggleColumn} />
+          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (
