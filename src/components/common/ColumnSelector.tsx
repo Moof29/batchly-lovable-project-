@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Columns, ArrowUp, ArrowDown } from "lucide-react";
+import { Columns, GripVertical } from "lucide-react";
 import { type ColumnConfig } from "@/hooks/useColumnSelection";
 import { useState } from "react";
 
@@ -37,33 +37,30 @@ export const ColumnSelector = ({ columns, onToggle, onMove }: ColumnSelectorProp
         <DropdownMenuLabel>Configure Columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {columns.sort((a, b) => a.order - b.order).map((column, index) => (
-          <div key={column.key} className="flex items-center px-2 py-1 hover:bg-accent">
-            <DropdownMenuCheckboxItem
-              checked={column.visible}
-              onCheckedChange={() => handleCheckedChange(column.key)}
-              onSelect={(e) => e.preventDefault()}
-              className="flex-grow"
-            >
-              {column.label}
-            </DropdownMenuCheckboxItem>
-            <div className="flex items-center space-x-1">
+          <div key={column.key} className="flex items-center px-2 py-1 hover:bg-accent cursor-move group">
+            <div className="flex items-center space-x-2">
+              <div className="text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                <GripVertical className="h-4 w-4" />
+              </div>
+              <DropdownMenuCheckboxItem
+                checked={column.visible}
+                onCheckedChange={() => handleCheckedChange(column.key)}
+                onSelect={(e) => e.preventDefault()}
+                className="flex-grow"
+              >
+                {column.label}
+              </DropdownMenuCheckboxItem>
+            </div>
+            <div className="flex items-center ml-auto">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 w-6 p-0"
+                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={() => onMove(column.key, 'up')}
                 disabled={index === 0}
               >
-                <ArrowUp className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0"
-                onClick={() => onMove(column.key, 'down')}
-                disabled={index === columns.length - 1}
-              >
-                <ArrowDown className="h-4 w-4" />
+                <span className="sr-only">Move up</span>
+                <GripVertical className="h-4 w-4" />
               </Button>
             </div>
           </div>
