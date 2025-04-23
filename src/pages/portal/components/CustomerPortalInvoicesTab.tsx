@@ -1,6 +1,8 @@
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import CustomerPortalTabCard from "./CustomerPortalTabCard";
+import InvoiceRow from "./InvoiceRow";
 
 interface CustomerPortalInvoicesTabProps {
   invoiceSearch: string;
@@ -25,7 +27,7 @@ export const CustomerPortalInvoicesTab = ({
         aria-label="Search invoices"
       />
     </div>
-    <div className="bg-white shadow-lg rounded-xl overflow-x-auto">
+    <CustomerPortalTabCard className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-gray-100 text-gray-700">
@@ -48,29 +50,11 @@ export const CustomerPortalInvoicesTab = ({
             </tr>
           )}
           {filteredInvoices.map(inv => (
-            <tr className="hover:bg-gray-50 transition" key={inv.id}>
-              <td className="px-4 py-2">{inv.invoice_number || "-"}</td>
-              <td className="px-4 py-2">{inv.invoice_date ? new Date(inv.invoice_date).toLocaleDateString() : "-"}</td>
-              <td className="px-4 py-2">${Number(inv.total).toFixed(2)}</td>
-              <td className="px-4 py-2">
-                <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                  inv.status === "paid"
-                    ? "bg-green-100 text-green-700"
-                    : inv.status === "draft"
-                    ? "bg-gray-200 text-gray-700"
-                    : "bg-yellow-100 text-yellow-700"
-                }`}>
-                  {inv.status}
-                </span>
-              </td>
-              <td className="px-4 py-2">
-                <Button size="sm" variant="outline" aria-label="View Invoice">View</Button>
-              </td>
-            </tr>
+            <InvoiceRow invoice={inv} key={inv.id} />
           ))}
         </tbody>
       </table>
-    </div>
+    </CustomerPortalTabCard>
   </section>
 );
 

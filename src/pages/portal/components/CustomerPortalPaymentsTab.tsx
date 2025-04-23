@@ -1,4 +1,7 @@
 
+import CustomerPortalTabCard from "./CustomerPortalTabCard";
+import PaymentRow from "./PaymentRow";
+
 interface CustomerPortalPaymentsTabProps {
   isLoading: boolean;
   paymentsData: any[];
@@ -9,7 +12,7 @@ export const CustomerPortalPaymentsTab = ({
   paymentsData
 }: CustomerPortalPaymentsTabProps) => (
   <section className="mt-8">
-    <div className="bg-white shadow-lg rounded-xl overflow-x-auto">
+    <CustomerPortalTabCard className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-gray-100 text-gray-700">
@@ -31,19 +34,11 @@ export const CustomerPortalPaymentsTab = ({
             </tr>
           )}
           {paymentsData && paymentsData.map(pm => (
-            <tr className="hover:bg-gray-50 transition" key={pm.id}>
-              <td className="px-4 py-2">{pm.payment_date ? new Date(pm.payment_date).toLocaleDateString() : "-"}</td>
-              <td className="px-4 py-2">{pm.payment_method || pm.payment_gateway || "-"}</td>
-              <td className="px-4 py-2">
-                {pm.total_amount !== undefined && pm.total_amount !== null ?
-                  "$" + Number(pm.total_amount).toFixed(2) : "-"}
-              </td>
-              <td className="px-4 py-2">{pm.payment_number || pm.reference_number || "-"}</td>
-            </tr>
+            <PaymentRow payment={pm} key={pm.id} />
           ))}
         </tbody>
       </table>
-    </div>
+    </CustomerPortalTabCard>
   </section>
 );
 
