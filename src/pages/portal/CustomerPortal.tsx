@@ -1,13 +1,14 @@
 
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Menu } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { usePortalInvoices } from "@/hooks/usePortalInvoices";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const TABS = [
   { key: "profile", label: "Profile" },
@@ -24,6 +25,7 @@ export const CustomerPortal = () => {
   const [invoiceSearch, setInvoiceSearch] = useState("");
   const [messageBody, setMessageBody] = useState("");
   const [sending, setSending] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Customer profile
   const { data: customer, isLoading } = useQuery({
@@ -100,6 +102,12 @@ export const CustomerPortal = () => {
     setSending(false);
   }
 
+  // Handle tab selection for mobile
+  const handleTabSelect = (tabKey: string) => {
+    setActiveTab(tabKey);
+    setMobileMenuOpen(false);
+  };
+
   if (isLoading || !customerId) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -143,12 +151,36 @@ export const CustomerPortal = () => {
           >
             <ArrowLeft className="h-5 w-5" aria-hidden />
           </button>
-          <h1 className="mx-auto text-2xl font-semibold text-gray-900 tracking-tight" style={{ letterSpacing: "-0.01em" }}>
+          <h1 className="text-xl md:text-2xl font-semibold text-gray-900 tracking-tight flex-grow text-center" style={{ letterSpacing: "-0.01em" }}>
             Customer Portal
           </h1>
+          
+          {/* Mobile menu trigger */}
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="ghost" size="icon" aria-label="Open menu">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="top" className="pt-12">
+              <div className="flex flex-col gap-2 py-2">
+                {TABS.map(tab => (
+                  <Button
+                    key={tab.key}
+                    variant={activeTab === tab.key ? "default" : "ghost"}
+                    className="justify-start text-lg py-3"
+                    onClick={() => handleTabSelect(tab.key)}
+                  >
+                    {tab.label}
+                  </Button>
+                ))}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
-        {/* Tabs */}
-        <div className="flex w-full max-w-4xl mx-auto mt-4 gap-2">
+        
+        {/* Desktop Tabs */}
+        <div className="hidden md:flex w-full max-w-4xl mx-auto mt-4 gap-2">
           {TABS.map(tab => (
             <button
               key={tab.key}
