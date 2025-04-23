@@ -14,7 +14,7 @@ export const CustomerList = () => {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const { data: customers, isLoading } = useCustomers(sorting, filters);
   
-  const { columns, toggleColumn, visibleColumns } = useColumnSelection(
+  const { columns, toggleColumn, moveColumn, visibleColumns } = useColumnSelection(
     'customer-list-columns',
     defaultCustomerColumns
   );
@@ -52,7 +52,11 @@ export const CustomerList = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>All Customers</CardTitle>
-            <ColumnSelector columns={columns} onToggle={toggleColumn} />
+            <ColumnSelector 
+              columns={columns} 
+              onToggle={toggleColumn} 
+              onMove={moveColumn}
+            />
           </div>
         </CardHeader>
         <CardContent>
