@@ -6,12 +6,18 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useCustomers } from "@/hooks/useCustomers";
 import { CustomersTable } from "@/components/people/CustomersTable";
+import { ColumnSelector } from "@/components/common/ColumnSelector";
+import { useColumnSelection, defaultCustomerColumns } from "@/hooks/useColumnSelection";
 
 export const CustomerList = () => {
   const [sorting, setSorting] = useState({ column: "display_name", direction: "asc" as "asc" | "desc" });
   const [filters, setFilters] = useState<Record<string, string>>({});
-
   const { data: customers, isLoading } = useCustomers(sorting, filters);
+  
+  const { columns, toggleColumn, visibleColumns } = useColumnSelection(
+    'customer-list-columns',
+    defaultCustomerColumns
+  );
 
   const handleSort = (column: string) => {
     setSorting(prev => ({
@@ -34,12 +40,15 @@ export const CustomerList = () => {
           <h1 className="text-2xl font-semibold tracking-tight">Customers</h1>
           <p className="text-sm text-muted-foreground">View and manage your customer accounts</p>
         </div>
-        <Button asChild>
-          <Link to="/people/customers/new">
-            <Plus className="mr-2 h-4 w-4" />
-            New Customer
-          </Link>
-        </Button>
+        <div className="flex items-center gap-4">
+          <ColumnSelector columns={columns} onToggle={toggleColumn} />
+          <Button asChild>
+            <Link to="/people/customers/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Customer
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <Card className="shadow-lg">
@@ -58,6 +67,7 @@ export const CustomerList = () => {
               filters={filters}
               onSort={handleSort}
               onFilter={handleFilter}
+              visibleColumns={visibleColumns}
             />
           )}
         </CardContent>
