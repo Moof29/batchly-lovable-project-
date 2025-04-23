@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 
-type ColumnConfig = {
+export type ColumnConfig = {
   key: string;
   label: string;
   visible: boolean;
