@@ -57,10 +57,28 @@ export const useColumnSelection = (storageKey: string, defaultColumns: ColumnCon
     });
   };
 
+  const reorderColumns = (startIndex: number, endIndex: number) => {
+    setColumns(prev => {
+      const sortedColumns = [...prev].sort((a, b) => a.order - b.order);
+      
+      // Remove the dragged item
+      const [removed] = sortedColumns.splice(startIndex, 1);
+      // Insert it at the new position
+      sortedColumns.splice(endIndex, 0, removed);
+      
+      // Update orders based on new positions
+      return sortedColumns.map((col, index) => ({
+        ...col,
+        order: index
+      }));
+    });
+  };
+
   return {
     columns,
     toggleColumn,
     moveColumn,
+    reorderColumns,
     visibleColumns: columns.filter(col => col.visible).sort((a, b) => a.order - b.order),
   };
 };

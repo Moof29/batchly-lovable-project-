@@ -14,7 +14,7 @@ export const CustomerList = () => {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const { data: customers, isLoading } = useCustomers(sorting, filters);
   
-  const { columns, toggleColumn, moveColumn, visibleColumns } = useColumnSelection(
+  const { columns, toggleColumn, moveColumn, reorderColumns, visibleColumns } = useColumnSelection(
     'customer-list-columns',
     defaultCustomerColumns
   );
@@ -56,6 +56,7 @@ export const CustomerList = () => {
               columns={columns} 
               onToggle={toggleColumn} 
               onMove={moveColumn}
+              onReorder={reorderColumns}
             />
           </div>
         </CardHeader>

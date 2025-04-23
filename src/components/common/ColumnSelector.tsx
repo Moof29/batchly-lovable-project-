@@ -11,19 +11,36 @@ import {
 import { Columns, GripVertical } from "lucide-react";
 import { type ColumnConfig } from "@/hooks/useColumnSelection";
 import { useState } from "react";
+import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
 
 interface ColumnSelectorProps {
   columns: ColumnConfig[];
   onToggle: (columnKey: string) => void;
   onMove: (columnKey: string, direction: 'up' | 'down') => void;
+  onReorder: (startIndex: number, endIndex: number) => void;
 }
 
-export const ColumnSelector = ({ columns, onToggle, onMove }: ColumnSelectorProps) => {
+export const ColumnSelector = ({ columns, onToggle, onMove, onReorder }: ColumnSelectorProps) => {
   const [open, setOpen] = useState(false);
 
   const handleCheckedChange = (columnKey: string) => {
     onToggle(columnKey);
   };
+
+  const handleDragEnd = (result: DropResult) => {
+    // Dropped outside the list
+    if (!result.destination) return;
+    
+    const startIndex = result.source.index;
+    const endIndex = result.destination.index;
+    
+    // If the item is dropped in a different position
+    if (startIndex !== endIndex) {
+      onReorder(startIndex, endIndex);
+    }
+  };
+
+  const sortedColumns = [...columns].sort((a, b) => a.order - b.order);
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -36,35 +53,53 @@ export const ColumnSelector = ({ columns, onToggle, onMove }: ColumnSelectorProp
       <DropdownMenuContent align="end" className="w-72" sideOffset={5}>
         <DropdownMenuLabel>Configure Columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {columns.sort((a, b) => a.order - b.order).map((column, index) => (
-          <div key={column.key} className="flex items-center px-2 py-1 hover:bg-accent cursor-move group">
-            <div className="flex items-center space-x-2">
-              <div className="text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                <GripVertical className="h-4 w-4" />
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="column-list">
+            {(provided) => (
+              <div 
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className="max-h-[400px] overflow-y-auto"
+              >
+                {sortedColumns.map((column, index) => (
+                  <Draggable 
+                    key={column.key} 
+                    draggableId={column.key} 
+                    index={index}
+                  >
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        className={`flex items-center px-2 py-1 hover:bg-accent group ${
+                          snapshot.isDragging ? "bg-accent" : ""
+                        }`}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <div 
+                            {...provided.dragHandleProps}
+                            className="text-gray-400 cursor-grab active:cursor-grabbing"
+                          >
+                            <GripVertical className="h-4 w-4" />
+                          </div>
+                          <DropdownMenuCheckboxItem
+                            checked={column.visible}
+                            onCheckedChange={() => handleCheckedChange(column.key)}
+                            onSelect={(e) => e.preventDefault()}
+                            className="flex-grow"
+                          >
+                            {column.label}
+                          </DropdownMenuCheckboxItem>
+                        </div>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
               </div>
-              <DropdownMenuCheckboxItem
-                checked={column.visible}
-                onCheckedChange={() => handleCheckedChange(column.key)}
-                onSelect={(e) => e.preventDefault()}
-                className="flex-grow"
-              >
-                {column.label}
-              </DropdownMenuCheckboxItem>
-            </div>
-            <div className="flex items-center ml-auto">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={() => onMove(column.key, 'up')}
-                disabled={index === 0}
-              >
-                <span className="sr-only">Move up</span>
-                <GripVertical className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        ))}
+            )}
+          </Droppable>
+        </DragDropContext>
       </DropdownMenuContent>
     </DropdownMenu>
   );
