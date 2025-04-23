@@ -1,10 +1,9 @@
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ArrowDownAZ, ArrowUpAZ } from "lucide-react";
 import { Link } from "react-router-dom";
 import { FilterDropdown } from "@/components/common/FilterDropdown";
-import { Switch } from "@/components/ui/switch";
 
 interface CustomersTableProps {
   customers: any[];
@@ -12,21 +11,9 @@ interface CustomersTableProps {
   filters: Record<string, string>;
   onSort: (column: string) => void;
   onFilter: (column: string, value: string) => void;
-  portalAccessMap?: Record<string, boolean>;
-  onTogglePortalAccess?: (customerId: string, enabled: boolean) => void;
-  loadingCustomerId?: string;
 }
 
-export const CustomersTable = ({
-  customers,
-  sorting,
-  filters,
-  onSort,
-  onFilter,
-  portalAccessMap = {},
-  onTogglePortalAccess,
-  loadingCustomerId,
-}: CustomersTableProps) => {
+export const CustomersTable = ({ customers, sorting, filters, onSort, onFilter }: CustomersTableProps) => {
   return (
     <div className="rounded-md border">
       <Table>
@@ -53,22 +40,34 @@ export const CustomersTable = ({
             <TableHead>
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={() => onSort("email")}
+                  onClick={() => onSort("company_name")}
                   className="flex items-center hover:text-primary"
                 >
-                  Email
-                  {sorting.column === "email" && (
+                  Company
+                  {sorting.column === "company_name" && (
                     sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
                   )}
                 </button>
                 <FilterDropdown
-                  value={filters.email || ""}
-                  onChange={(value) => onFilter("email", value)}
-                  placeholder="Filter by email..."
+                  value={filters.company_name || ""}
+                  onChange={(value) => onFilter("company_name", value)}
+                  placeholder="Filter by company..."
                 />
               </div>
             </TableHead>
-            <TableHead>Phone</TableHead>
+            <TableHead>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => onSort("phone")}
+                  className="flex items-center hover:text-primary"
+                >
+                  Phone
+                  {sorting.column === "phone" && (
+                    sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                  )}
+                </button>
+              </div>
+            </TableHead>
             <TableHead>
               <div className="flex items-center space-x-2">
                 <button
@@ -82,9 +81,6 @@ export const CustomersTable = ({
                 </button>
               </div>
             </TableHead>
-            <TableHead>
-              Portal Access
-            </TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -92,20 +88,10 @@ export const CustomersTable = ({
           {customers && customers.length > 0 ? (
             customers.map((customer) => (
               <TableRow key={customer.id} className="hover:bg-muted/50">
-                <TableCell>{customer.display_name}</TableCell>
-                <TableCell>{customer.email}</TableCell>
-                <TableCell>{customer.phone}</TableCell>
+                <TableCell className="font-medium">{customer.display_name}</TableCell>
+                <TableCell>{customer.company_name || '-'}</TableCell>
+                <TableCell>{customer.phone || '-'}</TableCell>
                 <TableCell>${customer.balance?.toFixed(2) || '0.00'}</TableCell>
-                <TableCell>
-                  <Switch
-                    checked={portalAccessMap[customer.id] || false}
-                    disabled={loadingCustomerId === customer.id}
-                    onCheckedChange={(checked) =>
-                      onTogglePortalAccess && onTogglePortalAccess(customer.id, checked)
-                    }
-                    aria-label={`Toggle portal access for ${customer.display_name}`}
-                  />
-                </TableCell>
                 <TableCell className="text-right">
                   <Button variant="outline" size="sm" asChild>
                     <Link to={`/people/customers/${customer.id}`}>View</Link>
@@ -115,7 +101,7 @@ export const CustomersTable = ({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-4">
+              <TableCell colSpan={5} className="text-center py-4">
                 No customers found.
               </TableCell>
             </TableRow>
