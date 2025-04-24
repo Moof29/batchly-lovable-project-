@@ -10,5 +10,6 @@ export const defaultPurchaseOrderColumns: ColumnConfig[] = [
   { key: 'expected_date', label: 'Expected Date', visible: false, order: 5 },
   { key: 'ship_to', label: 'Ship To', visible: false, order: 6 },
   { key: 'memo', label: 'Memo', visible: false, order: 7 },
-  { key: 'currency_id', label: 'Currency', visible: false, order: 8 }
+  { key: 'currency_id', label: 'Currency', visible: false, order: 8 },
+  { key: 'exchange_rate', label: 'Exchange Rate', visible: false, order: 9 }
 ];
