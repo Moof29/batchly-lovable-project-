@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowDownAZ, ArrowUpAZ } from "lucide-react";
 import { Link } from "react-router-dom";
 import { FilterDropdown } from "@/components/common/FilterDropdown";
+import { ColumnConfig } from "@/hooks/useColumnSelection";
 
 interface EmployeesTableProps {
   employees: any[];
@@ -12,6 +13,7 @@ interface EmployeesTableProps {
   filters: Record<string, string>;
   onSort: (column: string) => void;
   onFilter: (column: string, value: string) => void;
+  visibleColumns?: ColumnConfig[];
 }
 
 export const EmployeesTable = ({ 
@@ -19,68 +21,62 @@ export const EmployeesTable = ({
   sorting, 
   filters, 
   onSort, 
-  onFilter 
+  onFilter,
+  visibleColumns
 }: EmployeesTableProps) => {
+  // If no visibleColumns are provided, use the default columns
+  const columnsToRender = visibleColumns || [
+    { key: 'last_name', label: 'Name', visible: true, order: 0 },
+    { key: 'email', label: 'Email', visible: true, order: 1 },
+    { key: 'phone', label: 'Phone', visible: true, order: 2 },
+    { key: 'employment_type', label: 'Employment Type', visible: true, order: 3 }
+  ];
+
+  // Convert column key to a more readable cell value
+  const renderCell = (employee: any, key: string) => {
+    switch(key) {
+      case 'last_name':
+        return `${employee.first_name} ${employee.last_name}`;
+      case 'email':
+        return employee.email;
+      case 'phone':
+        return employee.phone;
+      case 'employment_type':
+        return (
+          <Badge variant="secondary" className="capitalize">
+            {employee.employment_type}
+          </Badge>
+        );
+      default:
+        return employee[key] || '-';
+    }
+  };
+  
   return (
     <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50">
-            <TableHead>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => onSort("last_name")}
-                  className="flex items-center hover:text-primary"
-                >
-                  Name
-                  {sorting.column === "last_name" && (
-                    sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                  )}
-                </button>
-                <FilterDropdown
-                  value={filters.last_name || ""}
-                  onChange={(value) => onFilter("last_name", value)}
-                  placeholder="Filter by name..."
-                />
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => onSort("email")}
-                  className="flex items-center hover:text-primary"
-                >
-                  Email
-                  {sorting.column === "email" && (
-                    sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                  )}
-                </button>
-                <FilterDropdown
-                  value={filters.email || ""}
-                  onChange={(value) => onFilter("email", value)}
-                  placeholder="Filter by email..."
-                />
-              </div>
-            </TableHead>
-            <TableHead>Phone</TableHead>
-            <TableHead>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => onSort("employment_type")}
-                  className="flex items-center hover:text-primary"
-                >
-                  Employment Type
-                  {sorting.column === "employment_type" && (
-                    sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                  )}
-                </button>
-                <FilterDropdown
-                  value={filters.employment_type || ""}
-                  onChange={(value) => onFilter("employment_type", value)}
-                  placeholder="Filter by type..."
-                />
-              </div>
-            </TableHead>
+            {columnsToRender.map((column) => (
+              <TableHead key={column.key}>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => onSort(column.key)}
+                    className="flex items-center hover:text-primary"
+                  >
+                    {column.label}
+                    {sorting.column === column.key && (
+                      sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                    )}
+                  </button>
+                  <FilterDropdown
+                    value={filters[column.key] || ""}
+                    onChange={(value) => onFilter(column.key, value)}
+                    placeholder={`Filter by ${column.label.toLowerCase()}...`}
+                  />
+                </div>
+              </TableHead>
+            ))}
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -88,14 +84,9 @@ export const EmployeesTable = ({
           {employees && employees.length > 0 ? (
             employees.map((employee) => (
               <TableRow key={employee.id} className="hover:bg-muted/50">
-                <TableCell>{`${employee.first_name} ${employee.last_name}`}</TableCell>
-                <TableCell>{employee.email}</TableCell>
-                <TableCell>{employee.phone}</TableCell>
-                <TableCell>
-                  <Badge variant="secondary" className="capitalize">
-                    {employee.employment_type}
-                  </Badge>
-                </TableCell>
+                {columnsToRender.map((column) => (
+                  <TableCell key={column.key}>{renderCell(employee, column.key)}</TableCell>
+                ))}
                 <TableCell className="text-right">
                   <Button variant="outline" size="sm" asChild>
                     <Link to={`/people/employees/${employee.id}`}>View</Link>
@@ -105,7 +96,7 @@ export const EmployeesTable = ({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">
+              <TableCell colSpan={columnsToRender.length + 1} className="text-center py-4 text-muted-foreground">
                 No employees found.
               </TableCell>
             </TableRow>

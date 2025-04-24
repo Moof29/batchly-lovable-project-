@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -5,9 +6,9 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useSalesOrders } from "@/hooks/useSalesOrders";
 import { SalesOrdersTable } from "@/components/orders/SalesOrdersTable";
-import { ColumnSelector } from "@/components/ui/column-selector";
+import { ColumnSelector } from "@/components/common/ColumnSelector";
 import { useColumnSelection } from "@/hooks/useColumnSelection";
-import { defaultSalesOrderColumns } from "@/constants";
+import { defaultSalesOrderColumns } from "@/hooks/useSalesOrderColumns";
 
 export const SalesOrderList = () => {
   const [sorting, setSorting] = useState({ column: "order_date", direction: "desc" as "asc" | "desc" });
@@ -69,7 +70,6 @@ export const SalesOrderList = () => {
               filters={filters}
               onSort={handleSort}
               onFilter={handleFilter}
-              visibleColumns={visibleColumns}
             />
           )}
         </CardContent>

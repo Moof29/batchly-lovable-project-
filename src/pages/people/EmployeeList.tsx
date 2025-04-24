@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -5,8 +6,9 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useEmployees } from "@/hooks/useEmployees";
 import { EmployeesTable } from "@/components/people/EmployeesTable";
-import { ColumnSelector } from "@/components/ui/column-selector";
+import { ColumnSelector } from "@/components/common/ColumnSelector";
 import { useColumnSelection } from "@/hooks/useColumnSelection";
+import { defaultEmployeeColumns } from "@/hooks/useEmployeeColumns";
 
 export const EmployeeList = () => {
   const [sorting, setSorting] = useState({ column: "last_name", direction: "asc" as "asc" | "desc" });
@@ -68,7 +70,6 @@ export const EmployeeList = () => {
               filters={filters}
               onSort={handleSort}
               onFilter={handleFilter}
-              visibleColumns={visibleColumns}
             />
           )}
         </CardContent>

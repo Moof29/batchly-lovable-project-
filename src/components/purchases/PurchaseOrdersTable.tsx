@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowDownAZ, ArrowUpAZ } from "lucide-react";
 import { Link } from "react-router-dom";
 import { FilterDropdown } from "../common/FilterDropdown";
+import { ColumnConfig } from "@/hooks/useColumnSelection";
 
 interface PurchaseOrdersTableProps {
   purchaseOrders: any[];
@@ -12,6 +13,7 @@ interface PurchaseOrdersTableProps {
   filters: Record<string, string>;
   onSort: (column: string) => void;
   onFilter: (column: string, value: string) => void;
+  visibleColumns?: ColumnConfig[];
 }
 
 export const PurchaseOrdersTable = ({ 
@@ -19,93 +21,75 @@ export const PurchaseOrdersTable = ({
   sorting, 
   filters, 
   onSort, 
-  onFilter 
+  onFilter,
+  visibleColumns
 }: PurchaseOrdersTableProps) => {
+  // If no visibleColumns are provided, use the default columns
+  const columnsToRender = visibleColumns || [
+    { key: 'purchase_order_number', label: 'PO Number', visible: true, order: 0 },
+    { key: 'po_date', label: 'Date', visible: true, order: 1 },
+    { key: 'vendor_profile.display_name', label: 'Vendor', visible: true, order: 2 },
+    { key: 'status', label: 'Status', visible: true, order: 3 },
+    { key: 'total', label: 'Total', visible: true, order: 4 }
+  ];
+
+  // Convert column key to a more readable cell value
+  const renderCell = (order: any, key: string) => {
+    switch(key) {
+      case 'purchase_order_number':
+        return order.purchase_order_number;
+      case 'po_date':
+        return order.po_date ? new Date(order.po_date).toLocaleDateString() : '-';
+      case 'vendor_profile.display_name':
+        return order.vendor_profile?.display_name ? (
+          <Link 
+            to={`/people/vendors/${order.vendor_id}`}
+            className="text-primary hover:underline"
+          >
+            {order.vendor_profile.display_name}
+          </Link>
+        ) : '-';
+      case 'status':
+        return (
+          <Badge 
+            variant={order.status === 'approved' ? 'default' : 'secondary'}
+            className="capitalize"
+          >
+            {order.status}
+          </Badge>
+        );
+      case 'total':
+        return `$${order.total?.toFixed(2) || '0.00'}`;
+      default:
+        return order[key] || '-';
+    }
+  };
+  
   return (
     <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50">
-            <TableHead>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => onSort("purchase_order_number")}
-                  className="flex items-center hover:text-primary"
-                >
-                  PO Number
-                  {sorting.column === "purchase_order_number" && (
-                    sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                  )}
-                </button>
-                <FilterDropdown
-                  value={filters.purchase_order_number || ""}
-                  onChange={(value) => onFilter("purchase_order_number", value)}
-                  placeholder="Filter PO number..."
-                />
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => onSort("po_date")}
-                  className="flex items-center hover:text-primary"
-                >
-                  Date
-                  {sorting.column === "po_date" && (
-                    sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => onSort("vendor_profile.display_name")}
-                  className="flex items-center hover:text-primary"
-                >
-                  Vendor
-                  {sorting.column === "vendor_profile.display_name" && (
-                    sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                  )}
-                </button>
-                <FilterDropdown
-                  value={filters["vendor_profile.display_name"] || ""}
-                  onChange={(value) => onFilter("vendor_profile.display_name", value)}
-                  placeholder="Filter vendors..."
-                />
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => onSort("status")}
-                  className="flex items-center hover:text-primary"
-                >
-                  Status
-                  {sorting.column === "status" && (
-                    sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                  )}
-                </button>
-                <FilterDropdown
-                  value={filters.status || ""}
-                  onChange={(value) => onFilter("status", value)}
-                  placeholder="Filter status..."
-                />
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => onSort("total")}
-                  className="flex items-center hover:text-primary"
-                >
-                  Total
-                  {sorting.column === "total" && (
-                    sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </TableHead>
+            {columnsToRender.map((column) => (
+              <TableHead key={column.key}>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => onSort(column.key)}
+                    className="flex items-center hover:text-primary"
+                  >
+                    {column.label}
+                    {sorting.column === column.key && (
+                      sorting.direction === "asc" ? <ArrowUpAZ className="ml-2 h-4 w-4" /> : <ArrowDownAZ className="ml-2 h-4 w-4" />
+                    )}
+                  </button>
+                  <FilterDropdown
+                    value={filters[column.key] || ""}
+                    onChange={(value) => onFilter(column.key, value)}
+                    placeholder={`Filter ${column.label.toLowerCase()}...`}
+                  />
+                </div>
+              </TableHead>
+            ))}
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -113,27 +97,9 @@ export const PurchaseOrdersTable = ({
           {purchaseOrders && purchaseOrders.length > 0 ? (
             purchaseOrders.map((order) => (
               <TableRow key={order.id} className="hover:bg-muted/50">
-                <TableCell className="font-medium">{order.purchase_order_number}</TableCell>
-                <TableCell>{order.po_date ? new Date(order.po_date).toLocaleDateString() : '-'}</TableCell>
-                <TableCell>
-                  {order.vendor_profile?.display_name ? (
-                    <Link 
-                      to={`/people/vendors/${order.vendor_id}`}
-                      className="text-primary hover:underline"
-                    >
-                      {order.vendor_profile.display_name}
-                    </Link>
-                  ) : '-'}
-                </TableCell>
-                <TableCell>
-                  <Badge 
-                    variant={order.status === 'approved' ? 'default' : 'secondary'}
-                    className="capitalize"
-                  >
-                    {order.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>${order.total?.toFixed(2) || '0.00'}</TableCell>
+                {columnsToRender.map((column) => (
+                  <TableCell key={column.key}>{renderCell(order, column.key)}</TableCell>
+                ))}
                 <TableCell className="text-right">
                   <Button variant="outline" size="sm" asChild>
                     <Link to={`/purchases/orders/${order.id}`}>View</Link>
@@ -143,7 +109,7 @@ export const PurchaseOrdersTable = ({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-4">
+              <TableCell colSpan={columnsToRender.length + 1} className="text-center py-4">
                 No purchase orders found.
               </TableCell>
             </TableRow>

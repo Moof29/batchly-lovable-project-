@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -5,7 +6,9 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useTimeTracking } from "@/hooks/useTimeTracking";
 import { TimeEntriesTable } from "@/components/time-tracking/TimeEntriesTable";
-import { ColumnSelector } from "@/components/ui/column-selector";
+import { ColumnSelector } from "@/components/common/ColumnSelector";
+import { useColumnSelection } from "@/hooks/useColumnSelection";
+import { defaultTimeEntryColumns } from "@/hooks/useTimeEntryColumns";
 
 export const TimeTrackingList = () => {
   const [sorting, setSorting] = useState({ column: "date", direction: "desc" as "asc" | "desc" });
@@ -70,7 +73,6 @@ export const TimeTrackingList = () => {
               filters={filters}
               onSort={handleSort}
               onFilter={handleFilter}
-              visibleColumns={visibleColumns}
             />
           )}
         </CardContent>
