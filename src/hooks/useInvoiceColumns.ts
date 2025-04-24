@@ -8,7 +8,8 @@ export const defaultInvoiceColumns: ColumnConfig[] = [
   { key: 'status', label: 'Status', visible: true, order: 3 },
   { key: 'total', label: 'Total', visible: true, order: 4 },
   { key: 'balance_due', label: 'Balance Due', visible: true, order: 5 },
-  { key: 'payment_terms', label: 'Payment Terms', visible: false, order: 6 },
-  { key: 'due_date', label: 'Due Date', visible: false, order: 7 }
+  { key: 'due_date', label: 'Due Date', visible: false, order: 6 },
+  { key: 'payment_terms', label: 'Payment Terms', visible: false, order: 7 },
+  { key: 'po_number', label: 'PO Number', visible: false, order: 8 },
+  { key: 'shipping_method', label: 'Shipping Method', visible: false, order: 9 }
 ];
-
