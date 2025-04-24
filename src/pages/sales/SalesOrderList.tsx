@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -6,12 +5,19 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useSalesOrders } from "@/hooks/useSalesOrders";
 import { SalesOrdersTable } from "@/components/orders/SalesOrdersTable";
+import { ColumnSelector } from "@/components/ui/column-selector";
+import { useColumnSelection } from "@/hooks/useColumnSelection";
+import { defaultSalesOrderColumns } from "@/constants";
 
 export const SalesOrderList = () => {
   const [sorting, setSorting] = useState({ column: "order_date", direction: "desc" as "asc" | "desc" });
   const [filters, setFilters] = useState<Record<string, string>>({});
 
   const { data: salesOrders, isLoading } = useSalesOrders(sorting, filters);
+  const { columns, toggleColumn, moveColumn, reorderColumns, visibleColumns } = useColumnSelection(
+    'sales-order-list-columns',
+    defaultSalesOrderColumns
+  );
 
   const handleSort = (column: string) => {
     setSorting(prev => ({
@@ -41,7 +47,15 @@ export const SalesOrderList = () => {
 
       <Card className="shadow-md">
         <CardHeader>
-          <CardTitle>All Orders</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>All Orders</CardTitle>
+            <ColumnSelector 
+              columns={columns} 
+              onToggle={toggleColumn} 
+              onMove={moveColumn}
+              onReorder={reorderColumns}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -55,6 +69,7 @@ export const SalesOrderList = () => {
               filters={filters}
               onSort={handleSort}
               onFilter={handleFilter}
+              visibleColumns={visibleColumns}
             />
           )}
         </CardContent>

@@ -5,12 +5,17 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useTimeTracking } from "@/hooks/useTimeTracking";
 import { TimeEntriesTable } from "@/components/time-tracking/TimeEntriesTable";
+import { ColumnSelector } from "@/components/ui/column-selector";
 
 export const TimeTrackingList = () => {
   const [sorting, setSorting] = useState({ column: "date", direction: "desc" as "asc" | "desc" });
   const [filters, setFilters] = useState<Record<string, string>>({});
   
   const { data: timeEntries, isLoading } = useTimeTracking(sorting, filters);
+  const { columns, toggleColumn, moveColumn, reorderColumns, visibleColumns } = useColumnSelection(
+    'time-entries-list-columns',
+    defaultTimeEntryColumns
+  );
 
   const handleSort = (column: string) => {
     setSorting(prev => ({
@@ -43,7 +48,15 @@ export const TimeTrackingList = () => {
 
       <Card className="shadow-md">
         <CardHeader className="py-4">
-          <CardTitle>Recent Time Entries</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Recent Time Entries</CardTitle>
+            <ColumnSelector 
+              columns={columns} 
+              onToggle={toggleColumn} 
+              onMove={moveColumn}
+              onReorder={reorderColumns}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -57,6 +70,7 @@ export const TimeTrackingList = () => {
               filters={filters}
               onSort={handleSort}
               onFilter={handleFilter}
+              visibleColumns={visibleColumns}
             />
           )}
         </CardContent>

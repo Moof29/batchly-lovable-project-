@@ -4,6 +4,9 @@ import { useState } from "react";
 import { BillListHeader } from "@/components/bills/BillListHeader";
 import { BillsTable } from "@/components/bills/BillsTable";
 import { useBills } from "@/hooks/useBills";
+import { useColumnSelection } from "@/hooks/useColumnSelection";
+import { defaultBillColumns } from "@/hooks/useBillColumns";
+import { ColumnSelector } from "@/components/common/ColumnSelector";
 
 export const BillList = () => {
   const [sorting, setSorting] = useState<{ column: string; direction: "asc" | "desc" }>({
@@ -13,6 +16,10 @@ export const BillList = () => {
   const [filters, setFilters] = useState<Record<string, string>>({});
 
   const { data: bills, isLoading } = useBills(sorting, filters);
+  const { columns, toggleColumn, moveColumn, reorderColumns, visibleColumns } = useColumnSelection(
+    'bill-list-columns',
+    defaultBillColumns
+  );
 
   const handleSort = (column: string) => {
     setSorting(prev => ({
@@ -28,16 +35,20 @@ export const BillList = () => {
     }));
   };
 
-  console.log("Current sorting:", sorting);
-  console.log("Current filters:", filters);
-  console.log("Bills data:", bills);
-
   return (
     <div className="space-y-6">
       <BillListHeader />
       <Card className="shadow-md">
         <CardHeader className="py-4">
-          <CardTitle>All Bills</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>All Bills</CardTitle>
+            <ColumnSelector 
+              columns={columns} 
+              onToggle={toggleColumn} 
+              onMove={moveColumn}
+              onReorder={reorderColumns}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -51,6 +62,7 @@ export const BillList = () => {
               filters={filters}
               onSort={handleSort}
               onFilter={handleFilter}
+              visibleColumns={visibleColumns}
             />
           )}
         </CardContent>
@@ -58,3 +70,4 @@ export const BillList = () => {
     </div>
   );
 };
+

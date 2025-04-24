@@ -6,12 +6,19 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useInvoices } from "@/hooks/useInvoices";
 import { InvoiceTable } from "@/components/sales/InvoiceTable";
+import { useColumnSelection } from "@/hooks/useColumnSelection";
+import { defaultInvoiceColumns } from "@/hooks/useInvoiceColumns";
+import { ColumnSelector } from "@/components/common/ColumnSelector";
 
 export const InvoiceList = () => {
   const [sorting, setSorting] = useState({ column: "invoice_date", direction: "desc" as "asc" | "desc" });
   const [filters, setFilters] = useState<Record<string, string>>({});
   
   const { data: invoices, isLoading } = useInvoices(sorting, filters);
+  const { columns, toggleColumn, moveColumn, reorderColumns, visibleColumns } = useColumnSelection(
+    'invoice-list-columns',
+    defaultInvoiceColumns
+  );
 
   const handleSort = (column: string) => {
     setSorting(prev => ({
@@ -41,7 +48,15 @@ export const InvoiceList = () => {
 
       <Card className="shadow-md">
         <CardHeader>
-          <CardTitle>All Invoices</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>All Invoices</CardTitle>
+            <ColumnSelector 
+              columns={columns} 
+              onToggle={toggleColumn} 
+              onMove={moveColumn}
+              onReorder={reorderColumns}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -55,6 +70,7 @@ export const InvoiceList = () => {
               filters={filters}
               onSort={handleSort}
               onFilter={handleFilter}
+              visibleColumns={visibleColumns}
             />
           )}
         </CardContent>
@@ -62,3 +78,4 @@ export const InvoiceList = () => {
     </div>
   );
 };
+
