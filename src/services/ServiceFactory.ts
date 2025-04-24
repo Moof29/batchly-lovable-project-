@@ -1,4 +1,3 @@
-
 import { EnhancedQBOServiceV2 } from "./qbo/entities/EnhancedQBOServiceV2";
 import { customerService } from "./qbo/entities/CustomerService";
 import { invoiceService } from "./qbo/entities/InvoiceService";
@@ -19,7 +18,7 @@ export class ServiceFactory {
   /**
    * Initialize all services with organization ID
    */
-  static async initialize(organizationId: string): Promise<void> {
+  static initialize(organizationId: string): boolean {
     this.organizationId = organizationId;
     
     // Initialize QBO services
@@ -29,6 +28,7 @@ export class ServiceFactory {
     MetricsCollector.initialize(organizationId);
     
     console.log(`[ServiceFactory] All services initialized for organization ${organizationId}`);
+    return true;
   }
   
   /**

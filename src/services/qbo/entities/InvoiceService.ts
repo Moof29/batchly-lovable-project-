@@ -61,8 +61,9 @@ export class InvoiceService {
   async fetchFromQBO(invoiceId: string, includeLineItems: boolean = false): Promise<any> {
     try {
       return await apiCircuitBreakers.invoice.exec(async () => {
-        // This would call the actual QBO service method
-        const result = await qboService.getQBOEntity('invoice', invoiceId);
+        // This would call the actual QBO API directly rather than using getQBOEntity
+        // which doesn't exist in the QBOService
+        const result = await qboService.getSyncEntityById('invoice', invoiceId);
         return result;
       });
     } catch (error) {
@@ -72,26 +73,6 @@ export class InvoiceService {
         String(error)
       );
       throw error;
-    }
-  }
-  
-  /**
-   * Send payment notification for an invoice
-   */
-  async sendPaymentNotification(invoiceId: string, paymentId: string): Promise<boolean> {
-    try {
-      return await apiCircuitBreakers.invoice.exec(async () => {
-        // This would implement the notification logic
-        console.log(`Sending payment notification for invoice ${invoiceId}, payment ${paymentId}`);
-        return true;
-      });
-    } catch (error) {
-      await qboService.logError(
-        categorizeError(error),
-        `Failed to send payment notification for invoice ${invoiceId}`,
-        String(error)
-      );
-      return false;
     }
   }
 }

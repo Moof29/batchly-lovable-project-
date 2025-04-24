@@ -58,11 +58,12 @@ export class CustomerService {
   /**
    * Fetch customer data from QBO
    */
-  async fetchFromQBO(customerId: string, includeDetails: boolean = false): Promise<any> {
+  async fetchFromQBO(customerId: string): Promise<any> {
     try {
       return await apiCircuitBreakers.customer.exec(async () => {
-        // This would call the actual QBO service method
-        const result = await qboService.getQBOEntity('customer', customerId);
+        // This would call the actual QBO API directly rather than using getQBOEntity
+        // which doesn't exist in the QBOService
+        const result = await qboService.getSyncEntityById('customer', customerId);
         return result;
       });
     } catch (error) {

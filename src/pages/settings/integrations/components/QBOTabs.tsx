@@ -5,7 +5,7 @@ import { QBOIntegrationSyncTab } from './QBOIntegrationSyncTab';
 import { QBOIntegrationSettingsTab } from './QBOIntegrationSettingsTab';
 import { QBOIntegrationEntitiesTab } from './QBOIntegrationEntitiesTab';
 import { QBOIntegrationErrorsTab } from './QBOIntegrationErrorsTab';
-import { QBOIntegrationReconciliationTab } from './QBOIntegrationReconciliationTab';
+import QBOIntegrationReconciliationTab from './QBOIntegrationReconciliationTab';
 import { UnifiedMonitoringDashboard } from '@/components/monitoring/UnifiedMonitoringDashboard';
 import { PermissionGate } from '@/components/PermissionGate';
 
