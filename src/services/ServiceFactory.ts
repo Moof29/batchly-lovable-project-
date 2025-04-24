@@ -38,7 +38,8 @@ export class ServiceFactory {
     if (!this.organizationId) {
       throw new Error('Services not initialized');
     }
-    return new EnhancedQBOServiceV2(this.organizationId);
+    // Pass both required parameters: organizationId and apiKey (using undefined for apiKey)
+    return new EnhancedQBOServiceV2(this.organizationId, undefined);
   }
   
   /**

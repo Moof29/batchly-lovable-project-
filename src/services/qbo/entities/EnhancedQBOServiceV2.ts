@@ -12,9 +12,11 @@ import { refreshTokenWithBreaker } from "./refreshTokenWithBreaker";
  */
 export class EnhancedQBOServiceV2 {
   private organizationId?: string;
+  private apiKey?: string;
 
-  constructor(organizationId?: string) {
+  constructor(organizationId?: string, apiKey?: string) {
     this.organizationId = organizationId;
+    this.apiKey = apiKey;
   }
   
   /**
