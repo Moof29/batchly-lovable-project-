@@ -6,12 +6,19 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useVendors } from "@/hooks/useVendors";
 import { VendorsTable } from "@/components/people/VendorsTable";
+import { ColumnSelector } from "@/components/common/ColumnSelector";
+import { useColumnSelection } from "@/hooks/useColumnSelection";
+import { defaultVendorColumns } from "@/hooks/useVendorColumns";
 
 export const VendorList = () => {
   const [sorting, setSorting] = useState({ column: "display_name", direction: "asc" as "asc" | "desc" });
   const [filters, setFilters] = useState<Record<string, string>>({});
 
   const { data: vendors, isLoading } = useVendors(sorting, filters);
+  const { columns, toggleColumn, moveColumn, reorderColumns, visibleColumns } = useColumnSelection(
+    'vendor-list-columns',
+    defaultVendorColumns
+  );
 
   const handleSort = (column: string) => {
     setSorting(prev => ({
@@ -41,7 +48,15 @@ export const VendorList = () => {
 
       <Card className="shadow-md">
         <CardHeader>
-          <CardTitle>All Vendors</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>All Vendors</CardTitle>
+            <ColumnSelector 
+              columns={columns} 
+              onToggle={toggleColumn} 
+              onMove={moveColumn}
+              onReorder={reorderColumns}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -55,6 +70,7 @@ export const VendorList = () => {
               filters={filters}
               onSort={handleSort}
               onFilter={handleFilter}
+              visibleColumns={visibleColumns}
             />
           )}
         </CardContent>
