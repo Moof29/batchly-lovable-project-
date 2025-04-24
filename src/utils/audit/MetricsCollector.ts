@@ -159,9 +159,9 @@ export class MetricsCollector {
         created_at: new Date().toISOString()
       }));
       
-      // Send metrics to database
+      // Send metrics to database - using manual query to work around typing issues
       const { error } = await supabase
-        .from('application_metrics')
+        .from('application_metrics' as any)
         .insert(metricsForDb);
       
       if (error) {

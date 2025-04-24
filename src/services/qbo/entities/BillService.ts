@@ -61,9 +61,9 @@ export class BillService {
   async fetchFromQBO(billId: string, includeLineItems: boolean = false): Promise<any> {
     try {
       return await apiCircuitBreakers.bill.exec(async () => {
-        // This would call the actual QBO API directly rather than using getQBOEntity
-        // which doesn't exist in the QBOService
-        const result = await qboService.getSyncEntityById('bill', billId);
+        // Use enhanced QBO service's method instead
+        const enhancedQBOServiceV2 = new (await import('../entities/EnhancedQBOServiceV2')).EnhancedQBOServiceV2();
+        const result = await enhancedQBOServiceV2.getSyncEntityById('bill', billId);
         return result;
       });
     } catch (error) {

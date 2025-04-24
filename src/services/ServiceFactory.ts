@@ -1,3 +1,4 @@
+
 import { EnhancedQBOServiceV2 } from "./qbo/entities/EnhancedQBOServiceV2";
 import { customerService } from "./qbo/entities/CustomerService";
 import { invoiceService } from "./qbo/entities/InvoiceService";
@@ -18,7 +19,7 @@ export class ServiceFactory {
   /**
    * Initialize all services with organization ID
    */
-  static initialize(organizationId: string): boolean {
+  static async initialize(organizationId: string): Promise<boolean> {
     this.organizationId = organizationId;
     
     // Initialize QBO services
