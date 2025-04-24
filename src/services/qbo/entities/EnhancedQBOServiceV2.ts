@@ -1,4 +1,3 @@
-
 import { SyncOperation } from "../QBOService";
 import { customerService } from "./CustomerService";
 import { invoiceService } from "./InvoiceService";
@@ -11,6 +10,12 @@ import { refreshTokenWithBreaker } from "./refreshTokenWithBreaker";
  * Entity-specific service implementation with improved modularity
  */
 export class EnhancedQBOServiceV2 {
+  private organizationId?: string;
+
+  constructor(organizationId?: string) {
+    this.organizationId = organizationId;
+  }
+  
   /**
    * Process a sync operation based on entity type
    */

@@ -38,7 +38,7 @@ export class ServiceFactory {
     if (!this.organizationId) {
       throw new Error('Services not initialized');
     }
-    return new EnhancedQBOServiceV2();  // Removed organizationId
+    return new EnhancedQBOServiceV2(this.organizationId);  // Pass organizationId back
   }
   
   /**
