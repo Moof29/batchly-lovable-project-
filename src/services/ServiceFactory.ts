@@ -1,4 +1,3 @@
-
 import { EnhancedQBOServiceV2 } from "./qbo/entities/EnhancedQBOServiceV2";
 import { customerService } from "./qbo/entities/CustomerService";
 import { invoiceService } from "./qbo/entities/InvoiceService";
@@ -39,7 +38,7 @@ export class ServiceFactory {
     if (!this.organizationId) {
       throw new Error('Services not initialized');
     }
-    return new EnhancedQBOServiceV2();
+    return new EnhancedQBOServiceV2(this.organizationId);
   }
   
   /**

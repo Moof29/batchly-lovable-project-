@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -565,7 +564,7 @@ function transformSyncHistoryForChart(syncHistory) {
   }, {});
   
   // Convert to array for chart
-  return Object.entries(grouped).map(([date, counts]) => ({
+  return Object.entries(grouped).map(([date, counts]: [string, { success: number; failure: number }]) => ({
     date,
     success: counts.success,
     failure: counts.failure

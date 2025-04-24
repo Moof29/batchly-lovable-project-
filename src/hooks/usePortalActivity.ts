@@ -37,8 +37,8 @@ export const usePortalActivity = (organizationId?: string) => {
           recentLogins: loginEvents ? loginEvents.map(event => ({
             userId: event.portal_user_id,
             timestamp: event.created_at,
-            ipAddress: event.metadata?.ip_address,
-            userAgent: event.metadata?.user_agent
+            ipAddress: event.metadata && typeof event.metadata === 'object' ? (event.metadata as any).ip_address : null,
+            userAgent: event.metadata && typeof event.metadata === 'object' ? (event.metadata as any).user_agent : null
           })) : []
         };
       } catch (error) {
@@ -151,7 +151,7 @@ export const usePortalActivity = (organizationId?: string) => {
             entityId: event.entity_id,
             userId: event.portal_user_id,
             timestamp: event.created_at,
-            documentName: event.metadata?.document_name
+            documentName: event.metadata && typeof event.metadata === 'object' ? (event.metadata as any).document_name : null
           })) : []
         };
       } catch (error) {
