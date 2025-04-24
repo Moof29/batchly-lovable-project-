@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { QBOConnectionStatus } from '@/components/integrations/QBOConnectionStatus';
 import { useQBOIntegration } from '@/hooks/useQBOIntegration';
@@ -7,15 +8,66 @@ import { useDevMode } from '@/contexts/DevModeContext';
 import { QBOMockConnectionModal } from '@/components/integrations/QBOMockConnectionModal';
 import { QBOHeader } from './components/QBOHeader';
 import { QBOTabs } from './components/QBOTabs';
+import { ServiceFactory } from '@/services/ServiceFactory';
+import { MetricsCollector } from '@/utils/audit/MetricsCollector';
+import { usePermissions } from '@/hooks/usePermissions';
+import { toast } from '@/hooks/use-toast';
 
 export const QBOIntegrationPage = () => {
   const { user } = useAuth();
   const { isDevMode } = useDevMode();
-  const { isConnected, connectionDetails, syncSettings, beginOAuthFlow, disconnectQBO, updateSyncSettings, refreshQBOToken, tokenExpiresAt, isRefreshingToken } = useQBOIntegration();
+  const { 
+    isConnected, 
+    connectionDetails, 
+    syncSettings, 
+    beginOAuthFlow, 
+    disconnectQBO, 
+    updateSyncSettings, 
+    refreshQBOToken, 
+    tokenExpiresAt, 
+    isRefreshingToken 
+  } = useQBOIntegration();
 
   const [isMockModalOpen, setIsMockModalOpen] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const { checkPermission } = usePermissions();
 
   const organizationId = user?.organization_id || (isDevMode ? "00000000-0000-0000-0000-000000000000" : undefined);
+
+  // Initialize services when component mounts
+  useEffect(() => {
+    if (organizationId && !isInitialized) {
+      const initServices = async () => {
+        try {
+          await ServiceFactory.initialize(organizationId);
+          setIsInitialized(true);
+          
+          // Record metric for page view
+          MetricsCollector.record({
+            category: 'system',
+            operation: 'read',
+            entity_type: 'page',
+            success: true,
+            metadata: { page: 'qbo_integration' }
+          });
+        } catch (error) {
+          console.error('Failed to initialize services:', error);
+          toast({
+            title: 'Initialization Error',
+            description: 'Failed to initialize integration services.',
+            variant: 'destructive'
+          });
+        }
+      };
+      
+      initServices();
+      
+      // Clean up on unmount
+      return () => {
+        ServiceFactory.cleanup();
+      };
+    }
+  }, [organizationId]);
 
   const {
     connection,
@@ -36,11 +88,24 @@ export const QBOIntegrationPage = () => {
     updateEntityConfig
   } = useQBOSync(organizationId);
 
+  // Auto-process pending operations if user has permissions
   useEffect(() => {
-    if (pendingOperations.length > 0 && !isProcessing) {
-      processOperations();
-    }
-  }, [pendingOperations, isProcessing, processOperations]);
+    const autoProcess = async () => {
+      if (
+        pendingOperations.length > 0 && 
+        !isProcessing && 
+        isConnected && 
+        isInitialized
+      ) {
+        const hasPermission = await checkPermission('integrations', 'update');
+        if (hasPermission) {
+          processOperations();
+        }
+      }
+    };
+    
+    autoProcess();
+  }, [pendingOperations, isProcessing, isConnected, isInitialized, checkPermission, processOperations]);
 
   const handleConnect = () => {
     if (isDevMode) {

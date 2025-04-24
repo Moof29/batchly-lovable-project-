@@ -5,25 +5,25 @@ import { validators } from "../validators";
 import { categorizeError } from "./categorizeError";
 
 /**
- * Invoice-specific QBO service implementation
+ * Bill-specific QBO service implementation
  */
-export class InvoiceService {
+export class BillService {
   /**
-   * Process an invoice sync operation with circuit breaker and validation
+   * Process a bill sync operation with circuit breaker and validation
    */
   async processOperation(operation: SyncOperation): Promise<boolean> {
-    if (operation.entity_type !== 'invoice_record') {
-      throw new Error('Invalid entity type for InvoiceService');
+    if (operation.entity_type !== 'bill_record') {
+      throw new Error('Invalid entity type for BillService');
     }
     
     try {
       if (operation.request_payload) {
-        const validator = validators.invoice_record;
+        const validator = validators.bill_record;
         const validationResult = validator.validate(operation.request_payload);
         if (!validationResult.isValid) {
           await qboService.logError(
             "validation",
-            `Data validation failed for invoice`,
+            `Data validation failed for bill`,
             `Fields with errors: ${validationResult.errors.map(e => `${e.field} (${e.message})`).join(", ")}`
           );
           await qboService.updateOperationStatus(
@@ -36,13 +36,13 @@ export class InvoiceService {
         }
       }
       
-      return await apiCircuitBreakers.invoice.exec(async () => {
+      return await apiCircuitBreakers.bill.exec(async () => {
         return await qboService.processSyncOperation(operation);
       });
     } catch (error) {
       await qboService.logError(
         categorizeError(error),
-        `Failed to sync invoice with id ${operation.entity_id}`,
+        `Failed to sync bill with id ${operation.entity_id}`,
         String(error)
       );
       await qboService.updateOperationStatus(
@@ -56,44 +56,24 @@ export class InvoiceService {
   }
   
   /**
-   * Fetch invoice data from QBO
+   * Fetch bill data from QBO
    */
-  async fetchFromQBO(invoiceId: string, includeLineItems: boolean = false): Promise<any> {
+  async fetchFromQBO(billId: string, includeLineItems: boolean = false): Promise<any> {
     try {
-      return await apiCircuitBreakers.invoice.exec(async () => {
+      return await apiCircuitBreakers.bill.exec(async () => {
         // This would call the actual QBO service method
-        const result = await qboService.getQBOEntity('invoice', invoiceId);
+        const result = await qboService.getQBOEntity('bill', billId);
         return result;
       });
     } catch (error) {
       await qboService.logError(
         categorizeError(error),
-        `Failed to fetch invoice ${invoiceId} from QBO`,
+        `Failed to fetch bill ${billId} from QBO`,
         String(error)
       );
       throw error;
     }
   }
-  
-  /**
-   * Send payment notification for an invoice
-   */
-  async sendPaymentNotification(invoiceId: string, paymentId: string): Promise<boolean> {
-    try {
-      return await apiCircuitBreakers.invoice.exec(async () => {
-        // This would implement the notification logic
-        console.log(`Sending payment notification for invoice ${invoiceId}, payment ${paymentId}`);
-        return true;
-      });
-    } catch (error) {
-      await qboService.logError(
-        categorizeError(error),
-        `Failed to send payment notification for invoice ${invoiceId}`,
-        String(error)
-      );
-      return false;
-    }
-  }
 }
 
-export const invoiceService = new InvoiceService();
+export const billService = new BillService();
