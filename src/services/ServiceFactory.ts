@@ -49,7 +49,8 @@ export class ServiceFactory {
     if (!this.organizationId) {
       throw new Error('Services not initialized');
     }
-    return new CustomerPortalService();
+    // Pass the required organizationId parameter to the constructor
+    return new CustomerPortalService(this.organizationId);
   }
   
   /**
