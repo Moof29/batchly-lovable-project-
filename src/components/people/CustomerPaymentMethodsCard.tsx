@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { Edit } from "lucide-react";
 
 interface PaymentMethod {
   id: string;
@@ -18,9 +19,10 @@ interface PaymentMethod {
 
 interface CustomerPaymentMethodsCardProps {
   customerId: string;
+  organizationId: string; // Added to match Supabase requirements
 }
 
-export const CustomerPaymentMethodsCard = ({ customerId }: CustomerPaymentMethodsCardProps) => {
+export const CustomerPaymentMethodsCard = ({ customerId, organizationId }: CustomerPaymentMethodsCardProps) => {
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({
@@ -44,13 +46,12 @@ export const CustomerPaymentMethodsCard = ({ customerId }: CustomerPaymentMethod
     if (error) {
       console.error(error);
     } else {
-      setMethods(data);
+      setMethods(data || []);
     }
   }
 
   useEffect(() => {
     fetchMethods();
-    // Optional: real-time updates could be added
     // eslint-disable-next-line
   }, [customerId]);
 
@@ -60,6 +61,7 @@ export const CustomerPaymentMethodsCard = ({ customerId }: CustomerPaymentMethod
     const insertData = {
       ...form,
       customer_id: customerId,
+      organization_id: organizationId,
       last_four: form.last_four,
       expiry_month: form.expiry_month ? parseInt(form.expiry_month) : null,
       expiry_year: form.expiry_year ? parseInt(form.expiry_year) : null,
@@ -89,8 +91,16 @@ export const CustomerPaymentMethodsCard = ({ customerId }: CustomerPaymentMethod
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Payment Methods</CardTitle>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          aria-label="Edit Payment Methods"
+          className="data-[select=true]:border-2 data-[select=true]:border-blue-500"
+        >
+          <Edit className="h-4 w-4" />
+        </Button>
       </CardHeader>
       <CardContent>
         <div className="mb-4">
@@ -179,7 +189,7 @@ export const CustomerPaymentMethodsCard = ({ customerId }: CustomerPaymentMethod
               </div>
               <Button 
                 variant="outline" 
-                size="sm"  // Changed from "xs" to "sm"
+                size="sm"
                 onClick={() => handleRemove(pm.id)} 
                 aria-label="Remove"
               >
